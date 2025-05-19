@@ -1,4 +1,4 @@
-# Exercise - 8 Solution
+# Exercise - 9 Solution
 
 1. Start the challenge by writing in your bash:
 
