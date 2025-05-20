@@ -1,9 +1,9 @@
 # Level 3 to 4 Solution
 
 1. Login using:
-```
-ssh bandit3@bandit.labs.overthewire.org -p 2220
-```
+    ```
+    ssh bandit3@bandit.labs.overthewire.org -p 2220
+    ```
 2. Put the password you got from the previous level.
 4. There is a hidden file in `inhere` directory , so to find its name use
     ```
