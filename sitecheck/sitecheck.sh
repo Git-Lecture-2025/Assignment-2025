@@ -16,6 +16,7 @@ function code_dictionary {
         "401") echo "Unauthorized";;
         "403") echo "Forbidden";;
         "404") echo "Not Found";;
+        "405") echo "Method not Allowed";;
         "408") echo "Request Timeout";;
         "000") echo $(error_dictionary $2);;
         *) echo "Error"
@@ -57,7 +58,22 @@ function extract_switch_commands {
 }
 
 function add_url() {
-    list >> $1
+    bul=true
+    for url in $(cat $list)
+    do
+        if [ $url == $1 ]
+            then bul=false ; break;
+        fi
+    done
+
+    if [ $bul != true ]
+    then
+    echo "NOT ADDING $1"
+    echo "this site is already being tracked."
+    else
+    echo "$1" >> $list
+    echo "ADDED $1 to the tracking list"
+    fi
 }
 
 function display_url() {
@@ -67,6 +83,23 @@ function display_url() {
     cat $list
     echo "\n---------------------------------------"
     echo "\n"
+}
+
+function edit_list() {
+    nano $list
+}
+
+function remove_url() {
+    r=""
+    for url in $(cat $list)
+    do
+        if [ $url != $1 ]
+        then
+            r=$r"\n"$url
+        fi
+    done
+    echo "$r" > $list 
+    echo "removing $1 from the list."
 }
 
 ####################################################
@@ -83,14 +116,16 @@ else
         then curr_command=${!i:1:1} ;i=$(expr $i + 1); 
             if [ $curr_command == "d" ] 
             then display_url;
+            elif [ $curr_command == "e" ]
+            then edit_list;
             fi
         continue;
         else 
             case $curr_command in
-                "a") echo "adding ${!i} to the tracking list." ; add_url ${!i} ;;
+                "a") add_url ${!i} ;;
                 # "d") ehco "reached here";display_url ;;
-                "x") echo "remove url(s)"; echo ${!i} ;;
-                "e") echo "edit url list"; echo ${!i} ;;
+                "x") remove_url ${!i} ;;
+                # "e") echo "edit url list"; echo ${!i} ;;
                 *) echo "nothing"
             esac
         fi
