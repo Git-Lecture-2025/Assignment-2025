@@ -22,8 +22,6 @@ function code_dictionary {
     esac
 }
 
-
-
 response_code=0
 curl_exit_code=0
 
@@ -58,49 +56,44 @@ function extract_switch_commands {
     echo "$r"
 }
 
-# function switch_worker {
-#     # for arg in $script_args
-#     # do
-#     #     case $arg in 
-#     #         "-a") echo "add link switch";
+function add_url() {
+    list >> $1
+}
 
-#     #         ;;
-#     #         "-x") echo "remove link switch"
-#     #         ;;
-#     #         "-e") echo "edit the links file"
-#     #         ;;
-#     #         *) continue
-#     #     esac
-#     # done
-# }
+function display_url() {
+    echo "\n"
+    echo "Tracked Sites"
+    echo "---------------------------------------"
+    cat $list
+    echo "\n---------------------------------------"
+    echo "\n"
+}
 
 ####################################################
 # just_display
 
-i=1
-curr_command=""
-while [ $i -le $# ]
-do
-    if [ ${!i:0:1} == "-" ]
-    then curr_command=${!i:1:1} ;i=$(expr $i + 1); continue;
-    else 
-        case $curr_command in
-            "a") echo "add url(s)"; echo ${!i} ;;
-            "d") echo "display list of urls"; echo ${!i} ;;
-            "x") echo "remove url(s)"; echo ${!i} ;;
-            "e") echo "edit url list"; echo ${!i} ;;
-            *) echo "nothing"
-        esac
-    fi
-
-    # case $curr_command in
-    #     "-a") echo "add url(s)"; echo ${!i} \n ;;
-    #     "-d") echo "display list of urls"; echo ${!i} \n;;
-    #     "-x") echo "remove url(s)"; echo ${!i} \n ;;
-    #     "-e") echo "edit url list"; echo ${!i} \n ;;
-    #     *) echo "nothing"
-    # esac
-
-
-    i=$(expr $i + 1)
-done
+if [ $# -eq 0 ]
+then just_display
+else
+    i=1
+    curr_command=""
+    while [ $i -le $# ]
+    do
+        if [ ${!i:0:1} == "-" ]
+        then curr_command=${!i:1:1} ;i=$(expr $i + 1); 
+            if [ $curr_command == "d" ] 
+            then display_url;
+            fi
+        continue;
+        else 
+            case $curr_command in
+                "a") echo "adding ${!i} to the tracking list." ; add_url ${!i} ;;
+                # "d") ehco "reached here";display_url ;;
+                "x") echo "remove url(s)"; echo ${!i} ;;
+                "e") echo "edit url list"; echo ${!i} ;;
+                *) echo "nothing"
+            esac
+        fi
+        i=$(expr $i + 1)
+    done
+fi
