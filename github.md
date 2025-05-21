@@ -86,7 +86,8 @@ $ git verify
 That checks whether I have correctly run the commands such as cloning and thus passes with the following result
 
 
-> Verifying the master exercise. > Hold on...        
+> Verifying the master exercise. 
+Hold on...        
 > Status: PASSED
 
 # 5th Exercise
