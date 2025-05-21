@@ -98,4 +98,65 @@ Made the required changes and then commited
 > git verify
 ```
 
-## 7. 
+## 7. change-branch-history
+I want to encorporate changes from branch into mine so I can try merging it into my branch. But this would create a merge commit and the final branch structure won't look as asked in the question. 
+So now I have to resort to the second option which is rebasing change-branch-history to the hot-bugfix base 
+```
+> git rebase hot-bugfix
+> git verify
+```
+
+## 8. remove-ignored
+Git was already tracking the file so we have to remove it from the index, so that it doesnt track the changes already made into it
+
+```
+> git rm --cached ignored.txt
+> git add .
+> git commit -m "Added ignore.txt to .gitignore properly "
+> git verify
+```
+
+## 8. case-sensitive-filename
+So initially my idea was to just do 
+```
+cp File.txt file.txt
+```
+
+but since windows won't let me do it i create a new file a.txt and used it as temporary file.
+
+File -> a \
+a -> file 
+
+Finally delete the unnecessary files
+```
+> cp File.txt temp.txt
+> rm File.txt
+> cp temp.txt file.txt
+> rm temp.txt
+
+> git add .
+> git commit -m "Rename File.txt to file.txt"
+> git verify
+```
+
+But then upon seeing the hint box after submission I got to know the faster way
+
+```
+> git mv File.txt file.txt
+> git add .
+> git commit -m "Rename File.txt to file.txt"
+```
+
+## 9. fix-typo
+Fix a type and don't let anyone know. 
+It was clear that I have to use --amend flag since changes were to be made in the same commit
+
+After fixing the typo
+```
+> git add .
+> git commit --amend
+```
+which opened up the commit message in editor. after editing the commit message 
+```
+> git verify
+```
