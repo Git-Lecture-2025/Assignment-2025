@@ -75,3 +75,27 @@ So I opened the conflicting file in vim. Modified by the file to match the desir
 > git commit -m "Merge another-piece-of-work into merge-conflict"
 > git verify
 ```
+
+## 6. save-your-work
+I started by staching my changes
+```
+> git stash
+```
+Now once i had a clean directory
+I removed the bug in bug.txt and commited the changes
+```
+> git add bug.txt
+> git commit -m "Fix bug in bug.txt"
+```
+I now wanted my old changes so that i can finish it
+```
+> git stash apply
+```
+Made the required changes and then commited
+```
+> git add .
+> git commit -m "Finish working in save-your-work"
+> git verify
+```
+
+## 7. 
