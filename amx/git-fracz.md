@@ -46,3 +46,32 @@ Then simply add and commit the changes
 > git add .gitignore
 > git commit -m "add .gitignore"
 ```
+
+## 4. chase-branch
+I started by observing the commits in botht eh branches by doing
+```
+> git checkout <branch> 
+> git log --oneline
+```
+as stated in the question there were 2 more commits in the escaped branch
+
+so i went back to the chase-branch and merged the escaped into it
+```
+> git checkout chase-branch
+> git merge escaped
+> git verify
+```
+## 5. merge-conflict
+I started by observing the file in the both the branches.
+I ran the folowing being in the merge-conflicts branch
+```
+> git merge another-piece-of-work 
+```
+Which showed mege conflicts. In my first try i used the graphical editor to resolve the conflicts and commit the changes. But I wanted to do it the "terminal" way.
+
+So I opened the conflicting file in vim. Modified by the file to match the desired output and save the file. Saved the file and added the files to mark resolution 
+```
+> git add equation.txt
+> git commit -m "Merge another-piece-of-work into merge-conflict"
+> git verify
+```
