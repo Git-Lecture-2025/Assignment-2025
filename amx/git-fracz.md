@@ -160,3 +160,52 @@ which opened up the commit message in editor. after editing the commit message
 ```
 > git verify
 ```
+
+## 10. forge-date
+Now in the first i thought may be change the date in the comment editor will help but it didn't change it so thought may just -m there must be some flag for date also. 
+-d didn't work. 
+on doing 
+```
+> git help commit
+```
+there was a date flag so i used it
+```
+> git commit --amend --date="Fri Mar 9 08:30:24 1987 +0100"
+```
+
+## 11. fix-old-typo
+This one took by far the most amount of time till now.
+
+I tried i going to the commit by it's hash and ammending it but now the hash is chaged so it went into a detached state which did no good. 
+
+Upon seeing the hint of using git rebase in interactive mode I first spent time learning how to use it. 
+
+Here is what is did
+
+First i took a look at the commits and got the commit hash of the previous commit from which i wanted to rebase.
+
+```
+> git rebase <hash>
+or
+> git rebase HEAD~2
+```
+then changed the type of both the commits to edit (previously pick)
+
+and closed the file. 
+Made the changes and ran
+```
+> git add .
+> git commit --amend
+```
+and then edited the commit message
+```
+> git rebase --continue
+```
+Same drill as above, made the changes 
+```
+> git add .
+> git commit --amend
+> git rebase --continue
+
+> git verify
+```
