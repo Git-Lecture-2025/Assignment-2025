@@ -119,3 +119,32 @@ git commit -am --ammend "fixed typo"
 ```
 
 After fixing the typo, use the above command to ammend on top if the last commit with the appoproate commit message.
+
+### Forge-Date
+
+```sh
+git commit --amend --no-edit --date="1987-01-01T00:00:00"
+```
+
+Is used to change the commit date. `--no-edit` ensures nothing about the commit changes.
+
+### Fix-Old-Typo        
+
+```sh
+git rebase -i HEAD~2
+```
+
+Running the above command will open a commit message wherein we update the message of the second line (since the second last commit) from `pick` to `edit`. 
+
+```sh
+pick <last commit>
+edit <second last commit> << changed from pick -> edit
+```
+
+Now the typo is fixed and the changes are committed.
+
+```sh
+git rebase --continue
+```
+
+Continues the rebase.
