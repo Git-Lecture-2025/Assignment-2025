@@ -33,7 +33,7 @@ Unstages a file so it is not committed.
 
 ### Ignore-Them
 
-A .gitignore file is a file that contains all files and directories to be ignored.
+A .gitignore is a file that contains all files and directories to be ignored.
 
 ```sh
 touch .gitignore
@@ -45,13 +45,13 @@ To create the file
 nano .gitignore
 ```
 
-To open the file in terminal for editing.
+To edit the file in the terminal.
 
 ```sh
 *.extension
 ```
 
-Ignores all files with the specific extension (ReGex pattern matching)
+Ignores all files with the specific extension (ReGex pattern matching).
 
 ```sh
 directories/
@@ -78,7 +78,8 @@ git stash
 ```
 `git stash` is used to stash my current work and `git stash pop` is used to undo that.
 
-Fix the bug after stashing and commit it. Then `pop` it and then finish the work and push the final commit.
+After stashing the current work, fix the bug and make a commit.
+Then `pop` the stash and then finish the work before executing the final commit.
 
 ### Change-Branch-History
 
@@ -86,9 +87,9 @@ Fix the bug after stashing and commit it. Then `pop` it and then finish the work
 git rebase hot-<branch>
 ```
 
-From what I understand, rebase will find the common ancestor, move my current branch (excluding commits) on top of the branch passed in as the argument, and then reapplies the commits.
+From what I understand, rebase will find the common ancestor, moves my current branch (excluding commits) on top of the branch passed in as the argument, and then reapplies the commits.
 
-Running it once will result in the required diretcory structure
+Running it once will result in the required diretcory structure.
 
 ### Remove-Ignored
 
@@ -97,12 +98,6 @@ git -rm
 ```
 
 Is used to remove a file from the git tree.
-
-### Case-Sensitive-Rename
-
-```sh
-git -mv
-```
 
 ### Case-Sensitive-Rename
 
