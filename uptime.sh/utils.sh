@@ -22,8 +22,23 @@ add_site(){
     echo $trackerid,$name,$url,$status,$response_time,$last_checked >> uptime.csv
 }
 
+
 list_sites() {
-    cat uptime.csv| column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED" -o " | "
+    IFS=","
+    local otpt=""
+    rm temp.csv 2> /dev/null
+    touch temp.csv
+    while read -r trackerid name url status latency lc; do
+        local line="$trackerid,$name,$url,$status,$latency,$lc"
+        if [ "$status" == "UP" ]; then
+            echo -e "\e[0;32m$line \e[0m	" >> temp.csv
+        else
+            echo -e "\e[0;31m$line \e[0m	" >> temp.csv
+        fi
+    done < uptime.csv
+
+    echo -e $(cat temp.csv | column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED	" -o " | ")
+    rm temp.csv
 }
 
 # TODO: IMPLEMENT uptimerc FOR -NOTFIICATION,CRONJOB,TIME INTERVAL
@@ -86,23 +101,23 @@ check() {
         local spinPid=$!
 
 
-        local res=$(curl -w "%{time_total}" -Is $url)
+        local res=$(curl -w "%{time_total}" -Is $url -m 2)
         local resStat=$(echo $res | head -n 1)
         local resLat=$(echo $res | tail -n 1)
         resLat=${resLat:0:-1}
         resLat="$resLat ms"
         if [[ "$resStat" == *"200"* ]]; then
-            status="up"
+            status="UP"
             latency=$resLat
             kill $spinPid > /dev/null
             clear_line
             echo "[🟢] $name is up, latency: $latency"
 
         else
-            if [ "$status" != "down" ]; then
+            if [ "$status" != "DOWN" ]; then
                 notify-send "Tracker '$name' is down"
             fi
-            status="down"
+            status="DOWN"
             latency="infinity"
             kill $spinPid > /dev/null
             clear_line
@@ -113,6 +128,12 @@ check() {
         local replacement="$trackerid,$name,$url,$status,$latency,$lc"
         sed -i "/^$trackerid,/c $replacement" uptime.csv          
     done < uptime.csv    
+
+    echo "Uptime check completed."
+    echo "----------------------------------------"
+    echo "Uptime Summary:"
+    echo ""
+    $0 ls
 }
 
 
@@ -128,16 +149,23 @@ desc() {
         echo "Tracker ID $trackerid not found."
         return 1
     fi
+    local otpt=""
 
-    echo "----------------------------------------"
-    echo "Tracker ID: $trackerid"
-    echo "Name: $name"
-    echo "URL: $url"
-    echo "Status: $status"
-    echo "Latency: $latency"
-    echo "Last Checked: $lc"
-    echo "----------------------------------------"
-    echo ""
+    otpt+=$(echo "Tracker ID,$trackerid\n")
+    otpt+=$(echo "Name,$name\n")
+    otpt+=$(echo "URL,$url\n")
+
+    if [ "$status" == "UP" ]; then
+        otpt+=$(echo "\e[0;32mStatus,$status\e[0m	\n")
+        otpt+=$(echo "\e[0;32mLatency,$latency\e[0m	\n")
+    else
+        otpt+=$(echo "\e[0;31mStatus,$status\e[0m	\n")
+        otpt+=$(echo "\e[0;31mLatency,$latency\e[0m \n")
+    fi
+
+    otpt+=$(echo "Last Checked,$lc\n")
+
+    echo -e $otpt | column -t -s "," -o " : "
 }
 
 
