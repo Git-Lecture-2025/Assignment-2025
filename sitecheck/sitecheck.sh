@@ -1,5 +1,6 @@
 #!/bin/bash
 
+touch list.txt
 list="./list.txt"
 script_args=$@
 
@@ -29,8 +30,9 @@ response_code=0
 curl_exit_code=0
 
 function just_display {
-    figlet "SiteCheck" | lolcat -a -s 100
-    echo "---developped by karma---"
+    check_dependency
+    conditional_heading
+    echo "---developed by karma---"
     echo 
     echo
     for item in $(cat $list)
@@ -86,13 +88,13 @@ function add_url() {
 }
 
 function display_url() {
-    figlet "SiteCheck" | lolcat -a -s 100
+    check_dependency
+    conditional_heading
     echo "---developped by karma---"
     echo 
     echo "Tracked Sites"
     echo "---------------------------------------"
     cat $list
-    echo
     echo "---------------------------------------"
     echo 
 }
@@ -115,8 +117,9 @@ function remove_url() {
 }
 
 function help_menu() {
+    check_dependency
     echo -e "\n"
-    figlet "SiteCheck" | lolcat -a -s 100
+    conditional_heading
     echo "your useful site tracking tool..."
     echo "---developed by karma---"
     echo 
@@ -131,11 +134,42 @@ function help_menu() {
     echo 
 }
 
+function check_dependency() {
+    which figlet >/dev/null
+    check1=$?
+    which lolcat >/dev/null
+    check2=$?
+
+    if [ $check1 -eq 1 ] || [ $check2 -eq 1 ];
+        then echo "Please install \`lolcat\` and \`figlet\` (for better user experience)";
+        read -p "wanna install? [y/n] " resp ;
+        if [ $resp == "y" ];
+        then brew install lolcat 2>/dev/null;
+        brew install figlet 2>/dev/null;
+        apt install lolcat 2>/dev/null;
+        apt install figlet 2>/dev/null;
+        check1=0; check2=0
+        elif [ $resp == "n" ];
+        then echo "not installing";
+        echo ;
+        check1=1;check2=1;
+        fi
+    fi
+}
+
+function conditional_heading() {
+    if [ $check1 -eq 0 ] && [ $check2 -eq 0 ]
+    then figlet "SiteCheck" | lolcat -a -s 100 2>/dev/null
+    else echo "SiteCheck"
+    fi
+}
+
 ####################################################
-# just_display
+check1=0
+check2=0
 
 if [ $# -eq 0 ]
-then just_display
+then just_display $isok
 else
     i=1
     curr_command=""
@@ -144,13 +178,15 @@ else
         if [ ${!i:0:1} == "-" ]
         then curr_command=${!i:1:1} ;i=$(expr $i + 1); 
             if [ $curr_command == "d" ] 
-            then display_url;
+            then display_url $isok;
             elif [ $curr_command == "e" ]
             then edit_list;
             elif [ $curr_command == "h" ]
-            then help_menu;
+            then help_menu $isok;
             elif [ $curr_command == "s" ]
-            then just_display;
+            then just_display $isok;
+            elif [ $curr_command == "i" ]
+            then int_display $isok;
             fi
         continue;
         else 
