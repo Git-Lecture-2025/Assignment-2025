@@ -14,17 +14,22 @@ fi
 add_website(){        
   while true; do
     tracking_list;
+    echo -e "${YELLOW}"
+    echo "[Enter "q" to quit and go back to the main menu]"
     echo -e "${BLUE}"
-    echo -e "Enter the website you want to add to the tracking-list:"
+    echo -e "Enter the full website URL you want to add to the tracking-list:"
     read website
-    if grep -q "$website" $WEBSITE_LIST; then
+    if [[ "$website" == "q" ]]; then
+      echo -e "Exiting edit mode.${NC}"
+      break
+    elif grep -q "$website" $WEBSITE_LIST; then
       echo -e "${RED}Website already exists in the tracking-list.${NC}"
     else
       echo "$website" >> $WEBSITE_LIST
       echo -e "${GREEN}Website added to the tracking-list.${NC}"
     fi
     echo -e "${BLUE}--------------------------------"
-    echo -e "Do you want to add another website? (${GREEN}y/${RED}n${BLUE})"
+    echo -e "Do you want to add another website URL? (${GREEN}y/${RED}n${BLUE})"
     read answer
     if [ "$answer" != "y" ]; then
       echo -e "Returning to main menu.${NC}"
@@ -38,7 +43,7 @@ remove_website(){
   if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
     echo -e "${RED}"
     echo "No websites to check!"
-    echo "Please add websites to the tracking-list first."
+    echo "Please add website URLs to the tracking-list first."
     echo -e "${NC}"
     sleep 1
     return
@@ -48,20 +53,26 @@ remove_website(){
     tracking_list;
     echo -e "${BLUE}"
     echo "--------------------------------"
-    echo "Enter the index number of the website you want to remove from the tracking-list:"
+    echo -e "${YELLOW}"
+    echo "[Enter "q" to quit and go back to the main menu]"
+    echo -e "${BLUE}"
+    echo "Enter the index number of the website URL you want to remove from the tracking-list:"
     read website_num
     total_lines=$(wc -l < "$WEBSITE_LIST")
 
     if [[ "$website_num" =~ ^[0-9]+$ ]] && [ "$website_num" -ge 1 ] && [ "$website_num" -le "$total_lines" ]; then 
       sed -i "${website_num}d" $WEBSITE_LIST
       echo -e "${GREEN}Website removed from the tracking-list.${NC}"
+    elif [[ "$website_num" == "q" ]]; then
+      echo -e "Exiting edit mode.${NC}"
+      break
     else
       echo -e "${RED}Invalid number. Please try again.${NC}"
       continue
     fi
 
     echo -e "${BLUE}--------------------------------"
-    echo -e "Do you want to remove another website? (${GREEN}y${BLUE}/${RED}n${BLUE})"
+    echo -e "Do you want to remove another website URL? (${GREEN}y${BLUE}/${RED}n${BLUE})"
     read answer
     if [ "$answer" != "y" ]; then
       tracking_list;
@@ -76,7 +87,7 @@ edit_website(){
   if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
     echo -e "${RED}"
     echo "No websites to check!"
-    echo "Please add websites to the tracking-list first."
+    echo "Please add website URLs to the tracking-list first."
     echo -e "${NC}"
     sleep 1
     return
@@ -86,22 +97,27 @@ edit_website(){
     tracking_list;
     echo -e "${BLUE}"
     echo "--------------------------------"
+    echo -e "${YELLOW}"
+    echo "[Enter "q" to quit and go back to the main menu]"
+    echo -e "${BLUE}"
     echo "Enter the index number of the website you want to edit in the tracking-list:"
     read website_num
     total_lines=$(wc -l < "$WEBSITE_LIST")
-
     if [[ "$website_num" =~ ^[0-9]+$ ]] && [ "$website_num" -ge 1 ] && [ "$website_num" -le "$total_lines" ]; then
       echo -e "${GREEN}"
       read -p "Enter the new website URL: " new_website
       sed -i "${website_num}s|.*|$new_website|" $WEBSITE_LIST
       echo -e "Tracking-list updated successfully.${NC}"
+    elif [[ "$website_num" == "q" ]]; then
+      echo -e "Exiting edit mode.${NC}"
+      break
     else
       echo -e "${RED}Invalid number. Please try again.${NC}"
       continue
     fi
 
     echo -e "${BLUE}--------------------------------"
-    echo -e "Do you want to edit another website? (${GREEN}y${BLUE}/${RED}n${BLUE})"
+    echo -e "Do you want to edit another website URL? (${GREEN}y${BLUE}/${RED}n${BLUE})"
     read answer
     if [ "$answer" != "y" ]; then
       tracking_list;
@@ -116,7 +132,7 @@ check_status(){
   if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
     echo -e "${RED}"
     echo "No websites to check!"
-    echo "Please add websites to the tracking-list first."
+    echo "Please add website URLs to the tracking-list first."
     echo -e "${NC}"
     sleep 1
     return
@@ -124,7 +140,7 @@ check_status(){
   echo -e "${BLUE}"
   echo "Checking website statuses..."
   echo "------------------------------"
-  echo "Website URL                     Status"
+  echo -e "Website URL\t\t\t\tStatus"
   echo "------------------------------"
   while IFS= read -r website; do
     if [[ -z "$website" ]]; then
@@ -138,7 +154,7 @@ check_status(){
       echo -e "${RED}"
       status="Not Accessible ($status_code)"
     fi
-    echo  "$website" "                       " "$status"
+    echo -e "$website\t\t\t\t$status"
   done < $WEBSITE_LIST
   sleep 2
   echo -e "${NC}"
@@ -163,11 +179,11 @@ tracking_list(){
 while [ true ]
 do
   echo -e "${BLUE}"
-  echo "██     ██ ███████ ██████  ███████ ██ ████████ ███████     ████████ ██████   █████  ███████ ██   ██ ███████ ██████ "
-  echo "██     ██ ██      ██   ██ ██      ██    ██    ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██"
-  echo "██  █  ██ █████   ██████  ███████ ██    ██    █████          ██    ██████  ███████ ██      █████   █████   ██████ "
-  echo "██ ███ ██ ██      ██   ██      ██ ██    ██    ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██"
-  echo " ███ ███  ███████ ██████  ███████ ██    ██    ███████        ██    ██   ██ ██   ██ ███████ ██   ██ ███████ ██   ██"
+  echo "█     █ ███  ███  ███  █  ███  ███     ███  ███   ██  ███ █  █ ███ ███ "
+  echo "█     █ █    █  █ █    █   █   █        █   █  █ █  █ █   █ █  █   █  █"
+  echo "█  █  █ ███  ███  ███  █   █   ███      █   ███  ████ █   ██   ███ ███ "
+  echo "█ █ █ █ █    █  █   █  █   █   █        █   █  █ █  █ █   █ █  █   █  █"
+  echo " █   █  ███  ███  ███  █   █   ███      █   █  █ █  █ ███ █  █ ███ █  █"
   echo -e "${RED}"
   echo -e "\e[1m \t\t\t\t\t\tby Regie\e[0m"
   echo -e "${NC}"
