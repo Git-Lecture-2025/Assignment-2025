@@ -5,7 +5,7 @@ function error_dictionary {
     case $1 in
         "0") echo "all good";;
         "6") echo "unresolved hostname";;
-        *) echo "some other error"
+        *) echo "curl exit code $1"
     esac
 }
 function code_dictionary {
@@ -27,6 +27,8 @@ response_code=0
 curl_exit_code=0
 
 function just_display {
+    figlet "SiteCheck" | lolcat -a -s 100
+    echo "---developped by karma---"
     echo "\n \n"
     for item in $(cat $list)
     do
@@ -38,6 +40,7 @@ function just_display {
         echo "----------------------------"
     done
     echo "\n \n"
+    echo "use -h to know more\n\n"
     sleep 0.5s
     echo "SiteCheck completed on :- \n$(date)"
 }
@@ -77,6 +80,8 @@ function add_url() {
 }
 
 function display_url() {
+    figlet "SiteCheck" | lolcat -a -s 100
+    echo "---developped by karma---"
     echo "\n"
     echo "Tracked Sites"
     echo "---------------------------------------"
@@ -102,6 +107,22 @@ function remove_url() {
     echo "removing $1 from the list."
 }
 
+function help_menu() {
+    echo "\n"
+    figlet "SiteCheck" | lolcat -a -s 100
+    echo "your useful site tracking tool..."
+    echo "---developed by karma---"
+    echo "\n"
+    echo "PURPOSE -> Tracks all the urls listed in the list.txt file, \nthe list can be manipulated using the following sub-commands."
+    echo "\n"
+    echo "  -a [arg1] [arg2] ...     Add url(s) to your tracking list."
+    echo "  -d                       Display all the urls in your tracking list"
+    echo "  -x [arg1] [arg2] ...     Remove url(s) from the tracking list."
+    echo "  -e                       To open the tracking list in text editor (for wider range of action)"
+    echo "  -h                       To open this help menu" 
+    echo "\n"
+}
+
 ####################################################
 # just_display
 
@@ -118,6 +139,8 @@ else
             then display_url;
             elif [ $curr_command == "e" ]
             then edit_list;
+            elif [ $curr_command == "h" ]
+            then help_menu;
             fi
         continue;
         else 
