@@ -120,8 +120,8 @@ clear_line() {
 
 
 edit_tracker() {
-    local target=$1
-    shift 1
+    local trackerid=$1
+    shift
 
     local uuidRegex="^$target"
     local nameRegex="^.*,$target,"
@@ -210,6 +210,7 @@ check() {
 
 desc() {
     local target=$1
+    local tuiCall=$2
     local uuidRegex="^$target,"
     local nameRegex="^.*,$target,"
 
@@ -221,6 +222,11 @@ desc() {
         return 1
     fi
     local otpt=""
+
+    if [ "$tuiCall" == "tui" ]; then
+        echo "$name,$url"
+        exit
+    fi
 
     otpt+=$(echo "Tracker ID,$trackerid\n")
     otpt+=$(echo "Name,$name\n")
@@ -289,7 +295,7 @@ case $1 in
         edit_tracker "${@:2}"
         ;;
     desc)
-        desc "$2"
+        desc "$2" "$3"
         ;;
     add-cron)
         add_cron

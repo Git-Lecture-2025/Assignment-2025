@@ -37,14 +37,8 @@ print_banner() {
     echo ""
 }
 
-
-
-
 opts=("↻ Refresh" "Add a Tracker" "Edit a Tracker" "Remove a Tracker" "Edit Config File")
 curr=0
-
-
-# TODO: ADD FUNCTIONS FOR EACH OPTION THAT OPENS VIM OR SOMETHING
 
 refresh() {
     local noping=$1
@@ -59,6 +53,20 @@ refresh() {
 }
 
 
+display_error() {
+    local error_msg=$1
+    clear
+    echo ""
+    echo ""
+    tput bold
+    echo "$error_msg"
+    tput sgr0
+    echo ""
+    echo "Press Any Key to Exit"
+    read -rsn1
+    refresh dont
+}
+
 add_tracker() {
     local tmpf=$(mktemp)
     builtin echo "# Enter the name of the site and its url separated by a comma." >> $tmpf
@@ -67,16 +75,7 @@ add_tracker() {
     
     IFS=","
     if [ "$(wc -l < "$tmpf")" -ne "3" ]; then
-        clear
-        echo ""
-        echo ""
-        tput bold
-        echo "Incorrect Input. Aborted"
-        tput sgr0
-        echo ""
-        echo "Press Any Key to Exit"
-        read -rsn1
-        refresh dont
+        display_error "Incorrect Input. Aborted"
         exit
     fi
 
@@ -87,6 +86,41 @@ add_tracker() {
     refresh
 }
 
+edit_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the Name of the Tracker or its UUID" >> $tmpf
+    nano +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r sitename <<< $(tail -n1 $tmpf)
+    uptty desc $sitename
+    if [ "$0" -ne "0" ]; then
+        display_error "Sitename - $sitename provided does not exist in the tracker list"
+        exit
+    fi
+    
+    tmpf=$(mktemp)
+    builtin echo "# Edit the Tracker below while maintaining the format: {Name},{URL}" >> $tmpf
+    uptty desc $sitename tui | tr -d '\n' >> $tmpf
+
+    nano +2,+999 $tmpf
+
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r newsitename url <<< $(tail -n1 $tmpf)
+    clear
+    uptty edit $sitename -n $newsitename -u $url
+    clear
+    sleep 1
+    refresh
+}
 
 action_dispatcher() {
     local targetAct=$1
@@ -97,6 +131,7 @@ action_dispatcher() {
             ;;
         2)
             #EDIT TRACKER
+            edit_tracker
             ;;
         3)
             #RM TRACKER
