@@ -100,7 +100,27 @@ function display_url() {
 }
 
 function edit_list() {
-    nano $list
+    x=$'\n' read -d '' -r -a lines < $list
+    i=1
+    for l in ${lines[@]}
+    do
+    echo "$i) $l"
+    i=$(expr $i + 1)
+    done
+
+    echo
+    echo "Which line to edit? (enter S.No)"
+    read r
+    r=$(expr $r - 1)
+    echo "> [${lines[$r]}] edit to :-" 
+    read resp
+    lines[$r]=$resp
+
+    echo "" > $list
+    for l in ${lines[@]}
+    do
+    echo "$l" >> $list
+    done
 }
 
 function remove_url() {
