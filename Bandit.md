@@ -214,3 +214,62 @@ Establishes a secure connection to port 30001 on the local machine
   <summary>Password</summary>
   kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
 </details>
+
+### Level 16 -> Level 17
+
+```sh
+nmap -p31000-32000 localhost
+```
+
+Lists all ports that are listening.
+
+```sh
+openssl s_client -connect localhost:<port>
+```
+
+Can be used to check for SSL/TLS response. Add the `-quiet` flag if the password starts with `k`.
+
+### Level 17 -> Level 18
+
+```sh
+diff <filea> <fileb>
+```
+
+Displays differences between the 2 files.
+
+<details>
+  <summary>Password</summary>
+  x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
+</details>
+
+### Level 18 -> Level 19
+
+```sh
+ssh -p <port> <username>@<hostname> "shell command"
+```
+
+SSH allows remote execution of commands which lets one bypass the logout from .bashsrc
+
+<details>
+  <summary>Password</summary>
+  cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8
+</details>
+
+### Level 19 -> Level 20
+
+```sh
+ls -al
+```
+
+Shows the setuid binary has the root user as bandit20 and group user as bandit19. So using the binary allows executing the `cat` command as bandit20.
+
+```sh
+./bandit20-do cat etc/bandit_pass/bandit20
+```
+
+Returns the required password
+
+<details>
+  <summary>Password</summary>
+  0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+</details>
