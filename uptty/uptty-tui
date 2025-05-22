@@ -1,0 +1,92 @@
+#!/bin/bash
+
+
+echo() {
+    local otpt="$1"
+    local width=$(tput cols)
+    local offs=$(( (width - ${#otpt}) / 2 ))
+    
+    local it=0;
+    while [ $it -lt $offs ]; do
+        builtin echo -n " "
+        it=$((it + 1))
+    done
+    builtin echo "$otpt"
+}
+
+h_center_body(){
+    local otpt="$1"
+    while IFS= read -r line; do
+        echo "$line"
+    done <<< "$otpt"
+}
+
+
+print_banner() {
+    echo ""
+    echo ""
+    echo ""
+
+    echo "▄• ▄▌ ▄▄▄·▄▄▄▄▄▄▄▄▄▄ ▄· ▄▌"
+    echo "█▪██▌▐█ ▄█•██  •██  ▐█▪██▌"
+    echo "█▌▐█▌ ██▀· ▐█.▪ ▐█.▪▐█▌▐█▪"
+    echo "▐█▄█▌▐█▪·• ▐█▌· ▐█▌· ▐█▀·."
+    echo " ▀▀▀ .▀    ▀▀▀  ▀▀▀   ▀ • "
+    echo ""
+    h_center_body "$(./uptty ls)"
+    echo ""
+}
+
+opts=("Add a Tracker" "Edit a Tracker" "Remove a Tracker" "Edit Config File" "↻ Refresh")
+curr=0
+clear
+print_banner
+
+echo "Press 'q' to exit"
+echo ""
+
+# TODO: ADD FUNCTIONS FOR EACH OPTION THAT OPENS VIM OR SOMETHING
+# TODO: IMPLEMENT REFRESH
+
+print_menu() {
+    tput civis
+    while true;do
+        tput bold
+        echo "Select an option:"
+        tput sgr0
+        local it=0
+        while [ $it -lt ${#opts[@]} ]; do
+            if [ $it -eq $curr ]; then
+                tput bold
+                echo "> ${opts[$it]}"
+                tput sgr0
+            else
+                echo "  ${opts[$it]}"
+            fi
+            it=$((it + 1))
+        done
+        tput cuu 6
+
+        read -rsn1 k
+        if [[ $k == $'\e' ]]; then
+            read -rsn2 k
+            case $k in
+                '[B')
+                    curr=$(((curr+1)% ${#opts[@]}))
+                    ;;
+                '[A')
+                    curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
+                    ;;
+            esac
+        elif [[ $k == "q" ]] ; then
+            exit
+        elif [[ $k == "k" ]] ; then
+            curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
+        elif [[ $k == "j" ]] ; then
+            curr=$(((curr+1)% ${#opts[@]}))
+        fi
+    done
+}
+
+
+print_menu
