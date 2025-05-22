@@ -71,15 +71,29 @@ function untrack() {
   		lines+=("$line")
 	done < "$file"
 
+	if [[ "${#lines[@]}" -eq 0 ]]; then
+		echo "Currently tracking no websites..."
+		return
+	fi
+
     > "$file"  
 
+	local i
+	local resolved=0
     for ((i = 0; i < ${#lines[@]}; i++)); do
         if contains "${lines[$i]}" "$@" || contains "$((i + 1))" "$@"; then
-			echo "No Longer Tracking: ${lines[$i]}"
+			echo "-> No longer tracking: ${lines[$i]}"
+			((resolved++))
             continue
         fi
+
         echo "${lines[$i]}" >> "$file"
-    done
+	done
+
+	echo "Untracked ${resolved} arguments successfully."
+	if (( resolved != "$#" )); then
+		echo "Failed to resolve remaining arguments..."
+	fi
 }
 
 function getStatus() {
@@ -90,9 +104,9 @@ function getStatus() {
 function status() {
 	echo "-----Tracking Results------" 
 
+	local lines=$(( $(wc -l < "$file") ))
 	if [[ "$#" -eq 0 ]]; then
-        local lines=$(( $(wc -l < "$file") ))
-        if [[ lines -eq 0 ]]; then
+        if [[ $lines -eq 0 ]]; then
             echo "No websites being tracked currently..."
             return
         fi
@@ -102,6 +116,11 @@ function status() {
 		done < "$file"
 	else
 		for id in "$@"; do
+			if [[ "$id" -le 0 || "$id" -gt "$lines" ]]; then
+				echo "Invalid ID: ${id}, ignoring..."
+				return
+			fi
+
 			getStatus $(sed -n "${id}p" .data.txt)
 		done
 	fi
@@ -109,6 +128,12 @@ function status() {
 
 function display() {
 	echo "-----Currently Tracking-----"
+
+	local lines=$(( $(wc -l < "$file") ))
+	if [[ $lines -eq 0 ]]; then
+		echo "No websites being tracker currently..."
+		return
+	fi
 
 	local i=1
 	while IFS= read -r line; do
