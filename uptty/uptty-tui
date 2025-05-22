@@ -176,7 +176,7 @@ action_dispatcher() {
 
 
 check_uptty() {
-    uptty > /dev/null 2> /dev/null
+    uptty version > /dev/null 2> /dev/null
     if [ $(echo $?) -n  e 0 ] ; then
         echo ""
         tput bold
