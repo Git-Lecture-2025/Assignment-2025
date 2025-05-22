@@ -1,7 +1,240 @@
 #!/bin/bash
 
 
-source ./utils.sh
+load_config() {
+    local config_file="$HOME/.local/share/upt/.uptrc"
+    if [ -f "$config_file" ]; then
+        source "$config_file"
+    else
+        echo "Configuration file not found. Creating a new one."
+        mkdir -p ~/.local/share/upt
+        touch $config_file
+        UPT_CSV="$HOME/.local/share/upt/uptime.csv"
+        echo "UPT_CSV=\"$HOME/.local/share/upt/uptime.csv\"" >> "$config_file"
+        echo "Configuration file created at $config_file"
+        touch $UPT_CSV
+    fi
+}
+
+add_cron() {
+    local scriptPath=$(realpath "$0")
+    local user=$(whoami)
+    if( crontab -u $user -l | grep --quiet "$scriptPath"); then   
+        echo "Cron job already exists."
+    else
+        mkdir -p ~/.local/share/upt
+        (crontab -u $user -l 2>/dev/null; echo "* * * * * $scriptPath check > /home/$user/uptime.log") | crontab -u $user -
+        echo "Cron job added to check trackers every minute"
+        echo "To remove the cron job, run the command: $0 remove-cron"
+        echo ""
+        echo "Logs are saved in ~/uptime.log"
+        echo "To view the logs, run the command: cat ~/uptime.log"
+    fi
+}
+
+remove_cron() {
+    local scriptPath=$(realpath "$0")
+    local user=$(whoami)
+    if( crontab -u $user -l | grep --quiet "$scriptPath"); then   
+        (crontab -u $user -l | grep -v "$scriptPath") | crontab -u $user -
+        echo "Cron job removed."
+    else
+        echo "No cron job found."
+    fi
+}
+
+
+cron_status() {
+    local scriptPath=$(realpath "$0")
+    local user=$(whoami)
+    echo $(crontab -u $user -l)
+    if( crontab -u $user -l | grep --quiet "$scriptPath"); then   
+        echo "Cron job is already registered."
+        echo "Logs are saved in ~/uptime.log"
+        echo ""
+        echo "Latest Logs:"
+        cat ~/uptime.log 2> /dev/null
+    else
+        echo "Cron job is not running."
+        echo "To add a cron job, run the command: $0 add-cron"
+    fi
+}
+
+#TODO: LOAD INTERVAL FOR CRONJOB FROM CONFIG FILE
+
+
+remove_site() {
+    local target=$1
+    local uuidRegex="^$target"
+    local nameRegex="^.*,$target,"
+
+    if grep --quiet -e "$uuidRegex" -e "$nameRegex" "$UPT_CSV"; then
+        sed -i "/$uuidRegex/d;/$nameRegex/d" "$UPT_CSV"
+        echo "$target removed successfully."
+    else
+        echo "Target site $target: not found."
+    fi
+}
+
+add_site(){
+    local trackerid=$(uuidgen)
+    trackerid=${trackerid:0:8}
+    local name=$1
+    local url=$2
+    local status="unknown"
+    local response_time="infinity"
+    local last_checked="never"
+    echo $trackerid,$name,$url,$status,$response_time,$last_checked >> "$UPT_CSV"
+}
+
+
+list_sites() {
+    IFS=","
+    local otpt=""
+    rm temp.csv 2> /dev/null
+    touch temp.csv
+    while read -r trackerid name url status latency lc; do
+        local line="$trackerid,$name,$url,$status,$latency,$lc"
+        if [ "$status" == "UP" ]; then
+            echo -e "\e[0;32m$line \e[0m	" >> temp.csv
+        else
+            echo -e "\e[0;31m$line \e[0m	" >> temp.csv
+        fi
+    done < "$UPT_CSV"
+
+    echo -e $(cat temp.csv | column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED	" -o " | ")
+    rm temp.csv
+}
+
+# TODO: IMPLEMENT uptimerc FOR -NOTFIICATION,CRONJOB,TIME INTERVAL
+
+clear_line() {
+    echo -ne "\r\033[K"
+}
+
+
+edit_tracker() {
+    local trackerid=$1
+    shift
+
+    local uuidRegex="^$target"
+    local nameRegex="^.*,$target,"
+
+
+    OPTSTRING=":n:u:"
+    local line
+    line=$(grep -e "$uuidRegex" -e "$nameRegex"  "$UPT_CSV")
+    IFS=',' read -r trackerid name url status latency lc <<< "$line"
+    if [ -z "$trackerid" ]; then
+        echo "Tracker ID $trackerid not found."
+        return 1
+    fi
+    
+    while getopts "$OPTSTRING" opt; do
+        case $opt in
+            n) 
+                echo "Editing name from $name to $OPTARG"
+                name=$OPTARG ;;
+            u) 
+                echo "Editing url from $url to $OPTARG"
+                url=$OPTARG ;;
+            *) 
+                echo "Invalid option: -$OPTARG" ;;
+        esac
+    done
+    sed -i "/^$trackerid,/c $trackerid,$name,$url,$status,$latency,$lc" "$UPT_CSV"
+}
+
+spinner(){
+    local spin='|/-\'
+    local it=0;
+    while :; do
+        echo -ne "\r[${spin:$it:1}]"
+        it=$((it+1))
+        it=$((it%4))
+        sleep 0.1
+    done
+}
+
+
+check() {
+    IFS=","
+    while read -r trackerid name url status latency lc; do
+
+        echo -n "[-] Pinging $name ($url)"
+        spinner &
+        local spinPid=$!
+
+
+        local res=$(curl -w "%{time_total}" -Is $url -m 2)
+        local resStat=$(echo $res | head -n 1)
+        local resLat=$(echo $res | tail -n 1)
+        resLat=${resLat:0:-1}
+        resLat="$resLat ms"
+        if [[ "$resStat" == *"200"* ]]; then
+            status="UP"
+            latency=$resLat
+            kill $spinPid > /dev/null
+            clear_line
+            echo "[🟢] $name is up, latency: $latency"
+
+        else
+            if [ "$status" != "DOWN" ]; then
+                notify-send -a "uptime.sh" "Tracker '$name' is down" > /dev/null 2>/dev/null
+            fi
+            status="DOWN"
+            latency="infinity"
+            kill $spinPid > /dev/null
+            clear_line
+            echo "[❌] $name is down, latency: $latency"
+        fi
+        lc=$(date "+%d-%m-%Y %H:%M:%S")
+
+        local replacement="$trackerid,$name,$url,$status,$latency,$lc"
+        sed -i "/^$trackerid,/c $replacement" "$UPT_CSV"
+    done < "$UPT_CSV"
+
+    echo "Uptime check completed."
+    echo "----------------------------------------"
+    echo "Uptime Summary:"
+    echo ""
+    $0 ls
+}
+
+
+desc() {
+    local target=$1
+    local uuidRegex="^$target,"
+    local nameRegex="^.*,$target,"
+
+    local line
+    line=$(grep -e "$uuidRegex" -e "$nameRegex"  "$UPT_CSV")
+    IFS=',' read -r trackerid name url status latency lc <<< "$line"
+    if [ -z "$trackerid" ]; then
+        echo "Tracker ID $trackerid not found."
+        return 1
+    fi
+    local otpt=""
+
+    otpt+=$(echo "Tracker ID,$trackerid\n")
+    otpt+=$(echo "Name,$name\n")
+    otpt+=$(echo "URL,$url\n")
+
+    if [ "$status" == "UP" ]; then
+        otpt+=$(echo "\e[0;32mStatus,$status\e[0m	\n")
+        otpt+=$(echo "\e[0;32mLatency,$latency\e[0m	\n")
+    else
+        otpt+=$(echo "\e[0;31mStatus,$status\e[0m	\n")
+        otpt+=$(echo "\e[0;31mLatency,$latency\e[0m \n")
+    fi
+
+    otpt+=$(echo "Last Checked,$lc\n")
+
+    echo -e $otpt | column -t -s "," -o " : "
+}
+
+
+
 
 help(){
     echo "Usage: $0 [options]"
@@ -14,6 +247,9 @@ help(){
     echo "  check, ping : Check the status of all monitored sites"
     echo "  edit, update : Edit the details of a monitored site"
     echo "  desc : Show the description of a monitored site"
+    echo "  add-cron : Add a cron job for monitoring"
+    echo "  remove-cron : Remove the cron job for monitoring"
+    echo "  cron : Show the status of the cron job"
     echo ""
     echo "Options:"
     echo "  -h, --help : Show this help message"
@@ -22,6 +258,8 @@ help(){
 
 # TODO: THIMK ABOUT INTERACTIVE TUI
 # TODO: README FOR INSTALLATION
+
+load_config
 
 case $1 in 
     help|-h|--help)
@@ -45,7 +283,15 @@ case $1 in
     desc)
         desc "$2"
         ;;
-    
+    add-cron)
+        add_cron
+        ;;
+    remove-cron)
+        remove_cron
+        ;;
+    cron)
+        cron_status
+        ;;
     *)
         echo "Invalid command: $1"
         help
@@ -53,3 +299,4 @@ case $1 in
 esac
 
 # TODO: EDGE CASES FOR COMMANDS AND USAGE HELP
+
