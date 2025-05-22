@@ -120,8 +120,8 @@ clear_line() {
 
 
 edit_tracker() {
-    local trackerid=$1
-    shift
+    local target=$1
+    shift 1
 
     local uuidRegex="^$target"
     local nameRegex="^.*,$target,"
