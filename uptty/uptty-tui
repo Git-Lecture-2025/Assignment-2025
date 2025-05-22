@@ -98,7 +98,7 @@ edit_tracker() {
     fi
     read -r sitename <<< $(tail -n1 $tmpf)
     uptty desc $sitename
-    if [ "$0" -ne "0" ]; then
+    if [ "$?" -ne "0" ]; then
         display_error "Sitename - $sitename provided does not exist in the tracker list"
         exit
     fi
