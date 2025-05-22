@@ -33,10 +33,20 @@ add_site(){
     local name=$1
     local url=$2
     local status="unknown"
-    local response_time="inf"
+    local response_time="infinity"
     local last_checked="never"
-    echo "$trackerid,$name,$url,$status,$response_time",$last_checked >> uptime.csv
+    echo $trackerid,$name,$url,$status,$response_time,$last_checked >> uptime.csv
 }
+
+list_sites() {
+    cat uptime.csv| column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED" -o " | "
+}
+
+# TODO: CLEANUP CODE ,CREATE A UTILS FILE AND PUT ALL THE STUFF THERE
+# TODO: THIMK ABOUT INTERACTIVE TUI
+# TODO: EDIT ENTRIES
+# TODO: desc TO DESCRIBE A TRACKER 
+# TODO: COLOURS
 
 case $1 in 
     help|-h|--help)
