@@ -27,16 +27,65 @@ list_sites() {
 }
 
 # TODO: USE NOTIFY-SEND
+# TODO: IMPLEMENT uptimerc FOR -NOTFIICATION,CRONJOB,TIME INTERVAL
 
 clear_line() {
     echo -ne "\r\033[K"
 }
 
 
+edit_tracker() {
+    local trackerid=$1
+    shift
+
+    local uuidRegex="^$target"
+    local nameRegex="^.*,$target,"
+
+
+    OPTSTRING=":n:u:"
+    local line
+    line=$(grep -e "$uuidRegex" -e "$nameRegex"  uptime.csv)
+    IFS=',' read -r trackerid name url status latency lc <<< "$line"
+    if [ -z "$trackerid" ]; then
+        echo "Tracker ID $trackerid not found."
+        return 1
+    fi
+    
+    while getopts "$OPTSTRING" opt; do
+        case $opt in
+            n) 
+                echo "Editing name from $name to $OPTARG"
+                name=$OPTARG ;;
+            u) 
+                echo "Editing url from $url to $OPTARG"
+                url=$OPTARG ;;
+            *) 
+                echo "Invalid option: -$OPTARG" ;;
+        esac
+    done
+    sed -i "/^$trackerid,/c $trackerid,$name,$url,$status,$latency,$lc" uptime.csv
+}
+
+spinner(){
+    local spin='|/-\'
+    local it=0;
+    while :; do
+        echo -ne "\r[${spin:$it:1}]"
+        it=$((it+1))
+        it=$((it%4))
+        sleep 0.1
+    done
+}
+
+
 check() {
     IFS=","
     while read -r trackerid name url status latency lc; do
+
         echo -n "[-] Pinging $name ($url)"
+        spinner &
+        local spinPid=$!
+
 
         local res=$(curl -w "%{time_total}" -Is $url)
         local resStat=$(echo $res | head -n 1)
@@ -45,12 +94,14 @@ check() {
         if [[ "$resStat" == *"200"* ]]; then
             status="up"
             latency=$resLat
+            kill $spinPid > /dev/null
             clear_line
             echo "[🟢] $name is up, latency: $latency"
 
         else
             status="down"
             latency="infinity"
+            kill $spinPid > /dev/null
             clear_line
             echo "[❌] $name is down, latency: $latency"
         fi
