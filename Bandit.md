@@ -151,3 +151,30 @@ Perform EGB13 on the data of a file.
   <summary>Password</summary>
   7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4
 </details>
+
+### Level 12 -> Level 13
+
+Since the file is an original hexadecimal dump, un hex dump it:
+
+```sh
+xxd -r <file> > <output_file>
+```
+
+Now:
+
+```sh
+file <output_file>
+```
+
+The file type may be `gzip compressed data`, `bzip2 compressed data` or `POSIX tar archive`. Use the appropriate decompression command recusrively to obtain the password.
+
+```sh
+gzip -d 
+bzip2 -D
+tar -xf
+```
+
+<details>
+  <summary>Password</summary>
+  FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn
+</details>
