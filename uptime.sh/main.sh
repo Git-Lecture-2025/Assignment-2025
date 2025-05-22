@@ -3,6 +3,7 @@
 
 load_config() {
     local config_file="$HOME/.local/share/upt/.uptrc"
+    remove_cron > /dev/null 2> /dev/null
     if [ -f "$config_file" ]; then
         source "$config_file"
         if [ "$UPT_CRONJOB" == "true" ]; then
@@ -18,8 +19,11 @@ load_config() {
         UPT_CRONJOB="true"
         echo "UPT_CSV=\"$HOME/.local/share/upt/uptime.csv\"" >> "$config_file"
         echo 'UPT_CRONJOB="true"' >> "$config_file"
+        echo 'UPT_CRONJOB_INTERVAL="1"' >> "$config_file"
         echo "Configuration file created at $config_file"
         touch $UPT_CSV
+        add_cron > /dev/null 2> /dev/null
+        echo "Cron job added."
     fi
 }
 
@@ -30,7 +34,7 @@ add_cron() {
         echo "Cron job already exists."
     else
         mkdir -p ~/.local/share/upt
-        (crontab -u $user -l 2>/dev/null; echo "* * * * * $scriptPath check > /home/$user/uptime.log") | crontab -u $user -
+        (crontab -u $user -l 2>/dev/null; echo "*/$UPT_CRONJOB_INTERVAL * * * * $scriptPath check > /home/$user/uptime.log") | crontab -u $user -
         echo "Cron job added to check trackers every minute"
         echo "To remove the cron job, run the command: $0 remove-cron"
         echo ""
@@ -65,10 +69,7 @@ cron_status() {
         echo "Cron job is not running."
         echo "To add a cron job, run the command: $0 add-cron"
     fi
-}
-
-#TODO: LOAD INTERVAL FOR CRONJOB FROM CONFIG FILE
-
+}           
 
 remove_site() {
     local target=$1
@@ -112,7 +113,6 @@ list_sites() {
     rm temp.csv
 }
 
-# TODO: IMPLEMENT uptimerc FOR -NOTFIICATION,CRONJOB,TIME INTERVAL
 
 clear_line() {
     echo -ne "\r\033[K"
