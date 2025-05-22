@@ -67,6 +67,10 @@ del_site() {
     exit 2
 }
 
+list_site(){
+    cat ./tracklist.txt
+}
+
 
 help(){
     echo "pinger [OPTIONS]... [FLAGS]..."
@@ -86,7 +90,7 @@ do
         p) pinger;;
         a) input=$OPTARG;add_site "$input";;
         d) input=$OPTARG;del_site "$input";;
-        l) echo "list site";;
+        l) list_site;;
         \?) help ;exit 1
     esac
 done
