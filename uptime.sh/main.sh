@@ -5,12 +5,19 @@ load_config() {
     local config_file="$HOME/.local/share/upt/.uptrc"
     if [ -f "$config_file" ]; then
         source "$config_file"
+        if [ "$UPT_CRONJOB" == "true" ]; then
+            add_cron > /dev/null 2> /dev/null
+        else
+            remove_cron > /dev/null 2> /dev/null
+        fi
     else
         echo "Configuration file not found. Creating a new one."
         mkdir -p ~/.local/share/upt
         touch $config_file
         UPT_CSV="$HOME/.local/share/upt/uptime.csv"
+        UPT_CRONJOB="true"
         echo "UPT_CSV=\"$HOME/.local/share/upt/uptime.csv\"" >> "$config_file"
+        echo 'UPT_CRONJOB="true"' >> "$config_file"
         echo "Configuration file created at $config_file"
         touch $UPT_CSV
     fi
@@ -86,7 +93,6 @@ add_site(){
     local last_checked="never"
     echo $trackerid,$name,$url,$status,$response_time,$last_checked >> "$UPT_CSV"
 }
-
 
 list_sites() {
     IFS=","
@@ -250,6 +256,7 @@ help(){
     echo "  add-cron : Add a cron job for monitoring"
     echo "  remove-cron : Remove the cron job for monitoring"
     echo "  cron : Show the status of the cron job"
+    echo "  reload : Reload the configuration file"
     echo ""
     echo "Options:"
     echo "  -h, --help : Show this help message"
@@ -288,6 +295,9 @@ case $1 in
         ;;
     remove-cron)
         remove_cron
+        ;;
+    reload)
+        load_config
         ;;
     cron)
         cron_status
