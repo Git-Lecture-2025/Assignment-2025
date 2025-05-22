@@ -243,7 +243,7 @@ desc() {
 
 
 help(){
-    echo "Usage: $0 [options]"
+    echo "Usage: $0 [command] [options]"
     echo ""
     echo "Commands:"
     echo "  help : Show this help message"
@@ -257,6 +257,7 @@ help(){
     echo "  remove-cron : Remove the cron job for monitoring"
     echo "  cron : Show the status of the cron job"
     echo "  reload : Reload the configuration file"
+    echo "  config : Edit the configuration file"
     echo ""
     echo "Options:"
     echo "  -h, --help : Show this help message"
@@ -301,6 +302,12 @@ case $1 in
         ;;
     cron)
         cron_status
+        ;;
+    config)
+        nano "$HOME/.local/share/upt/.uptrc"
+        ;;
+    "")
+        print_banner
         ;;
     *)
         echo "Invalid command: $1"
