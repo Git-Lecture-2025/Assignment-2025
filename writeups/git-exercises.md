@@ -1,7 +1,7 @@
 
 # Git-Exercises Writups
 
-Writups for the 
+Writups for the [Git Exercises](https://gitexercises.fracz.com )
 
 
 ## commit-one-file
@@ -14,21 +14,21 @@ and then making a commit
 
 `git commit -m "one-file"`
 
-FInall y verify that you have completed the stage
+Finally verify that you have completed the stage
 
 `git verify`
 
 
 ## commit-one-file-staged
 
-Again the direcotry has `A.txt` and `B.txt` but this time both the files are staged. This can be checked by running `git status`
+Again the directory has `A.txt` and `B.txt` but this time both the files are staged. This can be checked by running `git status`
 
-![[Pasted image 20250518170926.png]]
+![alt text](images/image.png)
 
 
 To unstage A.txt, use the following command:  `git restore --staged A.txt`
 
-Now Commit the staged B.txt and verify using
+Now commit the staged B.txt and verify using
 ```
 git commit -m "commit-one-file-staged"
 git verify
@@ -46,16 +46,23 @@ create a .gitignore file with the following contents;
 libraries/
 ```
 
+Stage, commit and verify to move on to the next stage:
+```
+git add .
+git commit -m "gitignore"
+git verify
+```
+
 
 ## chase-branch
 
 we need to rebase chase branch on to escaped so we first swtich to chase branch to `chase-branch` and then run `git rebase escaped` to rebase chase-branch onto escaped.
 
-Now both `chase-branch` and `escaped` are in the same position in the worktree
+Now both `chase-branch` and `escaped` are in the same position in the worktree.
 
 
 ## merge-conflict
-Since we need to merge `another-piece-of-work` into `merge-conflict` branch we switch to the merge comflict branch and then run `git merge another-piece-of-work` . Now to resolve the merge conflict open up `equation.txt` using the text editor of your choice
+Since we need to merge `another-piece-of-work` into `merge-conflict` branch we switch to the `merge-conflict` branch and then run `git merge another-piece-of-work` . Now to resolve the merge conflict open up `equation.txt` using the text editor of your choice
 ```
 <<<<<<< HEAD
 2 + ? = 5
@@ -64,12 +71,12 @@ Since we need to merge `another-piece-of-work` into `merge-conflict` branch we s
 >>>>>>> another-piece-of-work
 ```
 
-This is the contents of the equation.txt. Resolve this simply by chaning it to:
+This is the contents of the equation.txt. Resolve this simply by changing it to:
 ```
 2 + 3 = 5
 ```
 
-then stage the changes and commit
+Then stage the changes and commit
 ```
 git add .
 git commit -m "resolved merge conflicts"
@@ -111,16 +118,16 @@ git verify
 ```
 
 
-## Change Branch History
+## change-branch-history
 
-Simple rebase of change-branch-hisotyr on the head of hot-bugfix will do since we need the tree to be lienarlized.
+Simple rebase of `change-branch-history` on the head of `hot-bugfix` will do since we need the tree to be linearlized.
 
 ```
 git checkout change-branch-history
 git rebase hot-bugfix
 ```
 
-Finally stage,commit and verify to move to the next stage
+Finally stage, commit and verify to move to the next stage
 
 ```
 git add .
@@ -131,7 +138,7 @@ git verify
 
 ## remove-ignored
 
-Since ignored.txt is being tracked we can tell git to stop tracking it by running:
+Since `ignored.txt` is being tracked we can tell git to stop tracking it by running:
 ```
 git rm --cached ignored.txt
 ```
@@ -152,10 +159,14 @@ To rename the file a simple `mv` command will not do. For instance if one does
 Note: git runs rename detection for similar names. For instance renames like `File.txt`->`file.txt` gets registered as a rename even if the user uses the vanilla `mv` command.
 
 So for this challenge either one of the commands will do:
-`git mv File.txt file.txt`
-`mv File.txt file.txt`
+```
+git mv File.txt file.txt
+```
+```
+mv File.txt file.txt
+```
 
-Finally stage,commit and verify to move to the next stage
+Finally stage, commit and verify to move to the next stage
 
 ```
 git add .
@@ -166,8 +177,7 @@ git verify
 
 ## fix-typo
 
-In this challenge file.txt has a typo
-Its contents is:
+In this challenge file.txt has a typo:
 ```
 Hello wordl
 ```
@@ -183,7 +193,7 @@ git commit --amend
 ```
 
 git then opens up a text editor to edit the commit message. Fix the typo in the commit message and save the file.
-Finally verify to move on to the next stage
+Finally verify to move on to the next stage:
 ```
 git verify
 ```
@@ -192,7 +202,9 @@ git verify
 ## forge-date
 
 Use the following command the change the commit date of the latest commit
-`git commit --amend --no-edit --date="Wed Mar 4 12:34 1987 +0100"`
+```
+git commit --amend --no-edit --date="Wed Mar 4 12:34 1987 +0100"
+```
 Then `git verify` to move on to the next stage
 
 
@@ -200,13 +212,17 @@ Then `git verify` to move on to the next stage
 ## fix-old-typo
 
 Since we have to change a commit that isn't the latest we need to use the rebase in interactive mode
-`git rebase -i`
+```
+git rebase -i
+```
+
 Git then opens up a text editor with the commits and commands for them. Change the `pick` command to an `edit` command next to the commit with the typo.
 
-![[Pasted image 20250518192527.png]]
+![alt text](images/image-1.png)
 
 Save the file and exit. Now git will let you modify the contents of the file. Fix the type and stage it using
-`git add file.txt`
+`git add file.txt`.
+
 Commit the changes using  `git commit -m "-S"` which will also let you modify the commit message. Modify the commit message by fixing the typo and exit the text editor.
 
 Then run the following command to continue rebasing
