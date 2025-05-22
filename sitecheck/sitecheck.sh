@@ -159,7 +159,7 @@ else
                 # "d") ehco "reached here";display_url ;;
                 "x") remove_url ${!i} ;;
                 # "e") echo "edit url list"; echo ${!i} ;;
-                *) echo "invalid command, use -h to know more."
+                *) echo "invalid command(s) found, use -h to know more."
             esac
         fi
         i=$(expr $i + 1)
