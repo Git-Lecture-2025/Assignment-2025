@@ -37,19 +37,99 @@ print_banner() {
     echo ""
 }
 
-opts=("Add a Tracker" "Edit a Tracker" "Remove a Tracker" "Edit Config File" "↻ Refresh")
-curr=0
-clear
-print_banner
 
-echo "Press 'q' to exit"
-echo ""
+
+
+opts=("↻ Refresh" "Add a Tracker" "Edit a Tracker" "Remove a Tracker" "Edit Config File")
+curr=0
+
 
 # TODO: ADD FUNCTIONS FOR EACH OPTION THAT OPENS VIM OR SOMETHING
-# TODO: IMPLEMENT REFRESH
+
+refresh() {
+    local noping=$1
+
+    if [ -z "$noping" ]; then
+        clear
+        uptty ping
+        sleep 1
+        clear
+    fi
+    tui_init
+}
+
+
+add_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the name of the site and its url separated by a comma." >> $tmpf
+    builtin echo "# For Example: Google,https://www.google.com" >> $tmpf
+    nano +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "3" ]; then
+        clear
+        echo ""
+        echo ""
+        tput bold
+        echo "Incorrect Input. Aborted"
+        tput sgr0
+        echo ""
+        echo "Press Any Key to Exit"
+        read -rsn1
+        refresh dont
+        exit
+    fi
+
+    read -r sitename url <<< $(tail -n1 $tmpf)
+    clear
+    uptty add $sitename $url
+    clear
+    refresh
+}
+
+
+action_dispatcher() {
+    local targetAct=$1
+    case "$targetAct" in
+        1)
+            #ADD TRACKER
+            add_tracker
+            ;;
+        2)
+            #EDIT TRACKER
+            ;;
+        3)
+            #RM TRACKER
+            ;;
+        4) 
+            #EDIT CONFIG 
+            uptty config
+            ;;
+        0)
+            #REFRESH
+            refresh 
+            ;;
+        *)
+            ;;
+    esac
+}
+
+
+
+check_uptty() {
+    uptty > /dev/null 2> /dev/null
+    if [ $(echo $?) -n  e 0 ] ; then
+        echo ""
+        tput bold
+        echo "UPTTY Needs to be installed and in your PATH. Install it before using the TUI!"
+        tput sgr0
+        echo ""
+        read -n1
+        exit
+    fi
+}
 
 print_menu() {
-    tput civis
     while true;do
         tput bold
         echo "Select an option:"
@@ -84,9 +164,20 @@ print_menu() {
             curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
         elif [[ $k == "j" ]] ; then
             curr=$(((curr+1)% ${#opts[@]}))
+        elif [[ $k == "" ]] ; then
+            action_dispatcher "$curr"
         fi
     done
 }
 
+tui_init() {
+    tput civis
+    clear
+    print_banner
+    echo "Press 'q' to exit"
+    echo ""
+    print_menu
+}
 
-print_menu
+check_uptty
+tui_init
