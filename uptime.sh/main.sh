@@ -19,8 +19,6 @@ help(){
 
 
 # TODO: THIMK ABOUT INTERACTIVE TUI
-# TODO: EDIT ENTRIES
-# TODO: desc TO DESCRIBE A TRACKER 
 # TODO: COLOURS
 # TODO: README FOR INSTALLATION
 
@@ -43,6 +41,10 @@ case $1 in
     edit|update)
         edit_tracker "${@:2}"
         ;;
+    desc)
+        desc "$2"
+        ;;
+    
     *)
         echo "Invalid command: $1"
         help
