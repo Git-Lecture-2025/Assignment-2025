@@ -33,8 +33,7 @@ response_code=0
 curl_exit_code=0
 
 function just_display {
-    check_dependency
-    conditional_heading
+    decor_heading
     echo "---developed by karma---"
     echo 
     echo
@@ -91,8 +90,7 @@ function add_url() {
 }
 
 function display_url() {
-    check_dependency
-    conditional_heading
+    decor_heading
     echo "---developped by karma---"
     echo 
     echo "Tracked Sites"
@@ -140,9 +138,7 @@ function remove_url() {
 }
 
 function help_menu() {
-    check_dependency
-    echo -e "\n"
-    conditional_heading
+    decor_heading
     echo "your useful site tracking tool..."
     echo "---developed by karma---"
     echo 
@@ -181,11 +177,13 @@ function check_dependency() {
     fi
 }
 
-function conditional_heading() {
-    if [ $check1 -eq 0 ] && [ $check2 -eq 0 ]
-    then figlet "SiteCheck" | lolcat -a -s 100 2>/dev/null
-    else echo "SiteCheck"
-    fi
+function decor_heading() {
+    echo -e "\033[32m ____  _ _        ____ _               _    \033[0m"
+    echo -e "\033[33m/ ___|(_) |_ ___ / ___| |__   ___  ___| | __\033[0m"
+    echo -e "\033[36m\___ \| | __/ _ \ |   | '_ \ / _ \/ __| |/ /\033[0m"
+    echo -e "\033[36m ___) | | ||  __/ |___| | | |  __/ (__|   < \033[0m"
+    echo -e "\033[33m|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ \033[0m"
+    echo 
 }
 
 ####################################################
