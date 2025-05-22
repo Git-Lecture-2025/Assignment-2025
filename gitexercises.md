@@ -1,26 +1,37 @@
 # master
 
-Run `git start master`
+```
+git start master
+```
 
 # commit-one-file
 
-Run `git add A.txt` to only add `A.txt`
+In this exercise we need to only commit one file, for this we first add the file to staged area and then commit it
 
-Run `git commit -m 'Add A.txt'` to commit added file 
+```
+git add A.txt
+git commit -m 'Add A.txt'
+```
 
 # commit-one-staged-file
 
-Run `git restore --staged B.txt` to unstage B.txt
+In this exercise we need to commit only one of the staged files, we can do this by unstaging one of the files and commiting the other
 
-Run `git commit -m 'Add A.txt'` to commit
+```
+git restore --staged B.txt
+git commit -m 'Add A.txt'
+```
 
 # ignore-them
 
-Run `touch .gitignore` to create .gitignore file
+In this exercise we need to set some files to be ignore by git, this can be done using the `.gitignore` file, first we create the `.gitignore` file
 
-Run `nvim .gitignore` to edit it
+```
+touch .gitignore
+nvim .gitignore
+```
 
-Add the following to .gitignore
+Add the following to `.gitignore`
 
 ```
 *.exe
@@ -31,91 +42,123 @@ libraries/
 
 This will ignore all files ending with `.exe` `.o` `.jar` and the libraries folder
 
-Run `git add .` to stage all files in the current folder
-
-Run `git commit -m "Add .gitignore and file.txt"` to commit the changes
+Now we need to stage the remaining files and commit them
+```
+git add .
+git commit -m "Add .gitignore and file.txt"
+```
 
 # chase-branch
 
-Run `git merge escaped` to merge HEAD into escaped
+We need to merge the current head into the escaped branch which is two commits ahead, we can do this using the merge command
+
+```
+git merge escaped
+```
 
 # merge-conflict
 
-Run `git merge another-piece-of-work` to start the merge
+In this exercise we need to merge current branch into `another-piece-of-work` but the merge will fail due to conflicts, and we will need to manually fix the conflicts and continue the merge
 
-Run `nvim equation.txt` to edit the file with the merge conflicts
+```
+git merge another-piece-of-work
+nvim equation.txt
+```
 
 Edit the file removing the lines added by git and fix the equation
+After making the changes stage the file and commit the changes
 
-Run `git add equation.txt` to stage the modified file 
-
-Run `git commit -m "Merge another-piece-of-work"` to commit the changes
+```
+git add equation.txt
+git commit -m "Merge another-piece-of-work"
+```
 
 # save-your-work
 
-Run `git stash` to stash the changes
+In this exercise we need to fix a bug, we already have partial work so we first need to stash those changes and then fix the bug 
 
-Run `nvim bug.txt` to edit the file
+```
+git stash
+nvim bug.txt
+git add bug.txt
+git commit -m "fix(bug)"
+```
 
-Fix the bug in bug.txt
+Now we have fixed the bug and can finish our work
 
-Run `git add bug.txt` to stage bug.txt
-
-Run `git commit -m "fix(bug)"` to commit the bugfix
-
-Run `git stash pop` to get back your changes before the bugfix
-
-Add the required line at the end of bug.txt
-
-Run `git add .` move all files to staged area
-
-Run `git commit -m "Finish work"` to commit the completed work
+```
+git stash pop
+git add .
+git commit -m "Finish work"
+```
 
 # change-your-branch
 
-Run `git rebase hot-bugfix` to rebase your HEAD to hot-bugfix
+In this exercise we need to include a bugfix that was added a few commits after HEAD, we can do this using the git rebase command
+
+```
+git rebase hot-bugfix
+```
 
 # remove-ignored
 
-Run `git rm ignored.txt` to stop git from tracking it
+In this exercise we need to stop git from tracking files that we added to `.gitignore` after git started tracking them, we can do this using the `git rm` command 
 
-Run `git commit -m "Remove ignored.txt"` to commit the removal
+```
+git rm ignored.txt
+git commit -m "Remove ignored.txt"
+```
 
 # case-sensitive-filename
 
-Run `git mv File.txt file.txt` to rename File.txt to file.txt
+In this exercise we need to rename a file, we can do this with `git mv` command, we do this instead of just `mv` so that git keeps track of the file
 
-Run `git commit -m "Rename File.txt to file.txt"` to commit the changes
+```
+git mv File.txt file.txt
+git commit -m "Rename File.txt to file.txt"
+```
 
 # fix-typo
 
-Run `nvim file.txt` and fix the typo
+In this exercise we need to fix a typo we made in the last commit, but we dont want to make a new commit for this, we can mmend the last commit using the `--amend` flag in `git commit` command
 
-Run `git add file.txt` to stage the file
-
-Run `git commit --amend` to amend the previous commit and fix the typo in the commit message
+```
+nvim file.txt
+git add file.txt
+git commit --amend
+```
 
 # forge-date
 
-Run `git commit --date "Sun May 18 18:46:55 1987 +0530" --amend` to edit the date of a previous commit 
+We can forge the date of a commit using the `--date` flag in `git commit` command, for the format we can see the date in `git log`
+
+```
+git commit --date "Sun May 18 18:46:55 1987 +0530" --amend
+```
 
 # fix-old-typo
 
-Run `git rebase -i` to start interactive rebase
+In this exercise we need to fix a typo in a told commit, for this we can use git rebase in interactive mode and edit the commit with the typo
+We start the rebase in interactive mode using the `-i` flag
 
-Change pick to edit for the old typo commit, write and exit
+```
+git rebase -i
+```
 
-Edit file.txt and fix the typo
+Now we edit the commit with the typo by changing the `pick` to `edit`, then we save and close vim
+Edit file.txt and fix the typo, then stage the changes and amend the commit
 
-Run `git add file.txt` to stage the changes
+```
+git add file.txt
+git commit --amend '-S'
+```
 
-Run `git commit --amend '-S'` to amend the typo commit 
+Now we will continue the rebase using the `--continue` flag, and fix the merge conflicts that arise
 
-Run `git rebase --continue` to continue the rebase, it will fail due to merge conflicts
-
-Edit file.txt and manually fix the merge conflicts
-
-Run `git add file.txt` to stage the changes
-
-Run `git rebase --continue` to complete the rebase
+```
+git rebase --continue
+nvim file.txt
+git add file.txt
+git rebase --continue
+```
 
