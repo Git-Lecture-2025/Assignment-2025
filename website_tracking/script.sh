@@ -185,7 +185,7 @@ do
   echo "█ █ █ █ █    █  █   █  █   █   █        █   █  █ █  █ █   █ █  █   █  █"
   echo " █   █  ███  ███  ███  █   █   ███      █   █  █ █  █ ███ █  █ ███ █  █"
   echo -e "${RED}"
-  echo -e "\e[1m \t\t\t\t\t\tby Regie\e[0m"
+  echo -e "\e[1m \t\t\tby Regie\e[0m"
   echo -e "${NC}"
   echo -e "${YELLOW}-----------------------------------"
   echo -e "Choose from 1-5 to select what to do from the following:-"
