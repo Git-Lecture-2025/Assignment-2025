@@ -58,3 +58,15 @@ directories/
 ```
 
 Ignores the `directories` folder.
+
+### Chase-Branch
+
+```sh
+git merge escaped
+```
+
+Since chase is a direct ancestor this works and nothing bad happens.
+
+### Merge-Conflict
+
+Manually fix the merge conflict and use `git merge` to merge the branch.
