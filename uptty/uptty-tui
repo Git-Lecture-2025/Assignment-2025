@@ -88,7 +88,7 @@ add_tracker() {
 
 edit_tracker() {
     local tmpf=$(mktemp)
-    builtin echo "# Enter the Name of the Tracker or its UUID" >> $tmpf
+    builtin echo "# Enter the Name of the Tracker or its UUID to Edit" >> $tmpf
     nano +-1 $tmpf
     
     IFS=","
@@ -122,6 +122,29 @@ edit_tracker() {
     refresh
 }
 
+
+remove_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the Name of the Tracker or its UUID to Remove" >> $tmpf
+    nano +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r sitename <<< $(tail -n1 $tmpf)
+    uptty desc $sitename
+    if [ "$?" -ne "0" ]; then
+        display_error "Sitename - $sitename provided does not exist in the tracker list"
+        exit
+    fi
+    clear
+    uptty rm $sitename
+    clear
+    refresh
+}
+
 action_dispatcher() {
     local targetAct=$1
     case "$targetAct" in
@@ -135,6 +158,7 @@ action_dispatcher() {
             ;;
         3)
             #RM TRACKER
+            remove_tracker
             ;;
         4) 
             #EDIT CONFIG 
@@ -194,6 +218,7 @@ print_menu() {
                     ;;
             esac
         elif [[ $k == "q" ]] ; then
+            clear
             exit
         elif [[ $k == "k" ]] ; then
             curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))

@@ -109,7 +109,7 @@ list_sites() {
         fi
     done < "$UPT_CSV"
 
-    echo -e $(cat temp.csv | column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED                   " -o " | ")
+    echo -e $(cat temp.csv | column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED                     " -o " | ")
     rm temp.csv
 }
 
@@ -270,7 +270,6 @@ help(){
 }
 
 
-# TODO: THIMK ABOUT INTERACTIVE TUI
 # TODO: README FOR INSTALLATION
 
 load_config
