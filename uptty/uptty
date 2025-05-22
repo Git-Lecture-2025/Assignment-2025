@@ -306,9 +306,6 @@ case $1 in
     config)
         nano "$HOME/.local/share/upt/.uptrc"
         ;;
-    "")
-        print_banner
-        ;;
     *)
         echo "Invalid command: $1"
         help
