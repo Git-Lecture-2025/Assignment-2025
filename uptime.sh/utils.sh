@@ -26,7 +26,6 @@ list_sites() {
     cat uptime.csv| column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED" -o " | "
 }
 
-# TODO: USE NOTIFY-SEND
 # TODO: IMPLEMENT uptimerc FOR -NOTFIICATION,CRONJOB,TIME INTERVAL
 
 clear_line() {
@@ -91,6 +90,7 @@ check() {
         local resStat=$(echo $res | head -n 1)
         local resLat=$(echo $res | tail -n 1)
         resLat=${resLat:0:-1}
+        resLat="$resLat ms"
         if [[ "$resStat" == *"200"* ]]; then
             status="up"
             latency=$resLat
@@ -99,6 +99,9 @@ check() {
             echo "[🟢] $name is up, latency: $latency"
 
         else
+            if [ "$status" != "down" ]; then
+                notify-send "Tracker '$name' is down"
+            fi
             status="down"
             latency="infinity"
             kill $spinPid > /dev/null
@@ -110,6 +113,31 @@ check() {
         local replacement="$trackerid,$name,$url,$status,$latency,$lc"
         sed -i "/^$trackerid,/c $replacement" uptime.csv          
     done < uptime.csv    
+}
+
+
+desc() {
+    local target=$1
+    local uuidRegex="^$target,"
+    local nameRegex="^.*,$target,"
+
+    local line
+    line=$(grep -e "$uuidRegex" -e "$nameRegex"  uptime.csv)
+    IFS=',' read -r trackerid name url status latency lc <<< "$line"
+    if [ -z "$trackerid" ]; then
+        echo "Tracker ID $trackerid not found."
+        return 1
+    fi
+
+    echo "----------------------------------------"
+    echo "Tracker ID: $trackerid"
+    echo "Name: $name"
+    echo "URL: $url"
+    echo "Status: $status"
+    echo "Latency: $latency"
+    echo "Last Checked: $lc"
+    echo "----------------------------------------"
+    echo ""
 }
 
 
