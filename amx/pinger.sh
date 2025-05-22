@@ -23,12 +23,26 @@ add_site() {
     exit 1
 }
 
+del_site() {
+    if [ -z $(grep $1 ./tracklist.txt) ]
+    then
+        echo "Site not present in the track list"
+        echo "use -a to add site!"
+    else
+        echo "deleting $1"
+        sed -i "/^$1/d" ./tracklist.txt
+        echo "deleted succeessfully $1"
+    fi
+
+    exit 2
+}
+
 while getopts ":pa:d:l" opt
 do
     case $opt in
         p) echo "pinging sites";;
         a) input=$OPTARG;add_site "$input";;
-        d) input=$OPTARG;echo "$input";;
+        d) input=$OPTARG;del_site "$input";;
         l) echo "list site";;
         \?) echo "help";exit 1
     esac
