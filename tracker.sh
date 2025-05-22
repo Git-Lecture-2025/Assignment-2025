@@ -5,10 +5,10 @@ commands=(
 	"untrack" "untrack id1/url2 [id2/url2] [id3/url3] ...: Removes (a) website(s) to the tracking list."
 	
 	"status" "status [id1] [id2] ...: Displays the status of the requested websites."
-	"display" "display: Displays all teh tracked webistes."
+	"display" "display: Displays all the tracked webistes."
 
 	"help" "help: Displays this message."
-	"exit" "exit: Exits the command loop."
+	"exit" "exit: Exits the control loop."
 
 	"clear" "clear: Clears the terminal."
 )
@@ -91,6 +91,12 @@ function status() {
 	echo "-----Tracking Results------" 
 
 	if [[ "$#" -eq 0 ]]; then
+        local lines=$(( $(wc -l < "$file") ))
+        if [[ lines -eq 0 ]]; then
+            echo "No websites being tracked currently..."
+            return
+        fi
+ 
 		while IFS= read -r line; do
 			getStatus "$line"
 		done < "$file"
@@ -138,7 +144,7 @@ function loop() {
 
 		local i
 		for ((i = 0; i < ${#commands[@]}; i += 2)); do
-			cur=${commands[i]}
+			local cur=${commands[i]}
 			if [[ "$cmd" == "$cur" ]]; then
 				"${commands[i]}" "${args[@]:1}"
 				break
@@ -146,7 +152,7 @@ function loop() {
 		done
 
 		if [[ $i -ge ${#commands[@]} ]]; then
-			echo "ERR: Command not found. Use help for more info."
+			echo "Err: Command not found. Use help for more info."
 		fi
 	done
 }
