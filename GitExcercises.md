@@ -89,3 +89,17 @@ git rebase hot-<branch>
 From what I understand, rebase will find the common ancestor, move my current branch (excluding commits) on top of the branch passed in as the argument, and then reapplies the commits.
 
 Running it once will result in the required diretcory structure
+
+### Remove-Ignored
+
+```sh
+git -rm
+```
+
+Is used to remove a file from the git tree.
+
+### Case-Sensitive-Rename
+
+```sh
+git -mv
+```
