@@ -178,3 +178,39 @@ tar -xf
   <summary>Password</summary>
   FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn
 </details>
+
+### Level 13 -> Level 14
+
+```sh
+ssh -i <private_key>
+```
+
+Establishes a connection with the known private key. Since the directory structure offered a private key, it could be used to establish a connection without the use of a password.
+
+> Password: None
+
+### Level 14 -> Level 15
+
+```sh
+echo "password" | nc localhost 30000
+```
+
+Echoes the password to port 30000 on the local machine.
+
+<details>
+  <summary>Password</summary>
+  8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo
+</details>
+
+### Level 15 -> Level 16
+
+```sh
+openssl s_client -connect localhost:30001
+```
+
+Establishes a secure connection to port 30001 on the local machine 
+
+<details>
+  <summary>Password</summary>
+  kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+</details>
