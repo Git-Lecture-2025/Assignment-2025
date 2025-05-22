@@ -1,7 +1,10 @@
 #!/bin/bash
 
-touch list.txt
-list="./list.txt"
+list=~/.config/sitecheck/track_list.txt
+mkdir ~/.config/sitecheck > /dev/null
+cd ~/.config/sitecheck
+touch track_list.txt
+
 script_args=$@
 
 function error_dictionary {
