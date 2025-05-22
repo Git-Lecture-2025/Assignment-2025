@@ -103,3 +103,19 @@ Is used to remove a file from the git tree.
 ```sh
 git -mv
 ```
+
+### Case-Sensitive-Rename
+
+```sh
+git -mv
+```
+
+Is used to rename a file.
+
+### Fix-Typo
+
+```sh
+git commit -am --ammend "fixed typo"
+```
+
+After fixing the typo, use the above command to ammend on top if the last commit with the appoproate commit message.
