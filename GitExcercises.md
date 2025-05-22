@@ -30,3 +30,31 @@ git restore --staged <file>
 ```
 
 Unstages a file so it is not committed.
+
+### Ignore-Them
+
+A .gitignore file is a file that contains all files and directories to be ignored.
+
+```sh
+touch .gitignore
+```
+
+To create the file
+
+```sh
+nano .gitignore
+```
+
+To open the file in terminal for editing.
+
+```sh
+*.extension
+```
+
+Ignores all files with the specific extension (ReGex pattern matching)
+
+```sh
+directories/
+```
+
+Ignores the `directories` folder.
