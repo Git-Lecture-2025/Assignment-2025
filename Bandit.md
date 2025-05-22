@@ -86,3 +86,68 @@ Find all files from the root folder recursively that are owned by a particular u
   <summary>Password</summary>
   morbNTDkSW6jIlUc0ymOdMaLnOlFVAaj
 </details>
+
+### Level 7 -> Level 8
+
+```sh
+cat <file> | grep <key>
+```
+
+Get the line with a prticular key on it in some file.
+
+<details>
+  <summary>Password</summary>
+  dfwvzFQi4mU0wfNbFOe9RoWskMLg7eEc
+</details>
+
+### Level 8 -> Level 9
+
+```sh
+cat <file> | sort | uniq -u
+```
+
+Since uniq only checks for adjacent uniqueness, first sort the contents of the file
+
+<details>
+  <summary>Password</summary>
+  4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
+</details>
+
+### Level 9 -> Level 10
+
+```sh
+strings <file> | grep '^=+'
+```
+
+Gets all `strings` in a file that start with at least one `=`
+
+<details>
+  <summary>Password</summary>
+  FGUW5ilLVJrxX9kMYMmlN4MgbpfMiqey
+</details>
+
+### Level 10 -> Level 11
+
+```sh
+cat <file> | base64 -d
+```
+
+Pipe the output of the file and decode it assuming its in base 64
+
+<details>
+  <summary>Password</summary>
+  dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr
+</details>
+
+### Level 11 -> Level 12
+
+```sh
+cat <file> | tr 'A-Za-z' 'N-ZA-Mn-za-m'
+```
+
+Perform EGB13 on the data of a file.
+
+<details>
+  <summary>Password</summary>
+  7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4
+</details>
