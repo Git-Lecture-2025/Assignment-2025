@@ -1,93 +1,127 @@
 #!/bin/bash
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;36m'
+NC='\033[0m'
+YELLOW='\033[1;33m'
+
 WEBSITE_LIST=./.website_list.txt
 if [ ! -f $WEBSITE_LIST ]; then
   touch $WEBSITE_LIST
 fi
 
-add_website(){
-  tracking_list;
-  echo "Enter the website you want to add to the tracking-list:"
-  read website
-  if grep -q "$website" $WEBSITE_LIST; then
-    echo "Website already exists in the tracking-list."
-  else
-    echo "$website" >> $WEBSITE_LIST
-    echo "Website added to the tracking-list."
-  fi
-  echo "--------------------------------"
-  echo "Do you want to add another website? (y/n)"
-  read answer
-  if [ "$answer" == "y" ]; then
-    add_website
-  else
-    echo "Returning to main menu."
-  fi
-  tracking_list;
+add_website(){        
+  while true; do
+    tracking_list;
+    echo -e "${BLUE}"
+    echo -e "Enter the website you want to add to the tracking-list:"
+    read website
+    if grep -q "$website" $WEBSITE_LIST; then
+      echo -e "${RED}Website already exists in the tracking-list.${NC}"
+    else
+      echo "$website" >> $WEBSITE_LIST
+      echo -e "${GREEN}Website added to the tracking-list.${NC}"
+    fi
+    echo -e "${BLUE}--------------------------------"
+    echo -e "Do you want to add another website? (${GREEN}y/${RED}n${BLUE})"
+    read answer
+    if [ "$answer" != "y" ]; then
+      echo -e "Returning to main menu.${NC}"
+      break
+    fi
+  done
 }
+
 
 remove_website(){
-  tracking_list;
-  echo "--------------------------------"
-  echo "Enter the index number of the website you want to remove from the tracking-list:"
-  read website_num
-  if [ $website_num -lt 1 ] || [ $website_num -gt $(wc -l < $WEBSITE_LIST) ]; then
-    echo "Invalid number. Please try again."
-    remove_website  
-  else
-    sed -i "${website_num}d" $WEBSITE_LIST
-    echo "Website removed from the tracking-list."
+  if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
+    echo -e "${RED}"
+    echo "No websites to check!"
+    echo "Please add websites to the tracking-list first."
+    echo -e "${NC}"
+    sleep 1
+    return
   fi
-  echo "--------------------------------"
-  echo "Do you want to remove another website? (y/n)"
-  read answer
-  if [ "$answer" == "y" ]; then
-    remove_website
-  else
-    echo "Returning to main menu."
-  fi
-  tracking_list;
-  return;
+
+  while true; do
+    tracking_list;
+    echo -e "${BLUE}"
+    echo "--------------------------------"
+    echo "Enter the index number of the website you want to remove from the tracking-list:"
+    read website_num
+    total_lines=$(wc -l < "$WEBSITE_LIST")
+
+    if [[ "$website_num" =~ ^[0-9]+$ ]] && [ "$website_num" -ge 1 ] && [ "$website_num" -le "$total_lines" ]; then 
+      sed -i "${website_num}d" $WEBSITE_LIST
+      echo -e "${GREEN}Website removed from the tracking-list.${NC}"
+    else
+      echo -e "${RED}Invalid number. Please try again.${NC}"
+      continue
+    fi
+
+    echo -e "${BLUE}--------------------------------"
+    echo -e "Do you want to remove another website? (${GREEN}y${BLUE}/${RED}n${BLUE})"
+    read answer
+    if [ "$answer" != "y" ]; then
+      tracking_list;
+      echo -e "Returning to main menu.${NC}"
+      break
+    fi
+  done
 }
 
+
 edit_website(){
-  tracking_list;
-  echo "--------------------------------"
-  echo "Enter the index number of the website you want to edit in the tracking-list:"
-  read website_num
-  if [ $website_num -lt 1 ] || [ $website_num -gt $(wc -l < $WEBSITE_LIST) ]; then
-    echo "Invalid number. Please try again."
-    edit_website  
-  else
-    read -p "Enter the new website URL: " new_website
-    sed -i "${website_num}s|.*|$new_website|" $WEBSITE_LIST
-    echo "Tracking-list updated successfully."
+  if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
+    echo -e "${RED}"
+    echo "No websites to check!"
+    echo "Please add websites to the tracking-list first."
+    echo -e "${NC}"
+    sleep 1
+    return
   fi
-  echo "--------------------------------"
-  echo "Do you want to edit another website? (y/n)"
-  read answer
-  if [ "$answer" == "y" ]; then
-    edit_website
-  else
-    echo "Returning to main menu."
-  fi
-  echo "-----------------------------------"
-  echo "Current tracking-list:"
-  i=1
-  while IFS= read -r line
-  do
-    echo "$i.) $line"
-    i=$((i+1))
-  done < $WEBSITE_LIST
-  sleep 1
-  return;
+
+  while true; do
+    tracking_list;
+    echo -e "${BLUE}"
+    echo "--------------------------------"
+    echo "Enter the index number of the website you want to edit in the tracking-list:"
+    read website_num
+    total_lines=$(wc -l < "$WEBSITE_LIST")
+
+    if [[ "$website_num" =~ ^[0-9]+$ ]] && [ "$website_num" -ge 1 ] && [ "$website_num" -le "$total_lines" ]; then
+      echo -e "${GREEN}"
+      read -p "Enter the new website URL: " new_website
+      sed -i "${website_num}s|.*|$new_website|" $WEBSITE_LIST
+      echo -e "Tracking-list updated successfully.${NC}"
+    else
+      echo -e "${RED}Invalid number. Please try again.${NC}"
+      continue
+    fi
+
+    echo -e "${BLUE}--------------------------------"
+    echo -e "Do you want to edit another website? (${GREEN}y${BLUE}/${RED}n${BLUE})"
+    read answer
+    if [ "$answer" != "y" ]; then
+      tracking_list;
+      echo -e "Returning to main menu.${NC}"
+      break
+    fi
+  done
 }
+
 
 check_status(){
   if [[ ! -f $WEBSITE_LIST || ! -s $WEBSITE_LIST ]]; then
+    echo -e "${RED}"
     echo "No websites to check!"
+    echo "Please add websites to the tracking-list first."
+    echo -e "${NC}"
+    sleep 1
     return
   fi
+  echo -e "${BLUE}"
   echo "Checking website statuses..."
   echo "------------------------------"
   echo "Website URL                     Status"
@@ -98,17 +132,21 @@ check_status(){
     fi
     status_code=$(curl -o /dev/null -s -w "%{http_code}" "$website")
     if [[ "$status_code" -eq 200 ]]; then
+      echo -e "${GREEN}"
       status="Accessible"
     else
+      echo -e "${RED}"
       status="Not Accessible ($status_code)"
     fi
     echo  "$website" "                       " "$status"
   done < $WEBSITE_LIST
   sleep 2
+  echo -e "${NC}"
   return;
 }
 
 tracking_list(){
+  echo -e "${GREEN}"
   echo "-----------------------------------"
   echo "Current tracking-list:"
   i=1
@@ -118,52 +156,63 @@ tracking_list(){
     i=$((i+1))
   done < $WEBSITE_LIST
   sleep 1
+  echo -e "${NC}"
 }
 
 
 while [ true ]
 do
-  echo "-----------------------------------"
-  echo "Welcome to the website tracker by Regie!"
-  echo "-----------------------------------"
-  echo "Choose from 1-5 to select what to do from the following:-"
-  echo "1.) Add a website in the tracking-list"
-  echo "2.) Remove a website from the tracking-list"
-  echo "3.) Edit the tracking-list"
-  echo "4.) Check status"
-  echo "5.) Exit the program"
+  echo -e "${BLUE}"
+  echo "██     ██ ███████ ██████  ███████ ██ ████████ ███████     ████████ ██████   █████  ███████ ██   ██ ███████ ██████ "
+  echo "██     ██ ██      ██   ██ ██      ██    ██    ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██"
+  echo "██  █  ██ █████   ██████  ███████ ██    ██    █████          ██    ██████  ███████ ██      █████   █████   ██████ "
+  echo "██ ███ ██ ██      ██   ██      ██ ██    ██    ██             ██    ██   ██ ██   ██ ██      ██  ██  ██      ██   ██"
+  echo " ███ ███  ███████ ██████  ███████ ██    ██    ███████        ██    ██   ██ ██   ██ ███████ ██   ██ ███████ ██   ██"
+  echo -e "${RED}"
+  echo -e "\e[1m \t\t\t\t\t\tby Regie\e[0m"
+  echo -e "${NC}"
+  echo -e "${YELLOW}-----------------------------------"
+  echo -e "Choose from 1-5 to select what to do from the following:-"
+  echo -e "${YELLOW}-----------------------------------"
+  echo -e "${BLUE}1.)${NC} Add a website in the tracking-list"
+  echo -e "${BLUE}2.)${NC} Remove a website from the tracking-list"
+  echo -e "${BLUE}3.)${NC} Edit the tracking-list"
+  echo -e "${BLUE}4.)${NC} Check status"
+  echo -e "${BLUE}5.)${NC} Exit the program"
 
-  read -p "Enter your choice number: "  choice
+  echo -e "${GREEN}"
+  read -p "Enter your choice number and Press Enter: "  choice
+  echo -e "${NC}"
+  if [[ "$choice" =~ ^[0-9]+$ ]]; then
   if [ $choice -eq 1 ]
     then
 	    add_website;
-  fi
-  if [ $choice -eq 2 ]
+  elif [ $choice -eq 2 ]
     then
       remove_website;
-  fi
-  if [ $choice -eq 3 ]
+  elif [ $choice -eq 3 ]
     then
         edit_website;
-  fi
-  if [ $choice -eq 4 ]
+  elif [ $choice -eq 4 ]
     then
         check_status;
-  fi
-  if [ $choice -eq 5 ]
+  elif [ $choice -eq 5 ]
     then
+  echo -e "${YELLOW}"
 	echo "---------------------------"
         echo "Thanks for using the script"
 	echo "---------------------------"
+  echo -e "${NC}"
+  sleep 1
 	exit
   fi
-  if [ $choice -lt 1 ] || [ $choice -gt 5 ]
-    then
+  else
+        echo -e "${RED}"
         echo "Invalid choice. Please select a number between 1 and 5."
         sleep 0.5
-        echo "-----------------------------------"
-        echo "Returning to main menu."
+        echo -e "${NC}"
+        echo -e "${YELLOW}Please try again."
+        echo -e "${NC}"
         sleep 0.5
-        echo "-----------------------------------"
   fi
 done
