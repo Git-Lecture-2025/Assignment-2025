@@ -15,15 +15,16 @@ help(){
 }
 
 remove_site() {
+    local target=$1
+    local uuidRegex="^$target"
+    local nameRegex="^.*,$target,"
 
-}
-
-list_sites() {
-
-}
-
-check_sites() {
-
+    if grep --quiet -e "$uuidRegex" -e "$nameRegex" uptime.csv; then
+        sed -i "/$uuidRegex/d;/$nameRegex/d" uptime.csv
+        echo "$target removed successfully."
+    else
+        echo "Target site $target: not found."
+    fi
 }
 
 add_site(){
