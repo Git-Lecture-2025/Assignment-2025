@@ -12,6 +12,8 @@ help(){
     echo "  remove, rm : Remove a site from monitoring"
     echo "  ls, list : List all monitored sites"
     echo "  check, ping : Check the status of all monitored sites"
+    echo "  edit, update : Edit the details of a monitored site"
+    echo "  desc : Show the description of a monitored site"
     echo ""
     echo "Options:"
     echo "  -h, --help : Show this help message"
@@ -19,7 +21,6 @@ help(){
 
 
 # TODO: THIMK ABOUT INTERACTIVE TUI
-# TODO: COLOURS
 # TODO: README FOR INSTALLATION
 
 case $1 in 
