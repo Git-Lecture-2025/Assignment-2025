@@ -106,7 +106,7 @@ Get the line with a prticular key on it in some file.
 cat <file> | sort | uniq -u
 ```
 
-Since uniq only checks for adjacent uniqueness, first sort the contents of the file
+Since uniq only checks for adjacent uniqueness, first sort the contents of the file.
 
 <details>
   <summary>Password</summary>
@@ -119,7 +119,7 @@ Since uniq only checks for adjacent uniqueness, first sort the contents of the f
 strings <file> | grep '^=+'
 ```
 
-Gets all `strings` in a file that start with at least one `=`
+Gets all `strings` in a file that start with at least one `=`.
 
 <details>
   <summary>Password</summary>
@@ -132,7 +132,7 @@ Gets all `strings` in a file that start with at least one `=`
 cat <file> | base64 -d
 ```
 
-Pipe the output of the file and decode it assuming its in base 64
+Pipe the output of the file and decode it assuming its in base 64.
 
 <details>
   <summary>Password</summary>
@@ -187,8 +187,6 @@ ssh -i <private_key>
 
 Establishes a connection with the known private key. Since the directory structure offered a private key, it could be used to establish a connection without the use of a password.
 
-> Password: None
-
 ### Level 14 -> Level 15
 
 ```sh
@@ -208,7 +206,7 @@ Echoes the password to port 30000 on the local machine.
 openssl s_client -connect localhost:30001
 ```
 
-Establishes a secure connection to port 30001 on the local machine 
+Establishes a secure connection to port 30001 on the local machine.
 
 <details>
   <summary>Password</summary>
@@ -221,7 +219,7 @@ Establishes a secure connection to port 30001 on the local machine
 nmap -p31000-32000 localhost
 ```
 
-Lists all ports that are listening.
+Lists all ports that are listening within a range.
 
 ```sh
 openssl s_client -connect localhost:<port>
@@ -245,10 +243,10 @@ Displays differences between the 2 files.
 ### Level 18 -> Level 19
 
 ```sh
-ssh -p <port> <username>@<hostname> "shell command"
+ssh -p <port> <username>@<hostname> "echo hello world"
 ```
 
-SSH allows remote execution of commands which lets one bypass the logout from .bashsrc
+SSH allows remote execution of commands which lets one bypass the logout.
 
 <details>
   <summary>Password</summary>
@@ -267,7 +265,7 @@ Shows the setuid binary has the root user as bandit20 and group user as bandit19
 ./bandit20-do cat etc/bandit_pass/bandit20
 ```
 
-Returns the required password
+Returns the required password.
 
 <details>
   <summary>Password</summary>
