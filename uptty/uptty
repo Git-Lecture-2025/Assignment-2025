@@ -1,5 +1,9 @@
 #!/bin/bash
 
+version() {
+    echo "UpTTY v0.1"
+}
+
 
 load_config() {
     local config_file="$HOME/.local/share/upt/.uptrc"
@@ -264,6 +268,8 @@ help(){
     echo "  cron : Show the status of the cron job"
     echo "  reload : Reload the configuration file"
     echo "  config : Edit the configuration file"
+    echo "  version, -v, --version : Show the version of the script"
+    echo "  '' : Start the TUI interface"
     echo ""
     echo "Options:"
     echo "  -h, --help : Show this help message"
@@ -308,8 +314,14 @@ case $1 in
     cron)
         cron_status
         ;;
+    version|-v|--version)
+        version
+        ;;
     config)
         nano "$HOME/.local/share/upt/.uptrc"
+        ;;
+    "")
+        uptty-tui
         ;;
     *)
         echo "Invalid command: $1"
