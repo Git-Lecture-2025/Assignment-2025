@@ -22,3 +22,11 @@ git add <file>
 ```
 
 Registers an untracked file.
+
+### Commit-One-File-Staged
+
+```sh
+git restore --staged <file>
+```
+
+Unstages a file so it is not committed.
