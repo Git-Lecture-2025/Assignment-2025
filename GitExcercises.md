@@ -70,3 +70,12 @@ Since chase is a direct ancestor this works and nothing bad happens.
 ### Merge-Conflict
 
 Manually fix the merge conflict and use `git merge` to merge the branch.
+
+### Save-Your-works
+
+```sh
+git stash 
+```
+`git stash` is used to stash my current work and `git stash pop` is used to undo that.
+
+Fix the bug after stashing and commit it. Then `pop` it and then finish the work and push the final commit.
