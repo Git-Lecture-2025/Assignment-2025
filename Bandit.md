@@ -60,3 +60,29 @@ To show hidden files too
   <summary>Password</summary>
   2WmrDFRmJIq3IPxneAaMGhap0pFhF3NJ
 </details>
+
+### Level 5 -> Level 6
+
+```sh
+find . -type f -size <size> -exec file {} + | grep ASCII 
+```
+
+Execute file on each file in the current directory recursively of some size and pipe that into the input for grep to return all files of ASCII type.
+
+<details>
+  <summary>Password</summary>
+  HWasnPhtq9AVKe0dmk45nxy20cvUa6EG
+</details>
+
+### Level 6 -> Level 7
+
+```sh
+find / -user <user> -group <group> -size <size>
+```
+
+Find all files from the root folder recursively that are owned by a particular user, group and of a particular size.
+
+<details>
+  <summary>Password</summary>
+  morbNTDkSW6jIlUc0ymOdMaLnOlFVAaj
+</details>
