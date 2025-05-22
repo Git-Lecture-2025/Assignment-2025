@@ -123,7 +123,8 @@ function help_menu() {
     echo "your useful site tracking tool..."
     echo "---developed by karma---"
     echo 
-    echo "PURPOSE -> Tracks all the urls listed in the list.txt file, \nthe list can be manipulated using the following sub-commands."
+    echo "PURPOSE -> Tracks all the urls listed in the list.txt file,"
+    echo "the list can be manipulated using the following sub-commands."
     echo 
     echo "  -s                       Check status of all Tracked sites (Default function)"
     echo "  -a [arg1] [arg2] ...     Add url(s) to your tracking list."
