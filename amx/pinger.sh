@@ -37,6 +37,19 @@ del_site() {
     exit 2
 }
 
+
+help(){
+    echo "pinger [OPTIONS]... [FLAGS]..."
+    echo "FLAGS"
+    echo "-p : run pinger on tracklist"
+    echo "OPTIONS"
+    echo "-a : add site to tracklist"
+    echo "-d : delete site from tracklist"
+    echo "-l : list all sites in tracklist"
+    echo "-h : show this menu"
+    exit 3
+}
+
 while getopts ":pa:d:l" opt
 do
     case $opt in
@@ -44,6 +57,6 @@ do
         a) input=$OPTARG;add_site "$input";;
         d) input=$OPTARG;del_site "$input";;
         l) echo "list site";;
-        \?) echo "help";exit 1
+        \?) help ;exit 1
     esac
 done
