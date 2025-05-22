@@ -1,3 +1,5 @@
+#!/bin/bash
+
 list="./list.txt"
 script_args=$@
 
