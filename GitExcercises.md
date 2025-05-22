@@ -79,3 +79,13 @@ git stash
 `git stash` is used to stash my current work and `git stash pop` is used to undo that.
 
 Fix the bug after stashing and commit it. Then `pop` it and then finish the work and push the final commit.
+
+### Change-Branch-History
+
+```sh
+git rebase hot-<branch>
+```
+
+From what I understand, rebase will find the common ancestor, move my current branch (excluding commits) on top of the branch passed in as the argument, and then reapplies the commits.
+
+Running it once will result in the required diretcory structure
