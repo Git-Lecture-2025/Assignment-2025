@@ -9,6 +9,36 @@ then
     touch ./tracklist.txt
 fi
 
+#pings each site
+ping(){
+    echo "Pinging $1"
+    staus_code=$(curl -s -o /dev/null -w "%{http_code}" https://$1)
+
+    if [ $staus_code -eq 200 ]
+    then
+        echo "Site is up!"
+    else
+        echo "Site is down with status code: $status_code"
+    fi   
+}
+
+pinger() {
+    if [ -z $(cat ./tracklist.txt) ]
+    then
+        echo "Please add sites to ping"
+        echo "use -a <site-name> to single sites"
+        exit 4
+    fi
+
+    # goes over all sites one by one
+    cat ./tracklist.txt | while read line 
+    do
+        ping $line 
+    done
+
+    exit 0
+}
+
 add_site() {
     if [ -z $(grep $1 ./tracklist.txt) ]
     then
@@ -53,7 +83,7 @@ help(){
 while getopts ":pa:d:l" opt
 do
     case $opt in
-        p) echo "pinging sites";;
+        p) pinger;;
         a) input=$OPTARG;add_site "$input";;
         d) input=$OPTARG;del_site "$input";;
         l) echo "list site";;
