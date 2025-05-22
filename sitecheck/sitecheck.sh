@@ -31,7 +31,8 @@ curl_exit_code=0
 function just_display {
     figlet "SiteCheck" | lolcat -a -s 100
     echo "---developped by karma---"
-    echo "\n \n"
+    echo 
+    echo
     for item in $(cat $list)
     do
         response_code=$(curl -s -w "%{http_code}" -I "$item" -o /dev/null)    
@@ -41,10 +42,13 @@ function just_display {
         echo "Status - $response_code ( $desc )"
         echo "----------------------------"
     done
-    echo "\n \n"
-    echo "use -h to know more\n\n"
+    echo
+    echo "use -h to know more"
+    echo
+    echo
     sleep 0.5s
-    echo "SiteCheck completed on :- \n$(date)"
+    echo "SiteCheck completed on :-"
+    echo "$(date)"
 }
 
 function extract_switch_commands {
@@ -84,12 +88,13 @@ function add_url() {
 function display_url() {
     figlet "SiteCheck" | lolcat -a -s 100
     echo "---developped by karma---"
-    echo "\n"
+    echo 
     echo "Tracked Sites"
     echo "---------------------------------------"
     cat $list
-    echo "\n---------------------------------------"
-    echo "\n"
+    echo
+    echo "---------------------------------------"
+    echo 
 }
 
 function edit_list() {
@@ -105,24 +110,25 @@ function remove_url() {
             r=$r"\n"$url
         fi
     done
-    echo "$r" > $list 
+    echo -e "$r" > $list 
     echo "removing $1 from the list."
 }
 
 function help_menu() {
-    echo "\n"
+    echo -e "\n"
     figlet "SiteCheck" | lolcat -a -s 100
     echo "your useful site tracking tool..."
     echo "---developed by karma---"
-    echo "\n"
+    echo 
     echo "PURPOSE -> Tracks all the urls listed in the list.txt file, \nthe list can be manipulated using the following sub-commands."
-    echo "\n"
+    echo 
+    echo "  -s                       Check status of all Tracked sites (Default function)"
     echo "  -a [arg1] [arg2] ...     Add url(s) to your tracking list."
     echo "  -d                       Display all the urls in your tracking list"
     echo "  -x [arg1] [arg2] ...     Remove url(s) from the tracking list."
     echo "  -e                       To open the tracking list in text editor (for wider range of action)"
     echo "  -h                       To open this help menu" 
-    echo "\n"
+    echo 
 }
 
 ####################################################
@@ -143,6 +149,8 @@ else
             then edit_list;
             elif [ $curr_command == "h" ]
             then help_menu;
+            elif [ $curr_command == "s" ]
+            then just_display;
             fi
         continue;
         else 
@@ -151,7 +159,7 @@ else
                 # "d") ehco "reached here";display_url ;;
                 "x") remove_url ${!i} ;;
                 # "e") echo "edit url list"; echo ${!i} ;;
-                *) echo "nothing"
+                *) echo "invalid command, use -h to know more."
             esac
         fi
         i=$(expr $i + 1)
