@@ -142,12 +142,44 @@ That checks whether I have correctly run the commands such as cloning and thus p
 
 
 # 7th Exercise
+In this exercise we mainly learnt the usage of git stash
+So firstly we need to run the command
+```shell
+$ git stash -u
+```
+Which removes all the recent untracked and uncommited changes in the file and saves it with a hex code so that we go to that previous commit state that we wanted
+
+> No remove the bug line and commit as without that it won't let you bring back your previous uncommitted modifications
+
+```shell
+$ git commit -m "Fix the bug in bug.txt"
+```
+
+Now just run the command
+```shell
+$ git stash apply
+```
+So that all the new and the old changes(that were stashed) are merged together in the file
+
+Now just add a new line saying
+
+> Finally, finished it!
+
+just simply run
+```shell
+$ git add .
+$ git commit -m "Finally, finished it"
+```
+
+Just simply run
+```shell
+$ git verify
+```
+That checks whether I have correctly run the commands such as cloning and thus passes with the following result
 
 
-
-
-
-
+> Verifying the master exercise. > Hold on...        
+> Status: PASSED
 
 # 8th Exercise
 In this exercise we have 2 branches
