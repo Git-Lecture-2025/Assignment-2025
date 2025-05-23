@@ -52,6 +52,18 @@
     cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 ## Lesson 12 -> 13 
     pwd: FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn
+    We will make a temp directory as we need to work with the file and modify it repeatedly
+    mktemp -d
+    cat data.txt | xxd -r > /tmp/tmp.OLQPzeERc9/data
+    Then we will repeatedly identify the file type using file
+    We will encounter three types of compressions which we will decompress
+    When file output is
+    1. gzip 
+        gzip -d output
+    2. bzip2
+        bzip -d output
+    3. tar
+        tar -xf output
 ## Lesson 13 -> 14 
     pwd: MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS
     ls
@@ -70,4 +82,37 @@
     Then we enter the prev pwd when prompted
     We get the next pwd
 ## Lesson 16 -> 17
-    pwd: 
+    pwd: No pwd yielded, used the key
+    nmap localhost -p 31000-32000 | grep open
+    List of 5 servers. Try them manually (couldn't find a better method)
+    echo kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx | openssl s_client -connect localhost:31046 -ign_eof
+    Works upon 31790
+    Outputs RSA Key
+    Go to tmp dir
+    nano bandit.key
+    Paste the RSA key in this
+    Change the permissions
+    chmod 600 bandit.key
+    Now can be used
+    ssh -i bandit.key bandit17@bandit.labs.overthewire.org -p 2220
+## Lesson 17 -> 18
+    pwd: x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
+    Just spot the differences between them
+    ls
+    diff passwords.new passwords.old
+    Get the pwd
+## Lesson 18 -> 19
+    pwd: cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8
+    ssh -t bandit18@bandit.labs.overthewire.org -p 2220 bash --norc --noprofile
+    This basically connects via ssh without running .bashrc
+    ls
+    cd bandit18
+    ls - We find a readme
+    cat readme
+## Lesson 19 -> 20
+    pwd: 0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
+    So, bandit20-do allows you to run files as if you were bandit20 and not bandit 19
+    bandit_pass/bandit20 does not respond to cat, says permission denied
+    We run
+    ./bandit20-do cat /etc/bandit_pass/bandit20
+    This way we are allowed permissions as we are working as bandit20 and not bandit19
