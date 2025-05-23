@@ -116,6 +116,14 @@ if [[ $1 = "ping" ]]; then
 fi
 while true;
 do
+    reset
+    echo "__________.__                             "
+    echo "\\______   \\__| ____    ____   ___________ "
+    echo "|     ___/  |/    \\  / ___\\_/ __ \\_  __ \\"
+    echo "|    |   |  |   |  \\/ /_/  >  ___/|  | \\/"
+    echo "|____|   |__|___|  /\\___  / \\___  >__|   "
+    echo "                 \\//_____/      \\/       "
+
     echo "Available choices:"
     echo "1) Add a website"
     echo "2) Edit a website"
@@ -127,6 +135,7 @@ do
     echo -ne "Enter your choice: "
     read choice
     
+    reset
     case $choice in
         1)
             add_website
@@ -153,4 +162,6 @@ do
             echo "Wrong choice"
             ;;
     esac
+    echo "Press ENTER to go back to main menu"
+    read
 done
