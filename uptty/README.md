@@ -1,7 +1,7 @@
 <p align="center">
     <img src="../writeups/images/uptty.png" />
-</p>
 
+</p>
 
 UpTTY *(uptime + tty)* is a CLI/TUI tool to moniter remote services and get notified when they go down.
 
@@ -27,8 +27,7 @@ uptty config
 The configuration file `uptrc` currently only has 3 options:
 
 ### UPT_CSV
-Location of the CSV file used for storing Trackers
-By default its value is ~/.local/share/uptty/uptime.csv
+Location of the CSV file used for storing Trackers. By default its value is `~/.local/share/uptty/uptime.csv`
 
 ### UPT_CRONJOB
 `true` or `false` — determines whether the ping cronjob should be enabled.
