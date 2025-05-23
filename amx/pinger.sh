@@ -72,7 +72,16 @@ list_site(){
         echo "use -a <site-name> to single sites"
         exit 4
     fi
-    cat $trackfile
+
+    i=1
+    cat $trackfile | while read line
+    do
+        echo "$i: $line"
+        i=$(($i+1))
+    done 
+
+        
+    # cat $trackfile
 }
 
 
