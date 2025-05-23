@@ -199,6 +199,17 @@ function check_dependency() {
     fi
 }
 
+function check_dependency() {
+    which dialog >/dev/null
+    check=$?
+
+    if [ $check ]
+    then 
+        brew install dialog &>/dev/null;
+        apt install dialog &>/dev/null;
+    fi
+}
+
 function decor_heading() {
     echo -e "\033[32m ____  _ _        ____ _               _    \033[0m"
     echo -e "\033[33m/ ___|(_) |_ ___ / ___| |__   ___  ___| | __\033[0m"
@@ -309,9 +320,8 @@ function int_display(){
 
 ####################################################
 
-check1=0
-check2=0
-
+check=0
+check_dependency
 if [ $# -eq 0 ]
 then help_menu $isok;
 else
