@@ -34,6 +34,8 @@ addWebsite() {
     read url
     if [[ "$url" == "-1" ]]; then
         echo -e "Alright! ${magenta}Back to Home${clear}"
+    elif [[ "$url" == "" ]]; then
+        echo -e "${brired}Empty Input${clear}! Try again"
     else
         echo "$url" >> "$theFile"
         echo -e "${green}Website added to the list.${clear}"
@@ -81,7 +83,7 @@ editWebsite() {
         echo -e "${green}${num}${clear} ${blue}${url}${clear}"
     done
     echo " "
-    echo -e "${briyellow}REMOVE WEBSITE${clear}"
+    echo -e "${briyellow}EDIT WEBSITE${clear}"
     echo -e "If you have ${briyellow}arrived here accidentally${clear}, press ${brigreen}-1${clear} to go back"
     echo -n "Enter the line number to be edited: "
     read num
@@ -89,8 +91,12 @@ editWebsite() {
     if [[ $num -le $lines && $num -gt 0 ]]; then
         echo -n "Enter the new website URL: "
         read newURL
-        sed -i "${num}s#.*#$newURL#" "$theFile"
-        echo -e "${green}Website edited into the list.${clear}"
+        if [[ "$newURL" == "" ]]; then
+            echo -e "${brired}Empty Input${clear}! Try again"
+        else
+            sed -i "${num}s#.*#$newURL#" "$theFile"
+            echo -e "${green}Website edited into the list.${clear}"
+        fi
     elif [[ $num -eq "-1" ]]; then
         echo -e "Alright! ${magenta}Back to Home${clear}"
     else
@@ -122,11 +128,12 @@ checkWebsite() {
     echo "---------------------------------------------"
     echo "Website  -->  Status"
     echo "---------------------------------------------"
-    if [ ! command -v play ]; then
+    if ! which sox > /dev/null; then
         echo -e "${brigreen}SoX${clear} is ${brired}not installed${clear}."
+        echo -e "The program will now ask for permission to run: "
+        echo -e "${brigreen}sudo apt update && sudo apt install sox${clear}"
         sudo apt update && sudo apt install sox
     fi
-
     playSound &
     playSoundProcessId=$!
     while read -r URL; do
@@ -137,7 +144,6 @@ checkWebsite() {
             echo -e "$URL -->${thumbsDown} Unreachable"
         fi
     done < "$theFile"
-
     kill "$playSoundProcessId" 2>/dev/null
     wait "$playSoundProcessId" 2>/dev/null
 }
