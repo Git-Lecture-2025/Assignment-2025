@@ -2,11 +2,11 @@
 
 # Tool used to moniter status of websites
 
-if ! [ -f ./tracklist.txt ]
+if ! [ -f ./.tracklist.txt ]
 then
-    echo "Tracklist doesnt exists"
-    echo "Creating tracklist.txt"
-    touch ./tracklist.txt
+    # echo "Tracklist doesnt exists"
+    # echo "Creating tracklist.txt"
+    touch ./.tracklist.txt
 fi
 
 #pings each site
@@ -81,9 +81,23 @@ help(){
     echo "-a : add site to tracklist"
     echo "-d : delete site from tracklist"
     echo "-h : show this menu"
+    echo ""
+    echo "DESCRIPTION"
+    echo "      -a [site url], eg. -a www.google.com "
+    echo "      -d [site url], eg. -d www.google.com "
+    echo ""
     exit 3
 }
 
+banner(){
+    echo "WELCOME to pinger."
+}
+
+
+
+
+
+# Starting point for the program
 while getopts ":pa:d:l" opt
 do
     case $opt in
@@ -94,3 +108,8 @@ do
         \?) help ;exit 1
     esac
 done
+
+if [ "$OPTIND" -eq 1 ]; then
+  banner;
+  echo "use -h to see all the options"
+fi
