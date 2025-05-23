@@ -4,11 +4,19 @@ version() {
     echo "UpTTY v0.1"
 }
 
+preload_default_config() {
+    UPT_CSV="/home/tanmay/.local/share/upt/uptime.csv"
+    UPT_CRONJOB="true"
+    UPT_CRONJOB_INTERVAL=1
+    UPT_TEXT_EDITOR="nano"
+}
+
 
 load_config() {
     rm -f ~/.local/share/upt/sed* > /dev/null 2> /dev/null
     local config_file="$HOME/.local/share/upt/.uptrc"
     remove_cron > /dev/null 2> /dev/null
+    preload_default_config
     if [ -f "$config_file" ]; then
         source "$config_file"
         if [ "$UPT_CRONJOB" == "true" ]; then
@@ -25,6 +33,7 @@ load_config() {
         echo "UPT_CSV=\"$HOME/.local/share/upt/uptime.csv\"" >> "$config_file"
         echo 'UPT_CRONJOB="true"' >> "$config_file"
         echo 'UPT_CRONJOB_INTERVAL="1"' >> "$config_file"
+        echo 'UPT_TEXT_EDITOR="nano"' >> "$config_file"
         echo "Configuration file created at $config_file"
         touch $UPT_CSV
         add_cron > /dev/null 2> /dev/null
@@ -279,8 +288,6 @@ help(){
 }
 
 
-# TODO: README FOR INSTALLATION
-
 load_config
 
 case $1 in 
@@ -321,7 +328,7 @@ case $1 in
         version
         ;;
     config)
-        nano "$HOME/.local/share/upt/.uptrc"
+        $UPT_TEXT_EDITOR "$HOME/.local/share/upt/.uptrc"
         ;;
     "")
         uptty-tui
