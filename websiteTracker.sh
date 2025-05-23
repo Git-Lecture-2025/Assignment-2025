@@ -7,13 +7,13 @@ NC='\033[1;0m'
 YELLOW='\033[1;33m'
 
 echo -e "${YELLOW}"
-echo "    __      __      __        __                   __                      ";
-echo "   / /     / /___  / /_      / /___  ____   __    / /_  ____  _____";
-echo "  / /     / // _ \/ __ \\   / / __ \/ __  / __ \\/ __ \/ _ \\/ ___/";
-echo " / /__ __/ //  __/ /_/ //  / / / /_/ / /_/ / /_/// /_\ /  __/  __ / /";
-echo "/____//___/ \___/_.___(_)_/\\____/\\__,_/\\____//_/ \_ \\___/_/     ";
+echo "    __      __      __        __                           __                 ";
+echo "   / /     / /___  / /_      / /___  ______  ___    ___   / /_   ____  _____  ";
+echo "  / /     / // _ \/ __ \\   / / __ \/ __  // __ \ / __ \\/ __ \ / _ \\/ __  / ";
+echo " / /__ __/ //  __/ /_/ //  / / / /_/ / /_/  /_/ // /_  _/  _/ //   __/ / /_/  ";
+echo "/____//___/ \___/_____//__/\\____//_/    \\____/\\____//_/ \_\ \\___/_/       ";
 echo ""
-echo "               Track and Manage Websites easily               "
+echo "                    Track and Manage Websites easily                          "
 echo ""
 echo -e "${NC}"
 
@@ -41,12 +41,16 @@ options () {
 	elif [ "$option" = "a" ]; then
 		echo -e "${YELLOW}"
 		read -p "Enter the website you want to check : " key
-		add $key
-		echo -e "${NC}"
-
+                if [[ -z "$key" ]]; then
+                        echo "You can only check non-empty strings!"
+                        options
+                else
+                        add $key
+                        echo -e "${NC}"
+                fi
 	elif [ "$option" = "q" ]; then
 		echo "Exiting"
-		exit
+		exit 0
 	else
        		echo -e "${YELLOW}"
        		echo "Invalid option"
@@ -56,16 +60,30 @@ options () {
 }
 
 view () {
-	for key in "${!websites_list[@]}"; do
-		echo -e "$key ${RED} ${websites_list[$key]} ${YELLOW}"
-	done 
-	read -p "Would you like to view detailed status of the accessible websites? (y/n)" ans
-	if [[ "$ans" == "y" ]]; then
-		read -p "Enter the website you want detailed status of :" status_key
-		status $status_key
-	else 
-		options
-	fi
+        if [ "${#websites_list[@]}" -eq 0 ]; then
+                echo "The list is empty"
+                echo "You can check the status of websites by adding them to the list!"
+                echo ""
+        else
+                for key in "${!websites_list[@]}"; do
+                        if [[ "${websites_list[$key]}" == "accessible" ]]; then
+                                echo -e "$key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+                        else
+                                echo -e "$key ${RED} ${websites_list[$key]} ${YELLOW}"
+                        fi
+                done
+                echo ""
+                read -p "Would you like to view detailed status of the accessible websites? (y/n) " ans
+                if [[ "$ans" == "y" ]]; then
+                        read -p "Enter the website you want detailed status of : " status_key
+                        echo -e "${NC}"
+                        status $status_key
+                else
+                        options
+                fi
+
+        fi
+        options
 }
 
 add () {
@@ -73,6 +91,15 @@ add () {
 		echo -e "${GREEN}$1 is accessible"
 		websites_list[$1]="accessible"
 		echo -e "Added $1 to the list of tracked websites"
+  		echo -e "${YELLOW}"
+                echo ""
+                read -p "Would you like to view detailed status of this website? (y/n) " ans
+                if [[ "$ans" == "y" ]]; then
+                        echo -e "${NC}"
+                        status $1
+                else
+                        options
+                fi
 	else
 		echo -e "${RED}$1 is not accessible"
 		websites_list[$1]="not accessible"
@@ -82,7 +109,12 @@ add () {
 }
 
 edit () {
-	read -p "Enter the website you want to edit : " key
+        read -p "Enter the website you want to edit : " key
+        if [[ -z "$key" ]]; then
+                echo "You can only edit non-empty strings!"
+                options
+                return 0
+        fi
 	if [[ -n "${websites_list[$key]}" ]]; then
 		unset websites_list[$key]
                 read -p "Enter the new website : " key_replace
@@ -95,12 +127,16 @@ edit () {
 
 delete () { 
 	read -p "Enter the website you want to delete : " key
+ 	if [[ -z "$key" ]]; then
+                echo "You can only delete non-empty strings!"
+                options
+                return 0
+        fi
 	if [[ -n "${websites_list[$key]}" ]]; then
 		unset websites_list[$key]
                 echo "Deleted."
         else
 		echo "The website isnt being tracked currently."
-
 	fi
 	options
 }
