@@ -51,16 +51,30 @@ add_site() {
     exit 1
 }
 
-del_site() {
-    if [ -z $(grep $1 $trackfile) ]
+del_site() { 
+    total_lines=$(cat $trackfile | wc -w)
+    echo "Total sites present $total_lines"
+    if [ $total_lines -eq 0 ]
     then
-        echo "Site not present in the track list"
-        echo "use -a to add site!"
-    else
-        echo "deleting $1"
-        sed -i "/^$1/d" $trackfile
-        echo "deleted succeessfully $1"
+        echo "No sites to ping"
+        echo "use -a <site-name> to single sites"
+        exit 2
     fi
+
+    line=$1
+
+    if [ -z $line ]
+    then 
+        echo "Please input a non-empty index!"
+    elif [[ $line -ge 1 && $line -le $total_lines ]]
+    then
+        sed -i "$line d" $trackfile
+        echo "site id $line removed successfully"
+    else    
+        echo "Enter a valid index"
+    fi
+
+    echo "run with -l to list all sites with index"
 
     exit 2
 }
@@ -89,15 +103,15 @@ help(){
     echo "pinger [OPTIONS]... [FLAGS]..."
     echo "FLAGS"
     echo "-p : run pinger on tracklist"
-    echo "-l : list all sites in tracklist"
+    echo "-l : list all sites with in tracklist"
     echo "OPTIONS"
     echo "-a : add site to tracklist"
-    echo "-d : delete site from tracklist"
+    echo "-d : delete site by index from tracklist"
     echo "-h : show this menu"
     echo ""
     echo "DESCRIPTION"
     echo "      -a [site url], eg. -a www.google.com "
-    echo "      -d [site url], eg. -d www.google.com "
+    echo "      -d [site index], eg. -d 4 "
     echo ""
     exit 3
 }
@@ -118,6 +132,7 @@ do
         a) input=$OPTARG;add_site "$input";;
         d) input=$OPTARG;del_site "$input";;
         l) list_site;;
+        :) echo "Follow the syntax guidelines!";echo "";help ;exit 1;;
         \?) help ;exit 1
     esac
 done
