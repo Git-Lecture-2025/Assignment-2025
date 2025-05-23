@@ -72,6 +72,8 @@ edit_website() {
 }
 
 check_websites() {
+    echo "-------------------------------------"
+    date
     echo "Checking if saved websites are online"
     cat ~/website_checker_list |
         while read in; do
@@ -79,8 +81,39 @@ check_websites() {
             [[ $? = 0 ]] && result="\e[32mSUCCESS\e[0m" || result="\e[31mFAILED\e[0m"
             echo -e $in $result
         done
+    echo "-------------------------------------"
 }
 
+add_cron() {
+    path=$(realpath $0)
+    user=$(whoami)
+    if ( crontab -l 2> /dev/null | grep --quiet "$path" ); then
+        echo -e "\e[31mCronjob already exists, Remove it to add a new one\e[0m"
+    else
+        echo -ne "Enter the time interval in minutes [Default = 30m]: "
+        read schedule
+        if [[ $schedule = "" ]]; then
+            schedule="30"
+        fi
+        (crontab -l 2> /dev/null; echo "*/$schedule * * * * $path ping > /home/$user/website_checker_logs") | crontab -
+        echo -e "\e[32mCronjob Added\e[0m"
+    fi
+}
+
+remove_cron() {
+    path=$(realpath $0)
+    if ( crontab -l | grep --quiet "$path" ); then
+        (crontab -l 2> /dev/null | grep -v "$path") | crontab -
+        echo -e "\e[32mCronjob removed\e[0m"
+    else
+        echo -e "\e[31mCronjob doesnt exist\e[0m"
+    fi
+}
+
+if [[ $1 = "ping" ]]; then
+    check_websites
+    exit
+fi
 while true;
 do
     echo "Available choices:"
@@ -88,7 +121,9 @@ do
     echo "2) Edit a website"
     echo "3) Remove a website"
     echo "4) Check status"
-    echo "5) Exit"
+    echo "5) Add cronjob"
+    echo "6) Remove cronjob"
+    echo "7) Exit"
     echo -ne "Enter your choice: "
     read choice
     
@@ -106,6 +141,12 @@ do
             check_websites
             ;;
         5)
+            add_cron
+            ;;
+        6)
+            remove_cron
+            ;;
+        7)
             exit
             ;;
         *)
