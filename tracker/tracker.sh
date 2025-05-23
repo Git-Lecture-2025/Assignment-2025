@@ -3,8 +3,8 @@
 logfile=".crontrack.log"
 touch "$logfile"
 
-data=".data.txt"
-touch "$data"
+datafile=".data.txt"
+touch "$datafile"
 
 commands=( 
 	"track" "track url1 [url2] [url3] ...: Add(s) (a) website(s) to the tracking list."
@@ -23,11 +23,11 @@ commands=(
 	"clear" "clear: Clears the terminal."
 )
 
-source "functions.sh"
+source "functions.sh" $datafile
 
 function push() {
-	local line=$(( $(wc -l < "$data") + 1 ))
-    echo "$1" >> "$data"
+	local line=$(( $(wc -l < "$datafile") + 1 ))
+    echo "$1" >> "$datafile"
 }
 
 function track() {
@@ -37,7 +37,7 @@ function track() {
 	fi
 
 	for url in "$@"; do
-		if grep -Fq "$url" "$data"; then
+		if grep -Fq "$url" "$datafile"; then
 			echo "Already tracking: $url..."
 			return
 		fi
@@ -50,7 +50,7 @@ function track() {
 			*)
 				push "$url"
 
-				local line=$(( $(wc -l < "$data")))
+				local line=$(( $(wc -l < "$datafile")))
 				echo "Now tracking $url... at ID: $line"
 				;;
 		esac
@@ -78,14 +78,14 @@ function untrack() {
 	local lines=()
 	while IFS= read -r line; do
   		lines+=("$line")
-	done < "$data"
+	done < "$datafile"
 
 	if [[ "${#lines[@]}" -eq 0 ]]; then
 		echo "Currently tracking no websites..."
 		return
 	fi
 
-    > "$data"  
+    > "$datafile"  
 
 	local i
 	local resolved=0
@@ -96,7 +96,7 @@ function untrack() {
             continue
         fi
 
-        echo "${lines[$i]}" >> "$data"
+        echo "${lines[$i]}" >> "$datafile"
 	done
 
 	echo "Untracked ${resolved} arguments successfully."
@@ -115,7 +115,7 @@ function getStatus() {
 function status() {
 	echo "-----Tracking Results------" 
 
-	local lines=$(( $(wc -l < "$data") ))
+	local lines=$(( $(wc -l < "$datafile") ))
 	if [[ "$#" -eq 0 ]]; then
         if [[ $lines -eq 0 ]]; then
             echo "No websites being tracked currently..."
@@ -124,7 +124,7 @@ function status() {
  
 		while IFS= read -r line; do
 			getStatus "$line"
-		done < "$data"
+		done < "$datafile"
 	else
 		for id in "$@"; do
 			if [[ "$id" -le 0 || "$id" -gt "$lines" ]]; then
@@ -132,7 +132,7 @@ function status() {
 				return
 			fi
 
-			getStatus $(sed -n "${id}p" .data.txt)
+			getStatus $(sed -n "${id}p" .datafile.txt)
 		done
 	fi
 }
@@ -140,7 +140,7 @@ function status() {
 function display() {
 	echo "-----Currently Tracking-----"
 
-	local lines=$(( $(wc -l < "$data") ))
+	local lines=$(( $(wc -l < "$datafile") ))
 	if [[ $lines -eq 0 ]]; then
 		echo "No websites being tracker currently..."
 		return
@@ -150,7 +150,7 @@ function display() {
 	while IFS= read -r line; do
   		echo "$i. $line"
 		((i++))
-	done < "$data"
+	done < "$datafile"
 }
 
 function help() {
@@ -176,10 +176,14 @@ function cron() {
 	fi
 
 	if [ -e cronjob.sh ]; then
-		patern="*/$1 * * * * $(realpath "cronjob.sh") $(realpath "$logfile")"
-		(crontab -l 2>/dev/null; echo "$patern") | crontab -
+		if [[ $1 =~ ^[0-9]+$ ]] && [ "$1" -gt 0 ]; then
+			local patern="*/$1 * * * * $(realpath "cronjob.sh") $(realpath functions.sh) $(realpath "$datafile") $(realpath "$logfile")"
+			(crontab -l 2>/dev/null; echo "$patern") | crontab -
 
-		echo "Cron job successfully set up"
+			echo "Cron job successfully set up"
+		else
+			echo "The timout must be a natural number..."
+		fi
 	else
 		echo "Err: Failed to reoslve cronjob shell file... The file may have been deleted"
 	fi

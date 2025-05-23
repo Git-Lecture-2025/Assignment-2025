@@ -1,7 +1,9 @@
 #!/bin/bash
 
+datafile=$1
+
 function getStatus() {
-	local code=$(curl -s -o /dev/null -w "%{http_code} %{time_total}" "$1")
+	local code=$(curl -L -s -o /dev/null -w "%{http_code} %{time_total}" "$1")
 	IFS=' ' read -r -a code <<< "$code"
 
 	echo "Tracking Result: ${1}; Response Code: ${code[0]}; Latency: ${code[1]}"
@@ -10,7 +12,7 @@ function getStatus() {
 function status() {
 	echo "-----Tracking Results------" 
 
-	local lines=$(( $(wc -l < "$data") ))
+	local lines=$(( $(wc -l < "$datafile") ))
 	if [[ "$#" -eq 0 ]]; then
         if [[ $lines -eq 0 ]]; then
             echo "No websites being tracked currently..."
@@ -19,7 +21,7 @@ function status() {
  
 		while IFS= read -r line; do
 			getStatus "$line"
-		done < "$data"
+		done < "$datafile"
 	else
 		for id in "$@"; do
 			if [[ "$id" -le 0 || "$id" -gt "$lines" ]]; then
@@ -27,7 +29,7 @@ function status() {
 				return
 			fi
 
-			getStatus $(sed -n "${id}p" .data.txt)
+			getStatus $(sed -n "${id}p" $datafile)
 		done
 	fi
 }
