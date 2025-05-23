@@ -19,6 +19,11 @@ echo() {
     builtin echo ""
 }
 
+strip_string() {
+    local str="$1"
+    echo "$str" | xargs echo -n
+}
+
 preload_default_config() {
     UPT_CSV="/home/tanmay/.local/share/upt/uptime.csv"
     UPT_CRONJOB="true"
@@ -102,6 +107,8 @@ add_tracker() {
     fi
 
     read -r sitename url <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
+    url=$(strip_string "$url")
     if [ -z "$sitename" ] || [ -z "$url" ]; then
         display_error "Incorrect Input. Aborted"
         exit
@@ -124,6 +131,7 @@ edit_tracker() {
         exit
     fi
     read -r sitename <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
     uptty desc $sitename
     if [ "$?" -ne "0" ]; then
         display_error "Sitename - $sitename provided does not exist in the tracker list"
@@ -142,6 +150,8 @@ edit_tracker() {
         exit
     fi
     read -r newsitename url <<< $(tail -n1 $tmpf)
+    newsitename=$(strip_string "$newsitename")
+    url=$(strip_string "$url")
     if [ -z "$newsitename" ] || [ -z "$url" ]; then
         display_error "Incorrect Input. Aborted"
         exit
@@ -165,6 +175,7 @@ remove_tracker() {
         exit
     fi
     read -r sitename <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
     uptty desc $sitename
     if [ "$?" -ne "0" ]; then
         display_error "Sitename - $sitename provided does not exist in the tracker list"
