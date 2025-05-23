@@ -28,6 +28,7 @@ function code_dictionary {
         "404") echo "Not Found";;
         "405") echo "Method not Allowed";;
         "408") echo "Request Timeout";;
+        "503") echo "Service Unavailable";;
         "000") echo $(error_dictionary $2);;
         *) echo "Error"
     esac
@@ -113,9 +114,19 @@ function edit_list() {
     i=$(expr $i + 1)
     done
 
+    isok=true;
+    while $isok
+    do
     echo
     echo "Which line to edit? (enter S.No)"
     read r
+        if [ $(expr $r ) -gt ${#lines[@]} ] || [ $r -le 0 ]
+        then
+        echo -e "\nplease enter valid index"; continue
+        fi
+        isok=false
+    done
+
     r=$(expr $r - 1)
     echo "> [${lines[$r]}] edit to :-" 
     read resp
