@@ -55,6 +55,9 @@ UPT_TEXT_EDITOR="nano"
 <br></br>
 # Commands
 
+### `uptty`
+
+Start UpTTY in TUI mode.
 
 ### `uptty ls` / `uptty list`
 
