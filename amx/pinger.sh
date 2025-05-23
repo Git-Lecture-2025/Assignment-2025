@@ -76,10 +76,10 @@ help(){
     echo "pinger [OPTIONS]... [FLAGS]..."
     echo "FLAGS"
     echo "-p : run pinger on tracklist"
+    echo "-l : list all sites in tracklist"
     echo "OPTIONS"
     echo "-a : add site to tracklist"
     echo "-d : delete site from tracklist"
-    echo "-l : list all sites in tracklist"
     echo "-h : show this menu"
     exit 3
 }

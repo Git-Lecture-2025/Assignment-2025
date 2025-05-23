@@ -37,7 +37,7 @@
 > cat ./...Hiding-From-You
 ```
 *Code* : 4oQYVPkxZOOEOO5pTW81FB8j8lxXGUQw
-## Level 5 
+## Level 5 -- redo
 ```
 > ssh bandit5@bandit.labs.overthewire.org -p 2220
 > cat $(find . -size 1033c)
@@ -55,7 +55,7 @@
 > cat data.txt | grep "millionth"
 ```
 *Code* : dfwvzFQi4mU0wfNbFOe9RoWskMLg7eEc
-## Level 8 
+## Level 8 -- recap
 ```
 > ssh bandit8@bandit.labs.overthewire.org -p 2220
 > sort data.txt | uniq -u
@@ -113,6 +113,7 @@ Ran ```openssl s_client -h``` to get the paramter syntax
 ```
 
 *Code* : kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
+
 
 
 
