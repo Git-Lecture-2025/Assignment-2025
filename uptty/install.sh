@@ -6,6 +6,13 @@ if [ "$USER" != "root" ]; then
     exit
 fi
 
+echo ""
+echo "▄• ▄▌ ▄▄▄·▄▄▄▄▄▄▄▄▄▄ ▄· ▄▌"
+echo "█▪██▌▐█ ▄█•██  •██  ▐█▪██▌"
+echo "█▌▐█▌ ██▀· ▐█.▪ ▐█.▪▐█▌▐█▪"
+echo "▐█▄█▌▐█▪·• ▐█▌· ▐█▌· ▐█▀·."
+echo " ▀▀▀ .▀    ▀▀▀  ▀▀▀   ▀ • "
+echo ""
 
 echo "Installing UpTTY ..."
 wget -nv --no-cache -O /usr/bin/uptty https://raw.githubusercontent.com/TanmayArya-1p/Assignment-2025/refs/heads/tcan/uptty/uptty
