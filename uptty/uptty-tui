@@ -1,0 +1,289 @@
+#!/bin/bash
+
+
+echo() {
+    local otpt="$1"
+    local width=$(tput cols)
+    local offs=$(( (width - ${#otpt}) / 2 ))
+    
+    local it=0;
+    while [ $it -lt $offs ]; do
+        builtin echo -n " "
+        it=$((it + 1))
+    done
+    builtin echo -n "$otpt"
+    while [ $it -lt $offs ]; do
+        builtin echo -n " "
+        it=$((it + 1))
+    done
+    builtin echo ""
+}
+
+strip_string() {
+    local str="$1"
+    echo "$str" | xargs echo -n
+}
+
+preload_default_config() {
+    UPT_CSV="/home/tanmay/.local/share/upt/uptime.csv"
+    UPT_CRONJOB="true"
+    UPT_CRONJOB_INTERVAL=1
+    UPT_TEXT_EDITOR="nano"
+}
+
+
+load_config() {
+    preload_default_config
+    local config_file="$HOME/.local/share/upt/.uptrc"
+    if [ ! -f "$config_file" ]; then
+        exit
+    fi
+    source "$config_file"
+}
+
+h_center_body(){
+    local otpt="$1"
+    while IFS= read -r line; do
+        echo "$line"
+    done <<< "$otpt"
+}
+
+
+print_banner() {
+    echo ""
+    echo ""
+    echo ""
+    echo "▄• ▄▌ ▄▄▄·▄▄▄▄▄▄▄▄▄▄ ▄· ▄▌"
+    echo "█▪██▌▐█ ▄█•██  •██  ▐█▪██▌"
+    echo "█▌▐█▌ ██▀· ▐█.▪ ▐█.▪▐█▌▐█▪"
+    echo "▐█▄█▌▐█▪·• ▐█▌· ▐█▌· ▐█▀·."
+    echo " ▀▀▀ .▀    ▀▀▀  ▀▀▀   ▀ • "
+    echo ""
+    h_center_body "$(uptty ls)"
+    echo ""
+}
+
+opts=("↻ Refresh" "Add a Tracker" "Edit a Tracker" "Remove a Tracker" "Edit Config File")
+curr=0
+
+refresh() {
+    load_config
+    local noping=$1
+
+    if [ -z "$noping" ]; then
+        clear
+        uptty ping
+        sleep 1
+        clear
+    fi
+    tui_init
+    tput civis
+}
+
+
+display_error() {
+    local error_msg=$1
+    clear
+    echo ""
+    echo ""
+    tput bold
+    echo "$error_msg"
+    tput sgr0
+    echo ""
+    echo "Press Any Key to Exit"
+    read -rsn1
+    refresh dont
+}
+
+add_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the name of the site and its url separated by a comma." >> $tmpf
+    builtin echo "# For Example: Google,https://www.google.com" >> $tmpf
+    $UPT_TEXT_EDITOR +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "3" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+
+    read -r sitename url <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
+    url=$(strip_string "$url")
+    if [ -z "$sitename" ] || [ -z "$url" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+
+    clear
+    uptty add $sitename $url
+    clear
+    refresh
+}
+
+edit_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the Name of the Tracker or its UUID to Edit" >> $tmpf
+    $UPT_TEXT_EDITOR +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r sitename <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
+    uptty desc $sitename
+    if [ "$?" -ne "0" ]; then
+        display_error "Sitename - $sitename provided does not exist in the tracker list"
+        exit
+    fi
+    
+    tmpf=$(mktemp)
+    builtin echo "# Edit the Tracker below while maintaining the format: {Name},{URL}" >> $tmpf
+    uptty desc $sitename tui | tr -d '\n' >> $tmpf
+
+    $UPT_TEXT_EDITOR +2,+999 $tmpf
+
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r newsitename url <<< $(tail -n1 $tmpf)
+    newsitename=$(strip_string "$newsitename")
+    url=$(strip_string "$url")
+    if [ -z "$newsitename" ] || [ -z "$url" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    clear
+    uptty edit $sitename -n $newsitename -u $url
+    clear
+    sleep 1
+    refresh
+}
+
+
+remove_tracker() {
+    local tmpf=$(mktemp)
+    builtin echo "# Enter the Name of the Tracker or its UUID to Remove" >> $tmpf
+    $UPT_TEXT_EDITOR +-1 $tmpf
+    
+    IFS=","
+    if [ "$(wc -l < "$tmpf")" -ne "2" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+    read -r sitename <<< $(tail -n1 $tmpf)
+    sitename=$(strip_string "$sitename")
+    uptty desc $sitename
+    if [ "$?" -ne "0" ]; then
+        display_error "Sitename - $sitename provided does not exist in the tracker list"
+        exit
+    fi
+    clear
+    uptty rm $sitename
+    clear
+    refresh
+}
+
+action_dispatcher() {
+    local targetAct=$1
+    case "$targetAct" in
+        1)
+            #ADD TRACKER
+            add_tracker
+            ;;
+        2)
+            #EDIT TRACKER
+            edit_tracker
+            ;;
+        3)
+            #RM TRACKER
+            remove_tracker
+            ;;
+        4) 
+            #EDIT CONFIG 
+            uptty config
+            refresh
+            ;;
+        0)
+            #REFRESH
+            refresh 
+            ;;
+        *)
+            ;;
+    esac
+}
+
+
+
+check_uptty() {
+    uptty version > /dev/null 2> /dev/null
+    if [ $(echo $?) -n  e 0 ] ; then
+        echo ""
+        tput bold
+        echo "UPTTY Needs to be installed and in your PATH. Install it before using the TUI!"
+        tput sgr0
+        echo ""
+        read -n1
+        exit
+    fi
+}
+
+print_menu() {
+    while true;do
+        tput civis
+        tput bold
+        echo "Select an option:"
+        tput sgr0
+        local it=0
+        while [ $it -lt ${#opts[@]} ]; do
+            if [ $it -eq $curr ]; then
+                tput bold
+                echo "> ${opts[$it]}"
+                tput sgr0
+            else
+                echo "  ${opts[$it]}"
+            fi
+            it=$((it + 1))
+        done
+        tput cuu 6
+
+        read -rsn1 k
+        if [[ $k == $'\e' ]]; then
+            read -rsn2 k
+            case $k in
+                '[B')
+                    curr=$(((curr+1)% ${#opts[@]}))
+                    ;;
+                '[A')
+                    curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
+                    ;;
+            esac
+        elif [[ $k == "q" ]] ; then
+            clear
+            exit
+        elif [[ $k == "k" ]] ; then
+            curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
+        elif [[ $k == "j" ]] ; then
+            curr=$(((curr+1)% ${#opts[@]}))
+        elif [[ $k == "" ]] ; then
+            action_dispatcher "$curr"
+        fi
+    done
+}
+
+tui_init() {
+    load_config
+    tput civis
+    clear
+    print_banner
+    echo "Press 'q' to exit"
+    echo ""
+    print_menu
+}
+
+check_uptty
+tui_init
