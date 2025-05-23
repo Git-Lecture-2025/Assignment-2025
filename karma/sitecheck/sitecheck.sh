@@ -52,7 +52,7 @@ function just_display {
     echo
     for item in $(cat $list)
     do
-        response_code=$(curl -s -w "%{http_code}" -I "$item" -o /dev/null)    
+        response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
         curl_exit_code=$?
         echo "Site : $item" 
         desc=$(code_dictionary $response_code $curl_exit_code)
@@ -61,7 +61,6 @@ function just_display {
     done
     echo
     echo "use -h to know more"
-    echo
     echo
     sleep 0.5s
     echo "SiteCheck completed on :-"
@@ -210,23 +209,87 @@ function decor_heading() {
 }
 
 function int_display(){
-    resp=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display traced sites" 3>&1 1>&2 2>&3 3>&-)
+    resp=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
 
     case $resp in 
-    1);;
+    1)
+        dialog --msgbox "
+        $(
+        for item in $(cat $list)
+        do
+            response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
+            curl_exit_code=$?
+            echo "Site : $item" 
+            desc=$(code_dictionary $response_code $curl_exit_code)
+            echo "Status - $response_code ( $desc )"
+            echo "----------------------------"
+        done
+        )" 0 0
+        int_display
+    ;;
     2)
         site_add=$(dialog --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
-        add_url "$site_add"
-        dialog --title "Site added :-" --msgbox "$site_add" 0 0
+
+        if [ $? -eq 1 ]
+        then dialog --msgbox "nothing added" 0 0;
+        else
+        add_url "$site_add";
+        dialog --title "Site added - " --msgbox "$site_add" 0 0;
+        fi
+
         int_display
     ;;
-    3);;
-    4);;
+    3)
+        r2=""
+        i=1
+        for line in $(cat $list)
+        do
+            r2=$r2"$i $line "; i=$(expr $i + 1)
+        done
+
+        x2=$'\n' read -d '' -r -a linearray < $list
+
+        x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+
+        l_edit=${linearray[$(expr $x - 1)]}
+
+        n=$(dialog --inputbox "edit $l_edit to - " 0 0 3>&1 1>&2 2>&3 3>&-)    
+
+        dialog --title "Edit URL" --msgbox "$l_edit -> $n" 0 0  
+
+        linearray[$(expr $x - 1)]=$n
+
+        echo "" > $list
+        for l in ${linearray[@]}
+        do
+        echo "$l" >> $list
+        done
+
+        int_display
+    ;;
+    4)
+        r2=""
+        i=1
+        for line in $(cat $list)
+        do
+            r2=$r2"$i $line "; i=$(expr $i + 1)
+        done
+
+        x2=$'\n' read -d '' -r -a linearray < $list
+
+        x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+
+        l_remove=${linearray[$(expr $x - 1)]}
+        dialog --title "Removing Site - " --msgbox "$l_remove" 0 0 
+        remove_url "$l_remove"
+        int_display
+    ;;
     5)
-        dialog --msgbox "$(cat $list)"
+        dialog --msgbox "$(cat $list)" 0 0
         int_display
     ;;
-    *)dialog --msgbox "exiting the interactive mode" 0 0
+    *)dialog --msgbox "exit the interactive mode ?" 0 0; 
+    help_menu
     esac
 }
 
@@ -259,9 +322,7 @@ else
         else 
             case $curr_command in
                 "a") add_url ${!i} ;;
-                # "d") ehco "reached here";display_url ;;
                 "x") remove_url ${!i} ;;
-                # "e") echo "edit url list"; echo ${!i} ;;
                 *) echo "invalid command(s) found, use -h to know more."
             esac
         fi
