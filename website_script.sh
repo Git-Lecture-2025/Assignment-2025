@@ -122,10 +122,13 @@ checkWebsite() {
     echo "---------------------------------------------"
     echo "Website  -->  Status"
     echo "---------------------------------------------"
+    if [ ! command -v play ]; then
+        echo -e "${brigreen}SoX${clear} is ${brired}not installed${clear}."
+        sudo apt update && sudo apt install sox
+    fi
 
     playSound &
-    playSoundProcessId=$!        
-
+    playSoundProcessId=$!
     while read -r URL; do
         status=$(curl -Is "$URL" | head -n 1 | awk '{print $2}')
         if [[ $status =~ ^2|3 ]]; then
