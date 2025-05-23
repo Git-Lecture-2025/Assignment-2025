@@ -249,11 +249,15 @@ function int_display(){
 
         x2=$'\n' read -d '' -r -a linearray < $list
 
-        x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+        x=$(dialog --menu "choose site to be editted" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+       
+        if [ ! $x ]
+        then int_display
+        fi
 
         l_edit=${linearray[$(expr $x - 1)]}
 
-        n=$(dialog --inputbox "edit $l_edit to - " 0 0 3>&1 1>&2 2>&3 3>&-)    
+        n=$(dialog --inputbox "edit $l_edit to ? " 0 0 3>&1 1>&2 2>&3 3>&-)    
 
         dialog --title "Edit URL" --msgbox "$l_edit -> $n" 0 0  
 
