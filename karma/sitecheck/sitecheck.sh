@@ -209,7 +209,12 @@ function decor_heading() {
 }
 
 function int_display(){
-    resp=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
+    resp=$(dialog --menu "$(
+    echo "SiteCheck"
+    echo 
+    echo "your useful site tracking tool..."
+    echo "---developed by karma---"
+    echo )" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
 
     case $resp in 
     1)
@@ -292,8 +297,13 @@ function int_display(){
         dialog --msgbox "$(cat $list)" 0 0
         int_display
     ;;
-    *)dialog --msgbox "exit the interactive mode ?" 0 0; 
-    help_menu
+    *)dialog --yesno "exit the interactive mode ?" 0 0; 
+        dec=$?
+        if [ $dec -ne 0 ] 
+        then
+        int_display
+        else help_menu
+        fi
     esac
 }
 
@@ -303,7 +313,7 @@ check1=0
 check2=0
 
 if [ $# -eq 0 ]
-then help_menu $isok
+then help_mode $isok;
 else
     i=1
     curr_command=""
