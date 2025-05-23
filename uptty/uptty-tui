@@ -26,14 +26,13 @@ print_banner() {
     echo ""
     echo ""
     echo ""
-
     echo "▄• ▄▌ ▄▄▄·▄▄▄▄▄▄▄▄▄▄ ▄· ▄▌"
     echo "█▪██▌▐█ ▄█•██  •██  ▐█▪██▌"
     echo "█▌▐█▌ ██▀· ▐█.▪ ▐█.▪▐█▌▐█▪"
     echo "▐█▄█▌▐█▪·• ▐█▌· ▐█▌· ▐█▀·."
     echo " ▀▀▀ .▀    ▀▀▀  ▀▀▀   ▀ • "
     echo ""
-    h_center_body "$(./uptty ls)"
+    h_center_body "$(uptty ls)"
     echo ""
 }
 
