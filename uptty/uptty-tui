@@ -11,7 +11,12 @@ echo() {
         builtin echo -n " "
         it=$((it + 1))
     done
-    builtin echo "$otpt"
+    builtin echo -n "$otpt"
+    while [ $it -lt $offs ]; do
+        builtin echo -n " "
+        it=$((it + 1))
+    done
+    builtin echo ""
 }
 
 h_center_body(){
@@ -79,6 +84,11 @@ add_tracker() {
     fi
 
     read -r sitename url <<< $(tail -n1 $tmpf)
+    if [ -z "$sitename" ] || [ -z "$url" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
+
     clear
     uptty add $sitename $url
     clear
@@ -114,6 +124,10 @@ edit_tracker() {
         exit
     fi
     read -r newsitename url <<< $(tail -n1 $tmpf)
+    if [ -z "$newsitename" ] || [ -z "$url" ]; then
+        display_error "Incorrect Input. Aborted"
+        exit
+    fi
     clear
     uptty edit $sitename -n $newsitename -u $url
     clear
