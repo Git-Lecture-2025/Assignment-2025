@@ -1,8 +1,8 @@
 #!/bin/bash
 
-source functions.sh
+source $1 $2
 
-logfile=$1
+logfile=$3
 
 if [ -e "$logfile" ]; then
     {
