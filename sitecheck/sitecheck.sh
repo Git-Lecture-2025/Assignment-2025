@@ -1,5 +1,11 @@
 #!/bin/bash
 
+cd ~
+if ! test -d "./.config"
+then
+    mkdir ./.config/;
+fi
+
 cd ~/.config/
 if ! test -d "./sitecheck/"
 then
