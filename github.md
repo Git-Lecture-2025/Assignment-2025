@@ -277,3 +277,54 @@ That checks whether I have correctly run the commands such as cloning and thus p
 > Status: PASSED
 
 # 13 Exercise
+Firstly you need to go on that commit where you want to start bringing the changes so firstly do
+```shell
+$ git log
+
+```
+To get to that commit
+Then run
+```shell
+$ $ git checkout 2f689ab152c351686bd2bd56ed5ac1a40c8f08d9
+```
+
+In this exercise the most important command is
+```shell
+git rebase -i HEAD^^^
+```
+This command will help you to go through all the commits and then check which all needs to be editied
+
+So you will need to fill edit as an option for the log **Hello wordl**
+
+Then firstly bring the required changes in the file and then run the command
+
+```shell
+$ git add file.txt
+```
+Now when you run the command
+
+```shell
+$ git commit --amend -S
+```
+Both the message changes as well as the file changes will be taken care of
+
+>You may get a merge conflict error so that can be easily solved by checking the error and correcting it as well and then running the command
+
+Now simply run
+
+```shell
+$  git add .
+$ git rebase --continue
+$ git add .
+$ git commit -m "some changes"
+```
+
+
+```shell
+$ git verify
+```
+That checks whether I have correctly run the commands such as cloning and thus passes with the following result
+
+
+> Verifying the master exercise. > Hold on...        
+> Status: PASSED
