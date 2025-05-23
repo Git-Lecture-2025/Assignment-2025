@@ -114,7 +114,9 @@ list_sites() {
         fi
     done < "$UPT_CSV"
 
-    echo -e $(cat temp.csv | column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED                     " -o " | ")
+    while read -r line; do
+        printf "%-100s\n" "$line"
+    done <<< $(column -t -s "," -N "TRACKER ID,NAME,URL,STATUS,LATENCY,LAST CHECKED" -o " | " temp.csv)
     rm temp.csv
 }
 
