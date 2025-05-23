@@ -1,29 +1,27 @@
 #!/bin/bash
 
 # Tool used to moniter status of websites
-
-if ! [ -f ./.tracklist.txt ]
+trackfile=./.tracklist.txt
+if ! [ -f $trackfile ]
 then
-    # echo "Tracklist doesnt exists"
-    # echo "Creating tracklist.txt"
-    touch ./.tracklist.txt
+    touch $trackfile
 fi
 
 #pings each site
 ping(){
     echo "Pinging $1"
-    staus_code=$(curl -s -o /dev/null -w "%{http_code}" https://$1)
+    status_code=$(curl -s -L -o /dev/null -w "%{response_code}" $1)
 
-    if [ $staus_code -eq 200 ]
+    if [ $status_code -eq 200 ]
     then
-        echo "Site is up!"
+        echo "Site is up with status code: $status_code"
     else
         echo "Site is down with status code: $status_code"
     fi   
 }
 
 pinger() {
-    if [ -z $(cat ./tracklist.txt) ]
+    if [ -z "$(cat $trackfile)" ]
     then
         echo "Please add sites to ping"
         echo "use -a <site-name> to single sites"
@@ -31,7 +29,7 @@ pinger() {
     fi
 
     # goes over all sites one by one
-    cat ./tracklist.txt | while read line 
+    cat $trackfile | while read line 
     do
         ping $line 
     done
@@ -40,10 +38,10 @@ pinger() {
 }
 
 add_site() {
-    if [ -z $(grep $1 ./tracklist.txt) ]
+    if [ -z $(grep $1 $trackfile) ]
     then
         echo "adding $1"
-        echo "$1" >> ./tracklist.txt
+        echo "$1" >> $trackfile
         echo "$1 added successfully"
     else
         echo "Site already present in the track list"
@@ -54,13 +52,13 @@ add_site() {
 }
 
 del_site() {
-    if [ -z $(grep $1 ./tracklist.txt) ]
+    if [ -z $(grep $1 $trackfile) ]
     then
         echo "Site not present in the track list"
         echo "use -a to add site!"
     else
         echo "deleting $1"
-        sed -i "/^$1/d" ./tracklist.txt
+        sed -i "/^$1/d" $trackfile
         echo "deleted succeessfully $1"
     fi
 
@@ -68,7 +66,13 @@ del_site() {
 }
 
 list_site(){
-    cat ./tracklist.txt
+    if [ -z "$(cat $trackfile)" ]
+    then
+        echo "No sites to ping"
+        echo "use -a <site-name> to single sites"
+        exit 4
+    fi
+    cat $trackfile
 }
 
 
