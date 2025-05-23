@@ -1,10 +1,13 @@
 #!/bin/bash
 
+touch ~/website_checker_list
+
 add_website() {
     echo -ne "Enter your website: "
     read website
 
-    if [[ $website =~ ^https?:\/\/w?w?w?.+ ]]; then
+    curl -fSsL $website > /dev/null
+    if ! [[ $? = 6 ]]; then
         echo $website >> ~/website_checker_list
         echo -e "\e[32mWebsite added\e[0m"
     else
@@ -20,6 +23,11 @@ remove_website() {
     show_websites
     echo -ne "Which website do you want to remove? "
     read n
+    re='^[0-9]+$'
+    if ! [[ $n =~ $re ]] ; then
+        echo -e "\e[31mInvalid Choice\e[0m"
+        return
+    fi
     lines=($(awk 'END { print NR }' ~/website_checker_list))
     if [[ $n = 0 || $n -gt $lines ]];
     then
@@ -41,6 +49,11 @@ edit_website() {
     show_websites
     echo -ne "Which website do you want to edit? "
     read n
+    re='^[0-9]+$'
+    if ! [[ $n =~ $re ]] ; then
+        echo -e "\e[31mInvalid Choice\e[0m"
+        return
+    fi
     lines=($(awk 'END { print NR }' ~/website_checker_list))
     if [[ $n = 0 || $n -gt $lines ]];
     then
@@ -48,7 +61,8 @@ edit_website() {
     else
         entry=($(sed -n "${n}p;q" ~/website_checker_list))
         read -e -i $entry -p "Edit entry: " new_entry
-        if [[ $new_entry =~ ^https?:\/\/w?w?w?.+ ]]; then
+        curl -fsSL $new_entry > /dev/null
+        if ! [[ $? = 6 ]]; then
             sed -i "${n}s~.*~${new_entry}~" ~/website_checker_list
             echo -e "\e[32mWebsite edited\e[0m"
         else
@@ -61,7 +75,7 @@ check_websites() {
     echo "Checking if saved websites are online"
     cat ~/website_checker_list |
         while read in; do
-            curl -fsS $in > /dev/null
+            curl -fsSL $in > /dev/null
             [[ $? = 0 ]] && result="\e[32mSUCCESS\e[0m" || result="\e[31mFAILED\e[0m"
             echo -e $in $result
         done
