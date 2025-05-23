@@ -1,5 +1,11 @@
 #!/bin/bash
 
+logfile=".crontrack.log"
+touch "$logfile"
+
+data=".data.txt"
+touch "$data"
+
 commands=( 
 	"track" "track url1 [url2] [url3] ...: Add(s) (a) website(s) to the tracking list."
 	"untrack" "untrack id1/url2 [id2/url2] ...: Remove(s) (a) website(s) from the tracking list."
@@ -10,11 +16,12 @@ commands=(
 	"help" "help: Displays this message."
 	"exit" "exit: Exits the control loop."
 
+	"cron" "cron timeout: Sets up a cron job to run \`status\` and log the entries. Note: timeout is in minutes."
+	"cronlog" "cronlog: Displays the location of the logfile. Use \`cat\` to display the contents."
+	"uncron" "uncron: Stops any existing cron jobs."
+
 	"clear" "clear: Clears the terminal."
 )
-
-data=".data.txt"
-touch "$data"
 
 source "functions.sh"
 
@@ -155,6 +162,41 @@ function help() {
 	for ((i = 1; i < ${#commands[@]}; i += 2)); do
 		echo "$((i / 2 + 1)). " "${commands[i]}"
 	done
+}
+
+function cron() {
+	if [[ "$#" -ne 1 ]]; then
+		echo "Failed to resolve timeout"
+		return
+	fi
+
+	if crontab -l 2>/dev/null | grep -q "cronjob.sh"; then
+		echo "Cron job already exists..."
+		return
+	fi
+
+	if [ -e cronjob.sh ]; then
+		patern="*/$1 * * * * $(realpath "cronjob.sh") $(realpath "$logfile")"
+		(crontab -l 2>/dev/null; echo "$patern") | crontab -
+
+		echo "Cron job successfully set up"
+	else
+		echo "Err: Failed to reoslve cronjob shell file... The file may have been deleted"
+	fi
+}
+
+function cronlog() {
+	echo "Cron logs are stored at: $(realpath "$logfile")"
+}
+
+function uncron() {
+	if ! crontab -l 2>/dev/null | grep -q "cronjob.sh"; then
+		echo "No cron job running to stop..."
+		return
+	fi
+
+	crontab -l 2>/dev/null | grep -v "cronjob.sh" | crontab -
+	echo "Successfully removed cron job"
 }
 
 function loop() {
