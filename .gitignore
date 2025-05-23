@@ -1,2 +1,3 @@
 *.DS_Store
 tracker/.data.txt
+tracker/.crontrack.log
