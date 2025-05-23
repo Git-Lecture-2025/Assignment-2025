@@ -3,7 +3,7 @@
 datafile=$1
 
 function getStatus() {
-	local code=$(curl -L -s -o /dev/null -w "%{http_code} %{time_total}" "$1")
+	local code=$(curl -s -L -o /dev/null -w "%{http_code} %{time_total}" "$1")
 	IFS=' ' read -r -a code <<< "$code"
 
 	echo "Tracking Result: ${1}; Response Code: ${code[0]}; Latency: ${code[1]}"
