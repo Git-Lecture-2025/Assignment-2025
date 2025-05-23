@@ -32,7 +32,7 @@ addWebsite() {
     echo -e "If you have ${briyellow}arrived here accidentally${clear}, press ${brigreen}-1${clear} to go back"
     echo -n "Enter the website URL to be added: "
     read url
-    if [[ $url -eq "-1" ]]; then
+    if [[ "$url" == "-1" ]]; then
         echo -e "Alright! ${magenta}Back to Home${clear}"
     else
         echo "$url" >> "$theFile"
