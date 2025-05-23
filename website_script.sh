@@ -99,12 +99,12 @@ checkWebsite() {
     playSound &
     playSoundProcessId=$!        
 
-    while read -r url; do
-        status=$(curl -Is "$url" | head -n 1 | awk '{print $2}')
+    while read -r URL; do
+        status=$(curl -Is "$URL" | head -n 1 | awk '{print $2}')
         if [[ $status =~ ^2|3 ]]; then
-            echo -e "${blue}$url${clear} --> ${thumbsUp} Accessible ($status)"
+            echo -e "${blue}$URL${clear} --> ${thumbsUp} Accessible ($status)"
         else
-            echo -e "$url -->${thumbsDown} Unreachable"
+            echo -e "$URL -->${thumbsDown} Unreachable"
         fi
     done < "$theFile"
 
