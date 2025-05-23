@@ -1,9 +1,13 @@
 #!/bin/bash
 
+cd ~/.config/
+if ! test -d "./sitecheck/"
+then
+    mkdir ./sitecheck/;
+    touch ./sitecheck/track_list.txt
+fi
+
 list=~/.config/sitecheck/track_list.txt
-mkdir ~/.config/sitecheck > /dev/null
-cd ~/.config/sitecheck
-touch track_list.txt
 
 script_args=$@
 
