@@ -3,7 +3,9 @@
 
 </p>
 
+
 UpTTY *(uptime + tty)* is a CLI/TUI tool to moniter remote services and get notified when they go down.
+
 
 ![alt text](../writeups/images/demo.png)
 
@@ -45,3 +47,18 @@ UPT_CRONJOB_INTERVAL=1
 
 <br></br>
 # Commands
+
+
+## `uptty ls` / `uptty list`
+
+List monitered sites and their status.
+
+## `uptty help` / `uptty --help` / `uptty -h` 
+
+Show the help message.
+
+## `uptty config`
+
+Edit the config file (~/.local/share/upt/.uptrc) using nano
+
+## `uptty`
