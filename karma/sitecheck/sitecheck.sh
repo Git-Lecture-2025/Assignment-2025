@@ -208,6 +208,30 @@ function decor_heading() {
     echo 
 }
 
+function int_display(){
+    var=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display traced sites" 3>&1 1>&2 2>&3 3>&-)
+
+    if [ $? -eq 0 ]
+    then exit 123
+    fi
+
+    case $var in 
+    1);;
+    2)
+        site_add=$(dialog --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
+        dialog --title "Site added :-" --msgbox "$site_add" 0 0
+        int_display
+    ;;
+    3);;
+    4);;
+    5)
+        dialog --msgbox "$(cat $list)"
+        int_display
+    ;;
+    *)dialog --msgbox "some error"
+    esac
+}
+
 ####################################################
 check1=0
 check2=0
@@ -230,7 +254,7 @@ else
             elif [ $curr_command == "s" ]
             then just_display $isok;
             elif [ $curr_command == "i" ]
-            then int_display $isok;
+            then int_display;
             fi
         continue;
         else 
