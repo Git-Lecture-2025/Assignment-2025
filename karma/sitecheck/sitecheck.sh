@@ -313,7 +313,7 @@ check1=0
 check2=0
 
 if [ $# -eq 0 ]
-then help_mode $isok;
+then help_menu $isok;
 else
     i=1
     curr_command=""
