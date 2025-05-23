@@ -22,6 +22,7 @@ function code_dictionary {
     case $1 in 
         "200") echo "OK";;
         "301") echo "Moved Permanently";;
+        "302") echo "Moved Temporarily";;
         "400") echo "Bad request";;
         "401") echo "Unauthorized";;
         "403") echo "Forbidden";;
