@@ -27,10 +27,17 @@ showMenu() {
 }
 
 addWebsite() {
+    echo " "
+    echo -e "${brigreen}ADD WEBSITE${clear}"
+    echo -e "If you have ${briyellow}arrived here accidentally${clear}, press ${brigreen}-1${clear} to go back"
     echo -n "Enter the website URL to be added: "
     read url
-    echo "$url" >> "$theFile"
-    echo -e "${green}Website added to the list.${clear}"
+    if [[ $url -eq "-1" ]]; then
+        echo -e "Alright! ${magenta}Back to Home${clear}"
+    else
+        echo "$url" >> "$theFile"
+        echo -e "${green}Website added to the list.${clear}"
+    fi
 }
 
 listWebsite() {
@@ -43,18 +50,28 @@ removeWebsite() {
     nl -n ln -s '. ' -w 1 "$theFile" | while read -r num url; do
         echo -e "${num} ${blue}${url}${clear}"
     done
+    echo " "
+    echo -e "${brired}REMOVE WEBSITE${clear}"
+    echo -e "If you have ${briyellow}arrived here accidentally${clear}, press ${brigreen}-1${clear} to go back"
     echo -n "Enter the line number to be removed: "
     read lineNum
-    echo -n -e "Are you sure? ${skull} [Y/n]: "
-    read y
-    if [[ -z "$y" || "${y}" == "y" || "${y}" == "Y" ]]; then
-        echo -e "Alright. Goodbye file no.${lineNum} ${byebye}"
-        sed -i "${lineNum}d" "$theFile"
-        echo -e "${red}Website removed from the list.${clear}"
-    elif [[ "$y" == "n" || "$y" == "N" ]]; then
-        echo -e "${briyellow}You pressed no. Good thing I asked you before the data went whoosh!${clear}"
+    lines=$(wc -l < ${theFile})
+    if [[ $lineNum -le $lines && $lineNum -gt 0 ]]; then
+        echo -n -e "Are you sure? ${skull} [Y/n]: "
+        read y
+        if [[ -z "$y" || "${y}" == "y" || "${y}" == "Y" ]]; then
+            echo -e "Alright. Goodbye URL no.${lineNum} ${byebye}"
+            sed -i "${lineNum}d" "$theFile"
+            echo -e "${red}Website removed from the list.${clear}"
+        elif [[ "$y" == "n" || "$y" == "N" ]]; then
+            echo -e "${briyellow}You pressed no. Good thing I asked you before the data went whoosh!${clear}"
+        else
+            echo -e "You pressed something else entirely. ${brired}Not ready it seems${clear}. Go back Home."
+        fi
+    elif [[ $lineNum -eq "-1" ]]; then
+        echo -e "Alright! ${magenta}Back to Home${clear}"
     else
-        echo -e "You pressed something else entirely. ${brired}Not ready it seems${clear}. Go back Home."
+        echo -e "${brired}Invalid Input${clear}! Please try again."
     fi
 }
 
@@ -63,12 +80,22 @@ editWebsite() {
     nl -n ln -s '. ' -w 1 "$theFile" | while read -r num url; do
         echo -e "${green}${num}${clear} ${blue}${url}${clear}"
     done
+    echo " "
+    echo -e "${briyellow}REMOVE WEBSITE${clear}"
+    echo -e "If you have ${briyellow}arrived here accidentally${clear}, press ${brigreen}-1${clear} to go back"
     echo -n "Enter the line number to be edited: "
     read num
-    echo -n "Enter the new website URL: "
-    read newURL
-    sed -i "${num}s#.*#$newURL#" "$theFile"
-    echo -e "${green}Website edited into the list.${clear}"
+    lines=$(wc -l < ${theFile})
+    if [[ $num -le $lines && $num -gt 0 ]]; then
+        echo -n "Enter the new website URL: "
+        read newURL
+        sed -i "${num}s#.*#$newURL#" "$theFile"
+        echo -e "${green}Website edited into the list.${clear}"
+    elif [[ $num -eq "-1" ]]; then
+        echo -e "Alright! ${magenta}Back to Home${clear}"
+    else
+        echo -e "${brired}Invalid Input${clear}! Please try again."
+    fi 
 }
 
 playSound() {
@@ -127,10 +154,18 @@ while true; do
     elif [ "$val" == "5" ]; then
         checkWebsite
     elif [ "$val" == "6" ]; then
-        echo "Exiting. Bye Bye"
-        break
+        echo -n -e "Are you sure? ${skull} [Y/n]: "
+        read w
+        if [[ -z "$w" || "${w}" == "y" || "${w}" == "Y" ]]; then
+            echo -e "${magenta}Exiting. Bye Bye${clear}"
+            break
+        elif [[ "$w" == "n" || "$w" == "N" ]]; then
+            echo -e "${briyellow}No? Good.${clear}"
+        else
+            echo -e "You pressed something else entirely. ${brired}Not ready it seems${clear}. Go back Home."
+        fi
     else
-        echo "Wrong Number. Try again."
+        echo -e "${brired}Invalid Input${clear}! Try again."
     fi
     echo " "
 done
