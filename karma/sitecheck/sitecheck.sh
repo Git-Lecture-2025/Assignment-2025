@@ -17,6 +17,7 @@ list=~/.config/sitecheck/track_list.txt
 
 script_args=$@
 
+########function zone########################
 function error_dictionary {
     case $1 in
         "0") echo "all good";;
@@ -209,16 +210,13 @@ function decor_heading() {
 }
 
 function int_display(){
-    var=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display traced sites" 3>&1 1>&2 2>&3 3>&-)
+    resp=$(dialog --menu "choose function" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display traced sites" 3>&1 1>&2 2>&3 3>&-)
 
-    if [ $? -eq 0 ]
-    then exit 123
-    fi
-
-    case $var in 
+    case $resp in 
     1);;
     2)
         site_add=$(dialog --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
+        add_url "$site_add"
         dialog --title "Site added :-" --msgbox "$site_add" 0 0
         int_display
     ;;
@@ -228,11 +226,12 @@ function int_display(){
         dialog --msgbox "$(cat $list)"
         int_display
     ;;
-    *)dialog --msgbox "some error"
+    *)dialog --msgbox "exiting the interactive mode" 0 0
     esac
 }
 
 ####################################################
+
 check1=0
 check2=0
 
