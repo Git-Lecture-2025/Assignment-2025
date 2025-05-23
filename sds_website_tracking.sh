@@ -99,7 +99,7 @@ do
                 edited_site=$(dialog --title "Editing a site" --inputbox "What do you want the site to be from ${arr[editing_site]}" 0 0 3>&1 1>&2 2>&3 3>&-)
                 while [ "$check" = "no" ]
                 do
-                    status_code=$(curl --write-out %{http_code} --silent --output /dev/null "$editing_site")
+                    status_code=$(curl --write-out %{http_code} --silent --output /dev/null "$edited_site")
 	    	        if [ $status_code -eq 200 ]
                     then
                         check="yes"
