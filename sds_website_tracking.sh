@@ -20,6 +20,7 @@ check="no"
 while [ "$y_n" = "1" ]
 do
     : > website.txt
+    
     input=$(dialog --title "Website tracking" --menu "Tasks" 0 0 0 1 "Add" 2 "Remove" 3 "Status" 4 "Edit" 3>&1 1>&2 2>&3 3>&-)
     if [ $? -eq 1 ]
     then
@@ -28,22 +29,45 @@ do
         if [ "$input" = "1" ]
         then
             check="no"
-            for item in ${arr[@]}
-            do
-                echo "$item" >> website.txt
-            done
+            length=${#arr[@]}
+            if [ "$length" -eq 0 ]
+            then
+                echo "For now no websites have been added" > website.txt
+            else
+                for item in ${arr[@]}
+                do
+                    echo "$item" >> website.txt
+                done
+            fi
             dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
 
             while [ "$check" = "no" ]
             do
+                same="yes"
                 add=$(dialog --title "Adding a site" --inputbox "Please enter the site that you want to add" 0 0 3>&1 1>&2 2>&3 3>&-)
+                if [ "$length" -ne 0 ]
+                then
+                    while [ "$same" = "yes" ]
+                    do
+                        for items in ${arr[@]}
+                        do
+                            if [ "$items" = "$add" ]
+                            then
+                                dialog --title "Error" --msgbox "This site has already been added" 0 0
+                                add=$(dialog --title "Adding a site" --inputbox "Please enter the site that you want to add" 0 0 3>&1 1>&2 2>&3 3>&-)
+                                same="yes"
+                            else
+                                same="no"
+                            fi
+                        done
+                    done
+                fi
                 # sc=$(curl -s -o /dev/null -w "%{http_code} ${add}")
                 if [ $? -eq 1 ]
                 then
                     dialog --title "Cancel" --msgbox "You will meet a yes or no question where if you don't want to add , remove or edit anything then you can press no" 0 0
                     break
                 else
-                    # check the condition of website
                     status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$add")
                     if [ $? -eq 0 ]
                     then
