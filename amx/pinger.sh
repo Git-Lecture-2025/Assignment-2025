@@ -54,8 +54,8 @@ fi
 
 #pings each site
 ping(){
-    echo "${lightyellow}"
-    echo "Pinging $1"
+
+    echo "${lightyellow}Pinging $1"
     status_code=$(curl -s -L -o /dev/null -w "%{response_code}" $1)
 
     if [ $status_code -eq 200 ]
@@ -127,9 +127,8 @@ add_site() {
 
 del_site() { 
     total_lines=$(cat $trackfile | wc -w)
-    echo "${yellow}"
-    echo "${lightyellow}Total sites present: $total_lines"
-    echo "${normal}"
+    echo "${lightyellow}Total sites present: $total_lines ${normal}"
+
     if [ $total_lines -eq 0 ]
     then
         echo "${red}"
@@ -149,17 +148,17 @@ del_site() {
         echo "${normal}"
     elif [[ $line -ge 1 && $line -le $total_lines ]]
     then
-        echo "${green}"
         sed -i "$line d" $trackfile
-        echo "site id $line removed successfully"
+
+        echo "${green}site id $line removed successfully"
         echo "${normal}"
     else    
         echo "${red}"
         echo "Enter a valid index"
         echo "${normal}"
     fi
-    echo "${lightyellow}"
-    echo "run ./pinger.sh -l to list all sites with index"
+
+    echo "${lightyellow}run ./pinger.sh -l to list all sites with index"
     echo "${normal}"
 
     exit 2
@@ -167,9 +166,7 @@ del_site() {
 
 edit_site() {
     total_lines=$(cat $trackfile | wc -w)
-    echo "${yellow}"
-    echo "${lightyellow}Total sites present: $total_lines"
-    echo "${normal}"
+    echo "${lightyellow}Total sites present: $total_lines ${normal}"
     if [ $total_lines -eq 0 ]
     then
         echo "${red}"
@@ -189,15 +186,22 @@ edit_site() {
         echo "${normal}"
     elif [[ $line -ge 1 && $line -le $total_lines ]]
     then
-        echo "${green}"
-        echo "Enter new site name:"
-        echo "${lightyellow}"
+        echo "${green}Enter new site name:${lightyellow}"
         read edit
+
+        echo "${lightyellow}Checking validity of the site: $edit"
+        if ! [  -z "$(curl -L 2>/dev/null $edit)" ]
+        then 
+            echo "${green}$edit is valid."
+        else
+            echo "${red}$edit is invalid. Please enter a valid site"
+            exit 1
+        fi
+
 
         sed -i "$line c \
         $edit" $trackfile
-        echo "${green}"
-        echo "site id $line changed to $edit"
+        echo "${green}site id $line changed to $edit"
         echo "${normal}"
     else    
         echo "${red}"
@@ -205,7 +209,8 @@ edit_site() {
         echo "${normal}"
     fi
 
-    echo "run ./pinger.sh -l to list all sites with index"
+    echo "${lightyellow}run ./pinger.sh -l to list all sites with index"
+    echo "${normal}"
 
     exit 2
 }
@@ -221,8 +226,8 @@ list_site(){
         exit 4
     fi
 
+    echo "${lightyellow}index: site ${green}"
     i=1
-    echo "${green}"
     cat $trackfile | while read line
     do
         echo "$i: $line"
