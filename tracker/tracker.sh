@@ -23,6 +23,7 @@ commands=(
 	"clear" "clear: Clears the terminal."
 )
 
+source "decor.sh"
 source "functions.sh" $datafile
 
 function push() {
@@ -32,26 +33,26 @@ function push() {
 
 function track() {
 	if [[ "$#" -eq 0 ]]; then
-		echo "No websites passed..."
+		echo "${blue}No websites passed...${normal}"
 		return
 	fi
 
 	for url in "$@"; do
 		if grep -q "^$url" "$datafile"; then
-			echo "Already tracking: $url..."
+			echo "${red}Already tracking: $url...${normal}"
 			return
 		fi
 
 		local code=$(curl -s -o /dev/null -w "%{http_code}" "$url")
 		case "$code" in
 			"404"|"000")
-				echo "Err: Failed to track website. It may not exist."
+				echo "${RED}Err: Failed to track website. It may not exist.${normal}"
 				;;
 			*)
 				push "$url"
 
 				local line=$(( $(wc -l < "$datafile")))
-				echo "Now tracking $url... at ID: $line"
+				echo "${green}Now tracking $url... at ID: $line${normal}"
 				;;
 		esac
 	done
@@ -71,7 +72,7 @@ function contains() {
 
 function untrack() {
     if [[ "$#" -eq 0 ]]; then
-        echo "No ids passed..."
+        echo "${blue}No ids passed...${normal}"
         return
     fi
 
@@ -81,7 +82,7 @@ function untrack() {
 	done < "$datafile"
 
 	if [[ "${#lines[@]}" -eq 0 ]]; then
-		echo "Currently tracking no websites..."
+		echo "${blue}Currently tracking no websites...${normal}"
 		return
 	fi
 
@@ -91,7 +92,7 @@ function untrack() {
 	local resolved=0
     for ((i = 0; i < ${#lines[@]}; i++)); do
         if contains "${lines[$i]}" "$@" || contains "$((i + 1))" "$@"; then
-			echo "-> No longer tracking: ${lines[$i]}"
+			echo "${green}No longer tracking: ${lines[$i]}${normal}"
 			((resolved++))
             continue
         fi
@@ -99,9 +100,9 @@ function untrack() {
         echo "${lines[$i]}" >> "$datafile"
 	done
 
-	echo "Untracked ${resolved} arguments successfully."
+	echo "${green}Untracked ${resolved} arguments successfully.${normal}"
 	if (( resolved > 0 && resolved != "$#" )); then
-		echo "Failed to resolve remaining arguments..."
+		echo "${RED}Failed to resolve remaining arguments...${normal}"
 	fi
 }
 
@@ -110,13 +111,13 @@ function display() {
 
 	local lines=$(( $(wc -l < "$datafile") ))
 	if [[ $lines -eq 0 ]]; then
-		echo "No websites being tracker currently..."
+		echo "${blue}No websites being tracker currently...${normal}"
 		return
 	fi
 
 	local i=1
 	while IFS= read -r line; do
-  		echo "$i. $line"
+  		echo "${green}$i. $line${normal}"
 		((i++))
 	done < "$datafile"
 }
@@ -134,12 +135,12 @@ function help() {
 
 function cron() {
 	if [[ "$#" -ne 1 ]]; then
-		echo "Failed to resolve timeout"
+		echo "${red}Failed to resolve timeout${normal}"
 		return
 	fi
 
 	if crontab -l 2>/dev/null | grep -q "cronjob.sh"; then
-		echo "Cron job already exists..."
+		echo "${blue}Cron job already exists...${normal}"
 		return
 	fi
 
@@ -148,12 +149,12 @@ function cron() {
 			local patern="*/$1 * * * * $(realpath "cronjob.sh") $(realpath functions.sh) $(realpath "$datafile") $(realpath "$logfile")"
 			(crontab -l 2>/dev/null; echo "$patern") | crontab -
 
-			echo "Cron job successfully set up"
+			echo "${green}Cron job successfully set up${normal}"
 		else
-			echo "The timout must be a natural number..."
+			echo "${blue}The timout must be a natural number...${normal}"
 		fi
 	else
-		echo "Err: Failed to reoslve cronjob shell file... The file may have been deleted"
+		echo "${RED}Err: Failed to reoslve cronjob shell file... The file may have been deleted${normal}"
 	fi
 }
 
@@ -163,12 +164,12 @@ function cronlog() {
 
 function uncron() {
 	if ! crontab -l 2>/dev/null | grep -q "cronjob.sh"; then
-		echo "No cron job running to stop..."
+		echo "${blue}No cron job running to stop...${normal}"
 		return
 	fi
 
 	crontab -l 2>/dev/null | grep -v "cronjob.sh" | crontab -
-	echo "Successfully removed cron job"
+	echo "${green}Successfully removed cron job${normal}"
 }
 
 function loop() {
@@ -195,7 +196,7 @@ function loop() {
 		done
 
 		if [[ $i -ge ${#commands[@]} ]]; then
-			echo "Err: Command not found. Use help for more info."
+			echo "${RED}Err: Command not found. Use help for more info.${normal}"
 		fi
 	done
 }
@@ -205,13 +206,13 @@ echo ""
 echo ""
 
 echo "   ______  ______  ______  ______  __  __   ______  ______  ______  __    __    "
-echo "  /\__  _\/\  == \/\  __ \/\  ___\/\ \/ /  /\  ___\/\  == \/\__  _\/\ \"-./  \   "
+echo "${blue}  /\__  _\/\  == \/\  __ \/\  ___\/\ \/ /  /\  ___\/\  == \/\__  _\/\ \"-./  \   ${normal}"
 echo "  \/_/\ \/\ \  __<\ \  __ \ \ \___\ \  _\"-.\ \  __\\  \  __<\/_/\ \/\ \ \-./\ \  "
-echo "     \ \_\ \ \_\ \_\ \_\ \_\ \_____\ \_\ \_\\  \_____\ \_\ \_\ \ \_\ \ \_\ \ \_\ "
+echo "${blue}     \ \_\ \ \_\ \_\ \_\ \_\ \_____\ \_\ \_\\  \_____\ \_\ \_\ \ \_\ \ \_\ \ \_\ ${normal}"
 echo "      \/_/  \/_/ /_/\/_/\/_/\/_____/\/_/\/_/ \/_____/\/_/ /_/  \/_/  \/_/  \/_/ "
 echo "                                                                                "
 
-echo "                               Made by Kunal with 🤍                            "
+echo "${red}                               Made by Kunal with 🤍                            ${normal}"
 
 echo ""
 echo ""
