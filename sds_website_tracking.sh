@@ -3,6 +3,22 @@
 i=0
 touch website.txt
 
+if [[ "$OSTYPE" == "linux-gnu"* ]]
+then
+        sudo apt-get update
+        sudo apt-get install dialog
+elif [[ "$OSTYPE" == "darwin"* ]]
+then
+        brew install dialog
+elif [[ "$OSTYPE" == "win32" ]]
+then
+        sudo apt-get update
+        sudo apt-get install dialog
+elif [[ "$OSTYPE" == "msys" ]]
+then
+        sudo apt-get update
+        sudo apt-get install dialog
+fi
 y_n="1"
 check="no"
 while [ "$y_n" = "1" ]
@@ -23,20 +39,27 @@ do
 	    do
 		    add=$(dialog --title "Adding a site" --inputbox "Please enter the site that you want to add" 0 0 3>&1 1>&2 2>&3 3>&-)
             # sc=$(curl -s -o /dev/null -w "%{http_code} ${add}")
-            status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$add")
-	    	if [ $status_code -eq 200 ]
-	    	then
-                check="yes"
-                arr[i]="$add"
-                ((i++))
-                for item in ${arr[@]}
-                do
-                    echo "$item" >> website.txt
-                done
-	    	else
-			    check="no"
-			    dialog --title "Error" --msgbox "Please put a valid website" 0 0
-	    	fi
+            if [ $? -eq 1 ]
+            then
+                dialog --title "Cancel" --msgbox "You will meet a yes or no question where if you don't want to add , remove or edit anything then you can press no" 0 0
+                break
+            else
+
+                status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$add")
+                if [ $status_code -eq 200 ]
+                then
+                    check="yes"
+                    arr[i]="$add"
+                    ((i++))
+                    for item in ${arr[@]}
+                    do
+                        echo "$item" >> website.txt
+                    done
+                else
+                    check="no"
+                    dialog --title "Error" --msgbox "Please put a valid website" 0 0
+                fi
+            fi
 	    done
     elif [ "$input" = "2" ]
     then
@@ -96,27 +119,45 @@ do
                     echo "$item" >> website.txt
                 done
             dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
-                editing_site=$(dialog --title "Editing a site" --inputbox "Please enter the number[Starting site is assumed as 0] of site that you want to edit" 0 0 3>&1 1>&2 2>&3 3>&-)
+            editing_site=$(dialog --title "Editing a site" --inputbox "Please enter the number[Starting site is assumed as 0] of site that you want to edit" 0 0 3>&1 1>&2 2>&3 3>&-)
+            editing_site_exit_code=$?
+            if [[ "$editing_site_exit_code" -eq 1 ]]
+            then
+                dialog --title "Cancel" --msgbox "You will meet a yes or no question where if you don't want to add , remove or edit anything then you can press no" 0 0
+                break
+            else
                 edited_site=$(dialog --title "Editing a site" --inputbox "What do you want the site to be from ${arr[editing_site]}" 0 0 3>&1 1>&2 2>&3 3>&-)
+                edited_site_exit_code=$?
                 while [ "$check" = "no" ]
                 do
-                    status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$edited_site")
-	    	        if [ $status_code -eq 200 ]
+                    if [[ "$edited_site_exit_code" -eq 1 ]]
                     then
-                        check="yes"
-                        arr[editing_site]="$edited_site"
+                        dialog --title "Cancel" --msgbox "You will meet a yes or no question where if you don't want to add , remove or edit anything then you can press no" 0 0
+                        break
                     else
-                        check="no"
-                        dialog --title "Error" --msgbox "Please put a valid website" 0 0
-                        edited_site=$(dialog --title "Editing a site" --inputbox "What do you want the site to be" 0 0 3>&1 1>&2 2>&3 3>&-)
+                        status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$edited_site")
+                        if [ $status_code -eq 200 ]
+                        then
+                            check="yes"
+                            arr[editing_site]="$edited_site"
+                        else
+                            check="no"
+                            dialog --title "Error" --msgbox "Please put a valid website" 0 0
+                            edited_site=$(dialog --title "Editing a site" --inputbox "What do you want the site to be" 0 0 3>&1 1>&2 2>&3 3>&-)
+                        fi
                     fi
-            done
+                done
+            fi
         else
             dialog --title "Error" --msgbox "Please add a site first. You will be meeting with a yes or no first so put a yes and then click add a site" 0 0
             input="1"
         fi
     fi
     y_n=$(dialog --title "Yes or No" --menu "Please put a yes or a no" 0 0 0 1 "yes" 2 "no" 3>&1 1>&2 2>&3 3>&-)
+    if [ $? -eq 1 ]
+    then
+        y_n="no"
+    fi
 done
 for item in ${arr[@]}
 do
