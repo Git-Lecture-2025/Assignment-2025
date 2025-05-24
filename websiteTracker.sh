@@ -67,9 +67,9 @@ view () {
         else
                 for key in "${!websites_list[@]}"; do
                         if [[ "${websites_list[$key]}" == "accessible" ]]; then
-                                echo -e "$key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+                                echo -e "$key ${GREEN} accessible ${YELLOW}"
                         else
-                                echo -e "$key ${RED} ${websites_list[$key]} ${YELLOW}"
+                                echo -e "$key ${RED} not accessible ${YELLOW}"
                         fi
                 done
                 echo ""
@@ -144,8 +144,11 @@ delete () {
 status () {
 	if [[ "${websites_list[$1]}" == "accessible" ]]; then
 		curl -I "$1"
-	else
-		echo "Either the website is unaccessible or not being tracked check the list again."
+	elif [[ -n "${websites_list[$1]}" ]]; then
+                echo "The website is not accessible, you can only view detailed status of tracked accessible websites."
+        else
+                echo "The website isn't being tracked, you can only view detailed status of tracked accessible websites."
+        echo ""
 	fi
 	options
 }
