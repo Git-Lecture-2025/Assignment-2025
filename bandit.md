@@ -1,17 +1,22 @@
 # LEVEL 0 -> 1
-found how to login using ssh
+Figured out how to login using ssh:
 ```
 ssh bandit0@bandit.labs.overthewire.org -p 2220
 ```
-used to cat to read contents of readme
+We put the password we got (bandit0) and successfully login! 
+And used `cat` command to read contents of readme file to find the password of next level
 ```
 cat readme
 ```
 Password:ZjLjTmM6FvvyRnrb2rfNWOZOTa6ip5If
 
+> **NOTE:** From here on we will use
+> ```ssh banditx@bandit.labs.overthewire.org -p 2220```
+> to login where `x` is the level we are loging into and using password from previous level unless stated otherwise in the solution
+
 
 # LEVEL 1 -> 2
-have to specify full path as it is a special character
+We have to specify full path of the file here while using cat, as its name is a special character.
 ```
 cat ./-
 ```
@@ -19,7 +24,7 @@ Password: 263JGJPfgU6LtdEvgfWU1XP5yac29mFx
 
 
 # LEVEL 2 -> 3
-need to put it in quotes as spaces are parsed as argument seperators 
+We need to put the file name in quotes as spaces are parsed as argument seperators without them.
 ```
 cat "spaces in this filename"
 ```
@@ -27,10 +32,11 @@ Password: MNk8KNH3Usiio41PRUEoDFPqfxLPlSmx
 
 
 # LEVEL 3 -> 4
+We can use `find` inhere to find all files of inhere directory:
 ```
 find inhere
 ```
-got two paths 
+We get two paths, one of them being the one we require.
 ```
 cat inhere/...Hiding-From-You
 ```
@@ -38,14 +44,16 @@ Password:2WmrDFRmJIq3IPxneAaMGhap0pFhF3NJ
 
 
 # LEVEL 4 -> 5
+We again use `find` command to see the files.
 ```
  find inhere
 ```
+We can use the `file` command to get more details about the file we specify:
 ```
 file inhere/-file{00,01,02,03,04,05,06,07,08,09} 
 ```
-used {} to view all file details together
-only file07 contains ASCII text
+Here `{}` are used to view all file details from 00-09 together
+On reading through the details, we find that only file07 contains ASCII text hence we view its contents using `cat` command:
 ```
 cat inhere/-file07
 ```
@@ -53,14 +61,17 @@ Password:4oQYVPkxZOOEOO5pTW81FB8j8lxXGUQw
 
 
 # LEVEL 5 -> 6
+We first go into inhere directory
 ```
 cd inhere
 ```
-used -type f to find human-readable files -sizes to find 1033 byte sized files (c)
+The `find` command has flags `-type` and `-size` which can be used to find file of a certain type and size.
+* `f` refers to regular files which we use to find human-readable
+* `c` is used to refer to bytes and hence 1033 byte sized file found using 1033c
 ```
 find -type f -size 1033c
 ```
-found it
+The result is path to a singular file, we `cat` it to find its contents:
 ```
 cat ./maybehere07/.file2
 ```
@@ -68,10 +79,16 @@ Password:HWasnPhtq9AVKe0dmk45nxy20cvUa6EG
 
 
 # LEVEL 6 -> 7
+We need to find owned by particular user and group.
+We use `find` as:
 ```
 find / -size 33c -group bandit6 -user bandit7
 ```
--group to find owned by bandit6 group and -user to find owned by bandit7 user
+* `-group` species the group which should own the file, which in our case is bandit6
+* `-user` species the user who should own the file, which in our case is bandit7
+* `/` path since we need to search the whole root directory
+* `-size` to search 33 bytes file, where `c` is used for byte
+It would result in only one path which we would concatinate using `cat` to find our paasword.  
 ```
 cat /var/lib/dpkg/info/bandit7.password
 ```
@@ -79,7 +96,7 @@ Password:morbNTDkSW6jIlUc0ymOdMaLnOlFVAaj
 
 
 # LEVEL 7 -> 8
-looking for millionth using grep
+We use `grep` which is used to search for lines matching a specified pattern in a file and print the matching lines, the specified pattern in our case being *'miilionth'*
 ```
 grep millionth data.txt
 ```
@@ -87,7 +104,11 @@ Password:dfwvzFQi4mU0wfNbFOe9RoWskMLg7eEc
 
 
 # LEVEL 8 -> 9
-sorted the data using sort and gave that input to used uniq with -u flag to get only the unique line
+1. We use `sort`, which helps to sort lines of a file in a given order. Since we only care about unique lines and not the order we sort by default which alphabetical.
+2. * `uniq` is used to delete all the repeated lines in a file, used with
+   * `-u` it only outputs the unique line(s) in the file
+3. `|` is used to redirect the output from one command as the input to the other command, in our case the output of `sort` which are sorted lines as the input to `uniq` command.
+> **NOTE:** We need to `sort` first because duplicated lines must be adjacent for the `uniq` command to work as intended.
 ```
 sort data.txt | uniq -u
 ```
@@ -95,14 +116,17 @@ Password:4CKMh1JI91bUIZZPXDqGanal4xvAg0JM
 
 
 # LEVEL 9 -> 10
-found human readable text using strings and gave it to grep to find pattern using =+ '+' indication any number of = signs in pattern
+1. We use `strings` to find human readable text as it finds the printable strings in a file 
+2. Redirect the output to `grep` using `|` and find pattern using `=+`, where `+` indicates any number of = signs in pattern
 ```
 strings data.txt | grep =+
 ```
+We can see the password near a bunch of '='.
 Password:FGUW5ilLVJrxX9kMYMmlN4MgbpfMiqey
 
+
 # LEVEL 10 -> 11
-used base64 with -d (decode)
+We use `base64` with `-d` to decode a base64 encoded string back to its original form 
 ```
 base64 -d data.txt
 ```
