@@ -11,6 +11,7 @@ if ! test -d "./sitecheck/"
 then
     mkdir ./sitecheck/;
     touch ./sitecheck/track_list.txt
+    # dialog --create-rc ./sitecheck/dialogrc
 fi
 
 list=~/.config/sitecheck/track_list.txt
@@ -243,23 +244,21 @@ function decor_heading() {
 }
 
 function int_display(){
-    resp=$(dialog --no-collapse --cursor-off-label --cancel-label "Exit" --no-lines --backtitle "SiteCheck" --menu "$(
-    
-    echo -e " ____  _ _        ____ _               _    "
-    echo -e "/ ___|(_) |_ ___ / ___| |__   ___  ___| | __"
-    echo -e "\___ \| | __/ _ \ |   | '_ \ / _ \/ __| |/ /"
-    echo -e " ___) | | ||  __/ |___| | | |  __/ (__|   < "
-    echo -e "|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ "
+    resp=$(dialog --colors --no-collapse --cursor-off-label --cancel-label "Exit" --no-lines --backtitle "SiteCheck" --menu "$(
+    echo -e "\Z2\Zb ____  _ _        ____ _               _    \Zn"
+    echo -e "\Z2\Zb/ ___|(_) |_ ___ / ___| |__   ___  ___| | __\Zn"
+    echo -e "\Z8\Zb\___ \| | __/ _ \ |   | '_ \ / _ \/ __| |/ /\Zn"
+    echo -e "\Z8\Zb ___) | | | | __/ |___| | | |  __/ (__|   < \Zn"
+    echo -e "\Z2\Zb|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ \Zn"
     echo 
     echo "your useful site tracking tool..."
-    echo -e "---developed by karma---"
+    echo -e "---developed by \Zb\Z8karma\Zn---"
 
     )" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
 
     case $resp in 
     1)
-        dialog --scrollbar --cursor-off-label --no-lines --msgbox "
-        $(
+        dialog --scrollbar --cursor-off-label --no-lines --msgbox "$(
         x2=$'\n' read -d '' -r -a linearray < $list
         if [ ${#linearray[@]} -eq 0 ]
         then echo "[ EMPTY track_list ]"; exit 789
