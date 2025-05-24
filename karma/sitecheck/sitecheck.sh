@@ -64,7 +64,7 @@ function just_display {
     fi
     for item in $(cat $list)
     do
-        response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
+        response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
         curl_exit_code=$?
         echo -e "${blue}Site :${clear} $item" 
         desc=$(code_dictionary $response_code $curl_exit_code)
@@ -115,7 +115,6 @@ function add_url() {
 
 function display_url() {
     decor_heading
-    echo "---developped by karma---"
     echo 
     echo "Tracked Sites"
     echo "---------------------------------------"
@@ -124,6 +123,7 @@ function display_url() {
     then echo "[ EMPTY track_list ]"
     else cat $list
     fi
+    echo
     echo "---------------------------------------"
     echo 
 }
@@ -234,7 +234,7 @@ function decor_heading() {
     echo -e "\033[33m|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ \033[0m"
     echo 
     echo "your useful site tracking tool..."
-    echo -e "---developed by ${lightblue}karma${clear}---"
+    echo -e "---${cyan}developed by karma${clear}---"
 }
 
 function int_display(){
@@ -255,9 +255,9 @@ function int_display(){
         fi
         for item in $(cat $list)
         do
-            response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
+            response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
             curl_exit_code=$?
-            echo "Site : $item" 
+            echo -e "Site : $item" 
             desc=$(code_dictionary $response_code $curl_exit_code)
             echo "Status - $response_code ( $desc )"
             echo "----------------------------"
@@ -342,7 +342,7 @@ function int_display(){
         fi
         int_display
     ;;
-    *)dialog --yesno "exit the interactive mode ?" 0 0; 
+    *)dialog --yesno "exit the interactive mode ?" 10 40; 
         dec=$?
         if [ $dec -ne 0 ] 
         then
@@ -381,7 +381,7 @@ else
             case $curr_command in
                 "a") add_url ${!i}; curr_command="" ;;
                 "x") remove_url ${!i}; curr_command="" ;;
-                *) echo "invalid command(s) found, use -h to know more."
+                *) echo "invalid command(s) found, use -h to know more."; exit 567;
             esac
             continue
         fi
