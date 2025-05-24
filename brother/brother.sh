@@ -108,7 +108,9 @@ remove_website() {
     echo "$(tput setaf 6)Enter the number of the website to remove (or 0 to cancel): "
     move_cursor $((ROW + total_lines + 5)) $((COL-7))
     read -r choice
-    if [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$((total_lines+1))" ]]; then
+    if [[ "$choice" -eq 0 ]]; then
+      return
+    elif [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$((total_lines+1))" ]]; then
         sed_i "${choice}d" "$WEBSITE_FILE"
         move_cursor $((ROW + total_lines + 5)) $COL
         echo "$(tput setaf 2)Website removed successfully!"
