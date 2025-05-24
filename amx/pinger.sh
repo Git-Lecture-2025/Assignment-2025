@@ -70,7 +70,7 @@ ping(){
 pinger() {
     if [ -z "$(cat $trackfile)" ]
     then
-         echo "${red}"
+        echo "${red}"
         echo "No sites to ping"
         echo "${lightyellow}"
         echo "use ./pinger.sh -a <site-name> to single sites"
@@ -87,20 +87,40 @@ pinger() {
     exit 0
 }
 
+
+
 add_site() {
-    if [ -z $(grep $1 $trackfile) ]
-    then
-        echo "${green}"
-        echo "adding $1"
-        echo "$1" >> $trackfile
-        echo "$1 added successfully"
-        echo "${normal}"
+
+    target=$1
+    output=$(grep $target $trackfile)
+
+    for line in $output
+    do 
+        if [ $line = $target ]
+        then
+            echo "${red}"
+            echo "Site already present in the track list"
+            echo "use ./pinger.sh -l to view all sites!"
+            echo "${normal}"
+            exit 1
+        fi
+    done
+
+
+    echo "${lightyellow}Checking validity of the site: $1"
+    if ! [  -z "$(curl -L 2>/dev/null $1)" ]
+    then 
+        echo "${green}$1 is valid."
     else
-        echo "${red}"
-        echo "Site already present in the track list"
-        echo "use ./pinger.sh -l to view all sites!"
-        echo "${normal}"
+        echo "${red}$1 is invalid. Please enter a valid site"
+        exit 1
     fi
+
+    echo "${green}adding $1"
+    echo "$1" >> $trackfile
+    echo "$1 added successfully"
+    echo "${normal}"
+
 
     exit 1
 }
