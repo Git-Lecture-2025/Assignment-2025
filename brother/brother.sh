@@ -114,10 +114,11 @@ remove_website() {
         echo "$(tput setaf 2)Website removed successfully!"
     else
         move_cursor $((ROW + total_lines + 7)) $COL
-        echo "$(tput setaf 1) Didn't work " 
+        echo "$(tput setaf 1) Invalid choice" 
     fi
     move_cursor $((ROW + total_lines + 9)) $COL
     echo "$(tput setaf 6)Press Enter to continue..."
+    move_cursor $((ROW + total_lines + 11)) $COL
     read -r
 }
 
@@ -138,7 +139,7 @@ check_status() {
         if [[ "${website:0:4}" != "http" ]]; then
             website="https://$website"
         fi
-        if curl -s --head --request GET "$website" | grep "200 OK" > /dev/null; then
+        if curl -s --head --request GET "$website" | grep "200" > /dev/null; then
             move_cursor $line_num $((COL + 35))
             echo "$(tput setaf 2)Accessible"
         elif curl -s --head --request GET "$website" | grep "301" > /dev/null; then
