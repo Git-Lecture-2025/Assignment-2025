@@ -17,12 +17,13 @@ do
         do
             echo "$item" >> website.txt
         done
-        dialog --title "Websites till now" --textbox website.txt 0 0
+        dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
+
         while [ "$check" = "no" ]
 	    do
 		    add=$(dialog --title "Adding a site" --inputbox "Please enter the site that you want to add" 0 0 3>&1 1>&2 2>&3 3>&-)
             # sc=$(curl -s -o /dev/null -w "%{http_code} ${add}")
-            status_code=$(curl --write-out %{http_code} --silent --output /dev/null "$add")
+            status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$add")
 	    	if [ $status_code -eq 200 ]
 	    	then
                 check="yes"
@@ -47,7 +48,7 @@ do
                 echo "$item"
                 echo "$item" >> website.txt
             done
-            dialog --title "Websites till now" --textbox website.txt 0 0
+            dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
                 remove=$(dialog --title "Removing a site" --inputbox "Please enter the site number [starting from 0] that you want to remove" 0 0 3>&1 1>&2 2>&3 3>&-)
             num=$((remove + 0))
                 dialog --msgbox "$num"
@@ -69,14 +70,14 @@ do
         then
             for url in ${arr[@]}
             do
-                if curl --output /dev/null --silent --head --fail "$url"
+                if curl -L --output /dev/null --silent --head --fail "$url"
                 then
                     echo "URL exists: $url"
-                    curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
+                    curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
                     # curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
                 else
                     echo "URL does not exist: $url"
-                    curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
+                    curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
                     # curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
                 fi
             done
@@ -94,12 +95,12 @@ do
                 do
                     echo "$item" >> website.txt
                 done
-            dialog --title "Websites till now" --textbox website.txt 0 0
+            dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
                 editing_site=$(dialog --title "Editing a site" --inputbox "Please enter the number[Starting site is assumed as 0] of site that you want to edit" 0 0 3>&1 1>&2 2>&3 3>&-)
                 edited_site=$(dialog --title "Editing a site" --inputbox "What do you want the site to be from ${arr[editing_site]}" 0 0 3>&1 1>&2 2>&3 3>&-)
                 while [ "$check" = "no" ]
                 do
-                    status_code=$(curl --write-out %{http_code} --silent --output /dev/null "$edited_site")
+                    status_code=$(curl -L --write-out %{http_code} --silent --output /dev/null "$edited_site")
 	    	        if [ $status_code -eq 200 ]
                     then
                         check="yes"
@@ -124,14 +125,14 @@ do
 done
 for url in ${arr[@]}
 do
-	if curl --output /dev/null --silent --head --fail "$url"
+	if curl -L --output /dev/null --silent --head --fail "$url"
 	then
   		echo "URL exists: $url"
-		curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
-		curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
+		curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
+		curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
 	else
   		echo "URL does not exist: $url"
-		curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
-		curl -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
+		curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com >> website.txt
+		curl -L -s -o /dev/null -w "Status Code of $url: %{http_code}\n" https://www.example.com
 	fi
 done
