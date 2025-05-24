@@ -17,7 +17,7 @@ echo "                    Track and Manage Websites easily                      
 echo ""
 echo -e "${NC}"
 
-declare -A websites_list
+current_path=$(pwd)
 
 options () {
 	echo -e "${BLUE}To view all tracked websites    | Press(${GREEN}v${BLUE})" 
@@ -50,6 +50,7 @@ options () {
                 fi
 	elif [ "$option" = "q" ]; then
 		echo "Exiting"
+  		store_list
 		exit 0
 	else
        		echo -e "${YELLOW}"
@@ -152,5 +153,33 @@ status () {
 	fi
 	options
 }
+
+store_list () {
+        list_string=""
+        for key in "${!websites_list[@]}"; do
+                list_string+="$key=${websites_list[$key]} "
+        done
+        list_string="${list_string% }"
+        echo "$list_string" > websites_list.txt
+}
+
+retrieve_list () {
+        retrieved_string=$(cat websites_list.txt)
+        for pair in $retrieved_string; do
+                if [[ "$pair" =~ ^([^=]+)=(.*)$ ]]; then
+                        key="${BASH_REMATCH[1]}"
+                        value="${BASH_REMATCH[2]}"
+                        websites_list["$key"]="$value"
+                fi
+        done
+}
+
+if [ -f "$current_path/websites_list.txt" ]; then
+        declare -A websites_list
+        retrieve_list
+else
+        touch websites_list.txt
+        declare -A websites_list
+fi
 
 options
