@@ -54,22 +54,27 @@ fi
 
 #pings each site
 ping(){
+    echo "${lightyellow}"
     echo "Pinging $1"
     status_code=$(curl -s -L -o /dev/null -w "%{response_code}" $1)
 
     if [ $status_code -eq 200 ]
     then
-        echo "Site is up with status code: $status_code"
+        echo "${green}Site is up with status code: $status_code"
     else
-        echo "Site is down with status code: $status_code"
+        echo "${red}Site is down with status code: $status_code"
     fi   
+    echo "${normal}"
 }
 
 pinger() {
     if [ -z "$(cat $trackfile)" ]
     then
-        echo "Please add sites to ping"
+         echo "${red}"
+        echo "No sites to ping"
+        echo "${lightyellow}"
         echo "use ./pinger.sh -a <site-name> to single sites"
+        echo "${normal}"
         exit 4
     fi
 
@@ -85,12 +90,16 @@ pinger() {
 add_site() {
     if [ -z $(grep $1 $trackfile) ]
     then
+        echo "${green}"
         echo "adding $1"
         echo "$1" >> $trackfile
         echo "$1 added successfully"
+        echo "${normal}"
     else
+        echo "${red}"
         echo "Site already present in the track list"
         echo "use ./pinger.sh -l to view all sites!"
+        echo "${normal}"
     fi
 
     exit 1
@@ -98,11 +107,16 @@ add_site() {
 
 del_site() { 
     total_lines=$(cat $trackfile | wc -w)
-    echo "Total sites present $total_lines"
+    echo "${yellow}"
+    echo "${lightyellow}Total sites present: $total_lines"
+    echo "${normal}"
     if [ $total_lines -eq 0 ]
     then
+        echo "${red}"
         echo "No sites to ping"
+        echo "${lightyellow}"
         echo "use ./pinger.sh -a <site-name> to single sites"
+        echo "${normal}"
         exit 2
     fi
 
@@ -110,46 +124,65 @@ del_site() {
 
     if [ -z $line ]
     then 
+        echo "${red}"
         echo "Please input a non-empty index!"
+        echo "${normal}"
     elif [[ $line -ge 1 && $line -le $total_lines ]]
     then
+        echo "${green}"
         sed -i "$line d" $trackfile
         echo "site id $line removed successfully"
+        echo "${normal}"
     else    
+        echo "${red}"
         echo "Enter a valid index"
+        echo "${normal}"
     fi
-
+    echo "${lightyellow}"
     echo "run ./pinger.sh -l to list all sites with index"
+    echo "${normal}"
 
     exit 2
 }
 
 edit_site() {
     total_lines=$(cat $trackfile | wc -w)
-    echo "Total sites present $total_lines"
+    echo "${yellow}"
+    echo "${lightyellow}Total sites present: $total_lines"
+    echo "${normal}"
     if [ $total_lines -eq 0 ]
     then
+        echo "${red}"
         echo "No sites to ping"
+        echo "${lightyellow}"
         echo "use ./pinger.sh -a <site-name> to single sites"
+        echo "${normal}"
         exit 2
     fi
 
     line=$1
-    echo "editting site $line"
 
     if [ -z $line ]
     then 
+        echo "${red}"
         echo "Please input a non-empty index!"
+        echo "${normal}"
     elif [[ $line -ge 1 && $line -le $total_lines ]]
     then
+        echo "${green}"
         echo "Enter new site name:"
+        echo "${lightyellow}"
         read edit
 
         sed -i "$line c \
         $edit" $trackfile
+        echo "${green}"
         echo "site id $line changed to $edit"
+        echo "${normal}"
     else    
+        echo "${red}"
         echo "Enter a valid index"
+        echo "${normal}"
     fi
 
     echo "run ./pinger.sh -l to list all sites with index"
@@ -160,24 +193,28 @@ edit_site() {
 list_site(){
     if [ -z "$(cat $trackfile)" ]
     then
+        echo "${red}"
         echo "No sites to ping"
+        echo "${lightyellow}"
         echo "use ./pinger.sh -a <site-name> to single sites"
+        echo "${normal}"
         exit 4
     fi
 
     i=1
+    echo "${green}"
     cat $trackfile | while read line
     do
         echo "$i: $line"
         i=$(($i+1))
     done 
+    echo "${normal}"
 
-        
-    # cat $trackfile
 }
 
 
 help(){
+    echo "${lightyellow}"
     echo "./pinger.sh  [OPTIONS]... [FLAGS]..."
     echo "FLAGS"
     echo "-p : run pinger on tracklist"
@@ -192,6 +229,7 @@ help(){
     echo "      -a [site url], eg. -a www.google.com "
     echo "      -d [site index], eg. -d 4 "
     echo "      -e [site index], eg. -e 4, after this enter the new site name "
+    echo "${normal}"
     echo ""
     exit 3
 }
@@ -204,7 +242,7 @@ banner(){
     echo "#####  # #  # # #  ### #      #####"
     echo "#      # #   ## #    # #      #   #"
     echo "#      # #    #  ####  ###### #    #"
-    echo ""
+    echo "${normal}"
     echo ""
 }
 
@@ -219,12 +257,12 @@ do
         d) input=$OPTARG;del_site "$input";;
         e) input=$OPTARG;edit_site "$input";;
         l) list_site;;
-        :) echo "Follow the syntax guidelines!";echo "";help ;exit 1;;
+        :) echo "${red}Follow the syntax guidelines!";echo "${normal}";help ;exit 1;;
         \?) help ;exit 1
     esac
 done
 
 if [ "$OPTIND" -eq 1 ]; then
   banner;
-  echo "use ./pinger.sh -h to see all the options"
+  echo "${lightyellow}use ./pinger.sh -h to see all the options ${normal}"
 fi
