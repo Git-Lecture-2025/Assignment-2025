@@ -66,9 +66,13 @@ function just_display {
     do
         response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
         curl_exit_code=$?
-        echo -e "${blue}Site :${clear} $item" 
+        echo -e "${yellow}Site -${clear} $item" 
         desc=$(code_dictionary $response_code $curl_exit_code)
-        echo -e "${cyan}Status -${clear} $response_code ( $desc )"
+        if [ $response_code -eq 200 ]
+        then
+        echo -e "${cyan}Status${clear} - ${green}$response_code ( $desc )${clear}"
+        else echo -e "${cyan}Status${clear} - ${red}$response_code ( $desc )${clear}"
+        fi
         echo "----------------------------"
     done
     echo
@@ -184,11 +188,12 @@ function help_menu() {
     echo "PURPOSE -> Tracks all the urls listed in the tracking list,"
     echo "the list can be manipulated using the following flags."
     echo 
-    echo -e "  ${red}-s${clear}                       Check status of all Tracked sites"
-    echo -e "  ${red}-a${clear} [arg1] [arg2] ...     Add url(s) to your tracking list."
-    echo -e "  ${red}-d${clear}                       Display all the urls in your tracking list"
-    echo -e "  ${red}-x${clear} [arg1] [arg2] ...     Remove url(s) from the tracking list."
-    echo -e "  ${red}-e${clear}                       To open the tracking list in text editor (for wider range of action)"
+    echo -e "  ${green}-s${clear}                       Check status of all Tracked sites"
+    echo -e "  ${green}-a${clear} [arg1] [arg2] ...     Add url(s) to your tracking list."
+    echo -e "  ${green}-d${clear}                       Display all the urls in your tracking list"
+    echo -e "  ${green}-x${clear} [arg1] [arg2] ...     Remove url(s) from the tracking list."
+    echo -e "  ${green}-e${clear}                       Edit the tracking list."
+    echo -e "  ${yellow}-i${clear}                       To enter the Interactive mode."
     echo -e "  ${red}-h${clear}                       To open this help menu (default function)" 
     echo 
 }
@@ -328,6 +333,10 @@ function int_display(){
         fi
 
         x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+
+        if [ ! $x ]
+        then int_display
+        fi
 
         l_remove=${linearray[$(expr $x - 1)]}
         dialog --title "Removing Site - " --msgbox "$l_remove" 0 0 
