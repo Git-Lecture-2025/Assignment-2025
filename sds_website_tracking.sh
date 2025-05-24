@@ -153,7 +153,7 @@ do
             input="1"
         fi
     fi
-    y_n=$(dialog --title "Yes or No" --menu "Please put a yes or a no" 0 0 0 1 "yes" 2 "no" 3>&1 1>&2 2>&3 3>&-)
+    y_n=$(dialog --title "Yes or No" --menu "Please put a yes or a no" 0 0 0 1 "work" 2 "quit" 3>&1 1>&2 2>&3 3>&-)
     if [ $? -eq 1 ]
     then
         y_n="no"
