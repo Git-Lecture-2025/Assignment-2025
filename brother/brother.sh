@@ -3,6 +3,10 @@ WEBSITE_FILE="websites.txt"
 ROW=$(($(tput lines)/2 - 5))
 COL=$(($(tput cols)/2 - 20))
 OS=$(uname)
+if [[ $(tput lines) -lt 35 || $(tput cols) -lt 94 ]]; then
+  echo "Screen resolution too small"
+  exit
+fi
 
 
 if [[ ! -f "$WEBSITE_FILE" ]]; then
@@ -78,13 +82,55 @@ add_website() {
     echo "$(tput setaf 6)Enter the website URL to add:"
     move_cursor $((ROW)) $COL
     read -r website
-    echo "$website" >> "$WEBSITE_FILE"
-    move_cursor $((ROW + 2)) $COL
-    echo "$(tput setaf 2)Website added successfully!"
+
+    isthere=false
+
+    while IFS= read -r var; do
+        if [[ "$var" == "$website" ]]; then
+            isthere=true
+            break
+        fi
+    done < "$WEBSITE_FILE"
+
+    if [[ "$isthere" != "true" ]]; then
+        echo "$website" >> "$WEBSITE_FILE"
+        move_cursor $((ROW + 2)) $COL
+        echo "$(tput setaf 2)Website added successfully!"
+    else
+        move_cursor $((ROW + 2)) $COL
+        echo "$(tput setaf 3)Website already exists!"
+    fi
+
     move_cursor $((ROW + 3)) $COL
     echo "$(tput setaf 6)Press Enter to continue..."
     read -r
 }
+
+# add_website() {
+#     clear_screen
+#     print_banner
+#     move_cursor $((ROW - 2)) $COL
+#     echo "$(tput setaf 6)Enter the website URL to add:"
+#     move_cursor $((ROW)) $COL
+#     read -r website
+#     isthere=false
+#     while IFS= read -r var; then
+#       if [[ $var == $website ]]; then
+#         isthere=true
+#     done < $WEBSITE_FILE
+#
+#     if [[ $isthere!="true" ]]; then
+#       echo "$website" >> "$WEBSITE_FILE"
+#       move_cursor $((ROW + 2)) $COL
+#       echo "$(tput setaf 2)Website added successfully!"
+#     else
+#       move_cursor $((ROW + 2)) $COL
+#       echo "$(tput setaf 3)Website already exists!"
+#     fi
+#     move_cursor $((ROW + 3)) $COL
+#     echo "$(tput setaf 6)Press Enter to continue..."
+#     read -r
+# }
 
 display_websites() {
     clear_screen
