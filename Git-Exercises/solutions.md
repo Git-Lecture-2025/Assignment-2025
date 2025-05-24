@@ -9,6 +9,8 @@
  `git verify`
 
  
+
+ 
 # Exercise 2
 
 Add just one file, commit and verify using:
@@ -20,12 +22,16 @@ Add just one file, commit and verify using:
 
 `git verify`
 
+
+
 # Exercise 3
 Add both files using `git add .`
 
 Commit just A.txt using `git commit A.txt -m "commit only A.txt"`
 
 Verify using `git verify`
+
+
 
 # Exercise 4
 create a .gitignore file with contents 
@@ -42,6 +48,8 @@ create a .gitignore file with contents
  `git commit -m "ignore mentioned files"`
  `git verify`
 
+ 
+ 
  # Exercise 5
  To merge chase with escaped, use: 
  
@@ -49,6 +57,8 @@ create a .gitignore file with contents
  
  verify using `git verify`
 
+ 
+ 
  # Exercise 6
  the merge conflict arises after `git merge another-piece-of-work` in the equation.txt file
 
@@ -61,6 +71,8 @@ create a .gitignore file with contents
  `git commit -m "merge another-piece-of-work"`
 
  `git verify`
+
+
 
 
 # Exercise 7
@@ -82,6 +94,8 @@ make changes in bug.txt, then add, commit and verify using
 
 `git verify`
 
+
+
 # Exercise 8
 bring head to change-branch-history using 
 `git checkout change-branch-history`
@@ -92,6 +106,8 @@ rebase using `git rebase hot-bugfix`
 
 `git verify`
 
+
+
 # Exercise 9
 remove file using `git rm ignored.txt`
 
@@ -101,6 +117,8 @@ commit, verify using
 `git commit -m "untrack ignored"`
 
 `git verify`
+
+
 
 # Exercise 10
 rename the file using
@@ -114,6 +132,8 @@ commit, verify using
 
 `git verify`
 
+
+
 # Exercise 11
 manually edit file.txt
 
@@ -124,12 +144,16 @@ amend this change to last commit using
 
 `git verify`
 
+
+
 # Exercise 12
 to amend the date, use:
 
 `git commit --amend --date="1987" --no-edit`
 
 `git veriify`
+
+
 
 # Exercise 13
 use interactive rebasing and ccess last 2 commits using
