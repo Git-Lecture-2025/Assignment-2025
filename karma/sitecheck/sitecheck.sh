@@ -50,6 +50,10 @@ function just_display {
     echo "---developed by karma---"
     echo 
     echo
+    x2=$'\n' read -d '' -r -a linearray < $list
+    if [ ${#linearray[@]} -eq 0 ]
+    then echo "[ EMPTY track_list ]"; exit 789
+    fi
     for item in $(cat $list)
     do
         response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
@@ -107,7 +111,11 @@ function display_url() {
     echo 
     echo "Tracked Sites"
     echo "---------------------------------------"
-    cat $list
+    x2=$'\n' read -d '' -r -a linearray < $list
+    if [ ${#linearray[@]} -eq 0 ]
+    then echo "[ EMPTY track_list ]"
+    else cat $list
+    fi
     echo "---------------------------------------"
     echo 
 }
@@ -125,6 +133,9 @@ function edit_list() {
     while $isok
     do
     echo
+    if [ ${#lines[@]} -eq 0 ]
+    then echo "Current Tracking list is empty, add sites to edit them"; echo; exit 1234;
+    fi
     echo "Which line to edit? (enter S.No)"
     read r
         if [ $(expr $r ) -gt ${#lines[@]} ] || [ $r -le 0 ]
@@ -164,15 +175,15 @@ function help_menu() {
     echo "your useful site tracking tool..."
     echo "---developed by karma---"
     echo 
-    echo "PURPOSE -> Tracks all the urls listed in the list.txt file,"
-    echo "the list can be manipulated using the following sub-commands."
+    echo "PURPOSE -> Tracks all the urls listed in the tracking list,"
+    echo "the list can be manipulated using the following flags."
     echo 
-    echo "  -s                       Check status of all Tracked sites (Default function)"
+    echo "  -s                       Check status of all Tracked sites"
     echo "  -a [arg1] [arg2] ...     Add url(s) to your tracking list."
     echo "  -d                       Display all the urls in your tracking list"
     echo "  -x [arg1] [arg2] ...     Remove url(s) from the tracking list."
     echo "  -e                       To open the tracking list in text editor (for wider range of action)"
-    echo "  -h                       To open this help menu" 
+    echo "  -h                       To open this help menu (default function)" 
     echo 
 }
 
@@ -231,6 +242,10 @@ function int_display(){
     1)
         dialog --msgbox "
         $(
+        x2=$'\n' read -d '' -r -a linearray < $list
+        if [ ${#linearray[@]} -eq 0 ]
+        then echo "[ EMPTY track_list ]"; exit 789
+        fi
         for item in $(cat $list)
         do
             response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
@@ -265,6 +280,10 @@ function int_display(){
 
         x2=$'\n' read -d '' -r -a linearray < $list
 
+        if [ ${#linearray[@]} -eq 0 ]
+        then dialog --msgbox "[ EMPTY track_list ]" 10 40; int_display
+        fi
+
         x=$(dialog --menu "choose site to be editted" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
        
         if [ ! $x ]
@@ -297,6 +316,10 @@ function int_display(){
 
         x2=$'\n' read -d '' -r -a linearray < $list
 
+        if [ ${#linearray[@]} -eq 0 ]
+        then dialog --msgbox "[ EMPTY track_list ]" 10 40; int_display
+        fi
+
         x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
 
         l_remove=${linearray[$(expr $x - 1)]}
@@ -305,7 +328,11 @@ function int_display(){
         int_display
     ;;
     5)
-        dialog --msgbox "$(cat $list)" 0 0
+        x2=$'\n' read -d '' -r -a linearray < $list
+        if [ ${#linearray[@]} -eq 0 ]
+        then dialog --msgbox "[ EMPTY track_list ]" 10 40
+        else dialog --msgbox "$(cat $list)" 0 0
+        fi
         int_display
     ;;
     *)dialog --yesno "exit the interactive mode ?" 0 0; 
@@ -345,11 +372,17 @@ else
         continue;
         else 
             case $curr_command in
-                "a") add_url ${!i} ;;
-                "x") remove_url ${!i} ;;
+                "a") add_url ${!i}; curr_command="" ;;
+                "x") remove_url ${!i}; curr_command="" ;;
                 *) echo "invalid command(s) found, use -h to know more."
             esac
+            continue
         fi
         i=$(expr $i + 1)
     done
+    if [ $curr_command == "a" ]
+    then echo -e "\nArguments Expected to add url (Refer Help menu with -h)\n"
+    elif [ $curr_command == "x" ]
+    then echo -e "\nArguments Expected to remove url (Refer Help menu with -h)\n"
+    fi
 fi
