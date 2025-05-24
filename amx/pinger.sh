@@ -24,7 +24,7 @@ pinger() {
     if [ -z "$(cat $trackfile)" ]
     then
         echo "Please add sites to ping"
-        echo "use -a <site-name> to single sites"
+        echo "use ./pinger.sh -a <site-name> to single sites"
         exit 4
     fi
 
@@ -45,7 +45,7 @@ add_site() {
         echo "$1 added successfully"
     else
         echo "Site already present in the track list"
-        echo "use -l to view all sites!"
+        echo "use ./pinger.sh -l to view all sites!"
     fi
 
     exit 1
@@ -57,7 +57,7 @@ del_site() {
     if [ $total_lines -eq 0 ]
     then
         echo "No sites to ping"
-        echo "use -a <site-name> to single sites"
+        echo "use ./pinger.sh -a <site-name> to single sites"
         exit 2
     fi
 
@@ -74,7 +74,40 @@ del_site() {
         echo "Enter a valid index"
     fi
 
-    echo "run with -l to list all sites with index"
+    echo "run ./pinger.sh -l to list all sites with index"
+
+    exit 2
+}
+
+edit_site() {
+    total_lines=$(cat $trackfile | wc -w)
+    echo "Total sites present $total_lines"
+    if [ $total_lines -eq 0 ]
+    then
+        echo "No sites to ping"
+        echo "use ./pinger.sh -a <site-name> to single sites"
+        exit 2
+    fi
+
+    line=$1
+    echo "editting site $line"
+
+    if [ -z $line ]
+    then 
+        echo "Please input a non-empty index!"
+    elif [[ $line -ge 1 && $line -le $total_lines ]]
+    then
+        echo "Enter new site name:"
+        read edit
+
+        sed -i "$line c \
+        $edit" $trackfile
+        echo "site id $line changed to $edit"
+    else    
+        echo "Enter a valid index"
+    fi
+
+    echo "run ./pinger.sh -l to list all sites with index"
 
     exit 2
 }
@@ -83,7 +116,7 @@ list_site(){
     if [ -z "$(cat $trackfile)" ]
     then
         echo "No sites to ping"
-        echo "use -a <site-name> to single sites"
+        echo "use ./pinger.sh -a <site-name> to single sites"
         exit 4
     fi
 
@@ -100,18 +133,20 @@ list_site(){
 
 
 help(){
-    echo "pinger [OPTIONS]... [FLAGS]..."
+    echo "./pinger.sh  [OPTIONS]... [FLAGS]..."
     echo "FLAGS"
     echo "-p : run pinger on tracklist"
     echo "-l : list all sites with in tracklist"
     echo "OPTIONS"
     echo "-a : add site to tracklist"
     echo "-d : delete site by index from tracklist"
+    echo "-e : edit site by index from tracklist. prompts you for the new site name"
     echo "-h : show this menu"
     echo ""
     echo "DESCRIPTION"
     echo "      -a [site url], eg. -a www.google.com "
     echo "      -d [site index], eg. -d 4 "
+    echo "      -e [site index], eg. -e 4, after this enter the new site name "
     echo ""
     exit 3
 }
@@ -125,12 +160,13 @@ banner(){
 
 
 # Starting point for the program
-while getopts ":pa:d:l" opt
+while getopts ":pa:d:e:l" opt
 do
     case $opt in
         p) pinger;;
         a) input=$OPTARG;add_site "$input";;
         d) input=$OPTARG;del_site "$input";;
+        e) input=$OPTARG;edit_site "$input";;
         l) list_site;;
         :) echo "Follow the syntax guidelines!";echo "";help ;exit 1;;
         \?) help ;exit 1
@@ -139,5 +175,5 @@ done
 
 if [ "$OPTIND" -eq 1 ]; then
   banner;
-  echo "use -h to see all the options"
+  echo "use ./pinger.sh -h to see all the options"
 fi
