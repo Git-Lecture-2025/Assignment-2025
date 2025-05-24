@@ -13,8 +13,11 @@
 
 Add just one file, commit and verify using:
 
+
 `git add A.txt`
+
 `git commit -m "commit A.txt`
+
 `git verify`
 
 # Exercise 3
@@ -41,7 +44,9 @@ create a .gitignore file with contents
 
  # Exercise 5
  To merge chase with escaped, use: 
+ 
  `git merge escaped`
+ 
  verify using `git verify`
 
  # Exercise 6
@@ -50,8 +55,11 @@ create a .gitignore file with contents
  manually solve the equation to get 2+3=5
 
  then add, commit and verify using
+
  `git add equation.txt`
+
  `git commit -m "merge another-piece-of-work"`
+
  `git verify`
 
 
@@ -61,20 +69,26 @@ use `git stash` to stash current work
 fix the bug by removing the required line in bug.txt
 
 `git add bug.txt`
+
 `git commit bug.txt`
 
 use `git stash apply` to bring back unfinished work 
 
 make changes in bug.txt, then add, commit and verify using
+
 `git add .`
+
 `git commit -m "bug fixed"`
+
 `git verify`
 
 # Exercise 8
 bring head to change-branch-history using 
 `git checkout change-branch-history`
 
+
 rebase using `git rebase hot-bugfix`
+
 
 `git verify`
 
@@ -83,14 +97,21 @@ remove file using `git rm ignored.txt`
 
 commit, verify using 
 
+
 `git commit -m "untrack ignored"`
+
 `git verify`
 
 # Exercise 10
 rename the file using
+
 `git mv File.txt file.txt`
+
+
 commit, verify using
+
 `git commit -m "change file name"`
+
 `git verify`
 
 # Exercise 11
@@ -105,22 +126,37 @@ amend this change to last commit using
 
 # Exercise 12
 to amend the date, use:
+
 `git commit --amend --date="1987" --no-edit`
+
 `git veriify`
 
 # Exercise 13
 use interactive rebasing and ccess last 2 commits using
+
 `git rebase -i HEAD~2`
+
+
 replace pick with edit for the commit you want to edit.
+
+
 
 manually edit file.txt and change from wordl to world
 
+
 `git add file.txt`
+
 `git commit --amend -S`
+
 `git rebase --continue`
+
+
 
 resolve merge conflict in file.txt manually, then add, continue rebasing and verify using
 
+
 `git add file.txt`
+
 `git rebase --continue`
+
 `git verify`
