@@ -14,9 +14,30 @@ clear_screen() {
 move_cursor() {
     tput cup "$1" "$2"
 }
+print_banner() {
+    
+    move_cursor $((ROW - 12)) $((COL -10))
+    echo "$(tput setaf 5)"
+    move_cursor $((ROW - 11)) $((COL -10))
+    echo "██████╗ ██████╗  ██████╗ ████████╗██╗  ██╗███████╗██████╗ "
+    move_cursor $((ROW - 10)) $((COL -10))
+    echo "██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗"
+    move_cursor $((ROW - 9)) $((COL -10))
+    echo "██████╔╝██████╔╝██║   ██║   ██║   ███████║█████╗  ██████╔╝"
+    move_cursor $((ROW - 8)) $((COL -10))
+    echo "██╔══██╗██╔══██╗██║   ██║   ██║   ██╔══██║██╔══╝  ██╔══██╗"
+    move_cursor $((ROW - 7)) $((COL -10))
+    echo "██████═╝██║  ██║╚██████╔╝   ██║   ██║  ██║███████╗██║  ██║"
+    move_cursor $((ROW - 6)) $((COL -10))
+    echo "╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
+    move_cursor $((ROW - 5)) $((COL -10))
+    echo ""
+}
+
 
 show_menu() {
     clear_screen
+    print_banner
     move_cursor $((ROW - 1)) $COL
     echo "$(tput setaf 3)Website Accessibility Checker"
     move_cursor $((ROW + 1)) $((COL + 3))
@@ -39,6 +60,7 @@ show_menu() {
 
 add_website() {
     clear_screen
+    print_banner
     move_cursor $((ROW - 2)) $COL
     echo "$(tput setaf 6)Enter the website URL to add:"
     move_cursor $((ROW)) $COL
@@ -53,54 +75,64 @@ add_website() {
 
 display_websites() {
     clear_screen
+    print_banner
     move_cursor $((ROW - 3)) $COL
     echo "$(tput setaf 3)Websites in the track list:"
-    move_cursor $((ROW - 1)) $COL
     echo "$(tput setaf 6)"
-    awk -v col=$COL '{printf "\033[%d;%dH%s\n", NR + ENVIRON["ROW"] + 1, col, NR ". " $0}' "$WEBSITE_FILE"
+    index=1
+    while IFS= read -r val; do
+      move_cursor $((ROW + index)) $COL
+      echo "$index $val"
+      index=$((index+1))
+    done<$WEBSITE_FILE
     echo "$(tput sgr0)"
 }
 
 remove_website() {
     display_websites
     total_lines=$(wc -l < "$WEBSITE_FILE")
-    move_cursor $((ROW + total_lines + 3)) $COL
+    move_cursor $((ROW + total_lines + 3)) $((COL-7))
     echo "$(tput setaf 6)Enter the number of the website to remove (or 0 to cancel): "
+    move_cursor $((ROW + total_lines + 5)) $((COL-7))
     read -r choice
-    if [[ "$choice" -gt 0 ]]; then
+    if [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$total_lines" ]]; then
         sed -i '' "${choice}d" "$WEBSITE_FILE"
         move_cursor $((ROW + total_lines + 5)) $COL
         echo "$(tput setaf 2)Website removed successfully!"
+    else
+        move_cursor $((ROW + total_lines + 7)) $COL
+        echo "$(tput setaf 1) Didn't work " 
     fi
-    move_cursor $((ROW + total_lines + 7)) $COL
+    move_cursor $((ROW + total_lines + 9)) $COL
     echo "$(tput setaf 6)Press Enter to continue..."
     read -r
 }
 
 check_status() {
     clear_screen
-    move_cursor $((ROW - 3)) $COL
+    print_banner
+    move_cursor $((ROW - 3)) $((COL - 5))
     echo "$(tput setaf 3)Checking website status..."
-    move_cursor $((ROW - 1)) $COL
+    move_cursor $((ROW - 1)) $((COL - 5))
     echo "$(tput setaf 6)Website                                   Status"
-    move_cursor $ROW $COL
+    move_cursor $ROW $((COL - 5))
     echo "$(tput setaf 6)--------------------------------------------------"
     line_num=$((ROW + 1))
 
     while IFS= read -r website; do
-        move_cursor $line_num $COL
+        move_cursor $line_num $((COL - 5))
         echo "$(tput setaf 6)$website"
         if [[ "${website:0:4}" != "http" ]]; then
             website="https://$website"
         fi
         if curl -s --head --request GET "$website" | grep "200 OK" > /dev/null; then
-            move_cursor $line_num $((COL + 40))
+            move_cursor $line_num $((COL + 35))
             echo "$(tput setaf 2)Accessible"
         elif curl -s --head --request GET "$website" | grep "301" > /dev/null; then
-            move_cursor $line_num $((COL + 40))
+            move_cursor $line_num $((COL + 35))
             echo "$(tput setaf 3)Not Sure (301)"
         else
-            move_cursor $line_num $((COL + 40))
+            move_cursor $line_num $((COL + 35))
             echo "$(tput setaf 1)Not Accessible"
         fi
         line_num=$((line_num + 1))
@@ -121,6 +153,7 @@ while true; do
         *)
             move_cursor $((ROW + 8)) $COL
             echo "$(tput setaf 1)Invalid choice. Press Enter to continue..."
+            move_cursor $((ROW + 9)) $COL
             read -r
             ;;
     esac
