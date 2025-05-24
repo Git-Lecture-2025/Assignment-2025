@@ -243,16 +243,22 @@ function decor_heading() {
 }
 
 function int_display(){
-    resp=$(dialog --cursor-off-label --cancel-label "Exit" --no-lines --backtitle "SiteCheck" --menu "$(
-    echo -e "SiteCheck"
+    resp=$(dialog --no-collapse --cursor-off-label --cancel-label "Exit" --no-lines --backtitle "SiteCheck" --menu "$(
+    
+    echo -e " ____  _ _        ____ _               _    "
+    echo -e "/ ___|(_) |_ ___ / ___| |__   ___  ___| | __"
+    echo -e "\___ \| | __/ _ \ |   | '_ \ / _ \/ __| |/ /"
+    echo -e " ___) | | ||  __/ |___| | | |  __/ (__|   < "
+    echo -e "|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ "
     echo 
     echo "your useful site tracking tool..."
     echo -e "---developed by karma---"
-    echo )" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
+
+    )" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
 
     case $resp in 
     1)
-        dialog --cursor-off-label --no-lines --msgbox "
+        dialog --scrollbar --cursor-off-label --no-lines --msgbox "
         $(
         x2=$'\n' read -d '' -r -a linearray < $list
         if [ ${#linearray[@]} -eq 0 ]
@@ -351,11 +357,45 @@ function int_display(){
         x2=$'\n' read -d '' -r -a linearray < $list
         if [ ${#linearray[@]} -eq 0 ]
         then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40
-        else dialog --cursor-off-label --no-lines --msgbox "$(cat $list)" 0 0
+        else 
+        dialog --exit-label "Back" --cursor-off-label --no-lines --tailbox $list 0 0;
         fi
         int_display
     ;;
-    *)dialog --defaultno --cursor-off-label --no-lines --yesno "exit the interactive mode ?" 10 40; 
+    # 6)
+
+    # d_file=~/.config/sitecheck/detailed_inspection.txt
+    # touch $d_file
+    # echo " " > $d_file;
+
+    # r2=""
+    #     i=1
+    # for line in $(cat $list)
+    # do
+    #     r2=$r2"$i $line "; i=$(expr $i + 1)
+    # done
+
+    # x2=$'\n' read -d '' -r -a linearray < $list
+
+    # if [ ${#linearray[@]} -eq 0 ]
+    # then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40; int_display
+    # fi
+
+    # x=$(dialog --cursor-off-label --no-lines --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+
+    # if [ ! $x ]
+    # then int_display
+    # fi
+
+    # l_remove=${linearray[$(expr $x - 1)]}
+
+    # curl -s -L -m 10 -I $l_remove -o $d_file;
+    # code $d_file;
+    # dialog --no-lines --no-collapse --cursor-off-label --tailbox $d_file 0 0;
+    # int_display
+
+    # ;;
+    *)dialog --defaultno --cursor-off-label --no-lines --pause "exitting interactive mode...in" 10 40 5; 
         dec=$?
         if [ $dec -ne 0 ] 
         then
