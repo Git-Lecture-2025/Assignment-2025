@@ -121,6 +121,13 @@ do
             dialog --title "Websites till now" --msgbox "$(cat website.txt)" 0 0 --ok-label "Next"
             editing_site=$(dialog --title "Editing a site" --inputbox "Please enter the number[Starting site is assumed as 0] of site that you want to edit" 0 0 3>&1 1>&2 2>&3 3>&-)
             editing_site_exit_code=$?
+            editing_site_number=$((editing_site + 0))
+            while [[ "$editing_site_number" -ge "$length" || "$editing_site_number" -lt 0 ]]
+            do
+                dialog --title "Error" --msgbox "Please put a valid number" 0 0
+                editing_site=$(dialog --title "Editing a site" --inputbox "Please enter the number[Starting site is assumed as 0] of site that you want to edit" 0 0 3>&1 1>&2 2>&3 3>&-)
+                editing_site_number=$((editing_site + 0))
+            done
             if [[ "$editing_site_exit_code" -eq 1 ]]
             then
                 dialog --title "Cancel" --msgbox "You will meet a yes or no question where if you don't want to add , remove or edit anything then you can press no" 0 0
@@ -156,7 +163,7 @@ do
     y_n=$(dialog --title "Yes or No" --menu "Please put a yes or a no" 0 0 0 1 "work" 2 "quit" 3>&1 1>&2 2>&3 3>&-)
     if [ $? -eq 1 ]
     then
-        y_n="no"
+        y_n="0"
     fi
 done
 for item in ${arr[@]}
