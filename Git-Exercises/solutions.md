@@ -19,7 +19,9 @@ Add just one file, commit and verify using:
 
 # Exercise 3
 Add both files using `git add .`
+
 Commit just A.txt using `git commit A.txt -m "commit only A.txt"`
+
 Verify using `git verify`
 
 # Exercise 4
