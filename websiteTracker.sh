@@ -67,11 +67,7 @@ view () {
                 echo ""
         else
                 for key in "${!websites_list[@]}"; do
-                        if [[ "${websites_list[$key]}" == "accessible" ]]; then
-                                echo -e "$key ${GREEN} accessible ${YELLOW}"
-                        else
-                                echo -e "$key ${RED} not accessible ${YELLOW}"
-                        fi
+                        echo -e "$key ${GREEN} ${websites_list[$key]} ${YELLOW}"
                 done
                 echo ""
                 read -p "Would you like to view detailed status of the accessible websites? (y/n) " ans
@@ -88,9 +84,9 @@ view () {
 }
 
 add () {
-	if curl -Is "$1" >/dev/null 2>&1; then
+	if curl -ILs "$1" >/dev/null 2>&1; then
 		echo -e "${GREEN}$1 is accessible"
-		websites_list[$1]="accessible"
+		websites_list[$1]=$(curl -s -o /dev/null -I -w "%{http_code}" "$1")
 		echo -e "Added $1 to the list of tracked websites"
   		echo -e "${YELLOW}"
                 echo ""
@@ -102,9 +98,7 @@ add () {
                         options
                 fi
 	else
-		echo -e "${RED}$1 is not accessible"
-		websites_list[$1]="not accessible"
-                echo -e "Added $1 to the list of tracked websites"
+		echo -e "${RED}$1 is not a valid website"
 	fi
 	options
 }
@@ -143,13 +137,13 @@ delete () {
 }
 
 status () {
-	if [[ "${websites_list[$1]}" == "accessible" ]]; then
-		curl -I "$1"
-	elif [[ -n "${websites_list[$1]}" ]]; then
-                echo "The website is not accessible, you can only view detailed status of tracked accessible websites."
-        else
+	if [[ -n "${websites_list[$1]}" ]]; then
+		curl -IL "$1"
+        elif curl -ILs "$1" >/dev/null 2>&1; then
                 echo "The website isn't being tracked, you can only view detailed status of tracked accessible websites."
-        echo ""
+        else
+		echo "The input is not a valid website!"	
+ 	echo ""
 	fi
 	options
 }
