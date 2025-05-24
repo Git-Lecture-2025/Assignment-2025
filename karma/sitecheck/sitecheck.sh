@@ -18,6 +18,16 @@ list=~/.config/sitecheck/track_list.txt
 script_args=$@
 
 ########function zone########################
+red='\033[0;31m'
+green='\033[0;32m'
+yellow='\033[0;33m'
+blue='\033[0;34m'
+magenta='\033[0;35m'
+cyan='\033[0;36m'
+lightblue='\033[1;34m'
+clear='\033[0m'
+
+
 function error_dictionary {
     case $1 in
         "0") echo "all good";;
@@ -47,8 +57,6 @@ curl_exit_code=0
 
 function just_display {
     decor_heading
-    echo "---developed by karma---"
-    echo 
     echo
     x2=$'\n' read -d '' -r -a linearray < $list
     if [ ${#linearray[@]} -eq 0 ]
@@ -58,9 +66,9 @@ function just_display {
     do
         response_code=$(curl -s -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
         curl_exit_code=$?
-        echo "Site : $item" 
+        echo -e "${blue}Site :${clear} $item" 
         desc=$(code_dictionary $response_code $curl_exit_code)
-        echo "Status - $response_code ( $desc )"
+        echo -e "${cyan}Status -${clear} $response_code ( $desc )"
         echo "----------------------------"
     done
     echo
@@ -172,43 +180,40 @@ function remove_url() {
 
 function help_menu() {
     decor_heading
-    echo "your useful site tracking tool..."
-    echo "---developed by karma---"
     echo 
     echo "PURPOSE -> Tracks all the urls listed in the tracking list,"
     echo "the list can be manipulated using the following flags."
     echo 
-    echo "  -s                       Check status of all Tracked sites"
-    echo "  -a [arg1] [arg2] ...     Add url(s) to your tracking list."
-    echo "  -d                       Display all the urls in your tracking list"
-    echo "  -x [arg1] [arg2] ...     Remove url(s) from the tracking list."
-    echo "  -e                       To open the tracking list in text editor (for wider range of action)"
-    echo "  -h                       To open this help menu (default function)" 
+    echo -e "  ${red}-s${clear}                       Check status of all Tracked sites"
+    echo -e "  ${red}-a${clear} [arg1] [arg2] ...     Add url(s) to your tracking list."
+    echo -e "  ${red}-d${clear}                       Display all the urls in your tracking list"
+    echo -e "  ${red}-x${clear} [arg1] [arg2] ...     Remove url(s) from the tracking list."
+    echo -e "  ${red}-e${clear}                       To open the tracking list in text editor (for wider range of action)"
+    echo -e "  ${red}-h${clear}                       To open this help menu (default function)" 
     echo 
 }
 
-function check_dependency() {
-    which figlet >/dev/null
-    check1=$?
-    which lolcat >/dev/null
-    check2=$?
-
-    if [ $check1 -eq 1 ] || [ $check2 -eq 1 ];
-        then echo "Please install \`lolcat\` and \`figlet\` (for better user experience)";
-        read -p "wanna install? [y/n] " resp ;
-        if [ $resp == "y" ];
-        then brew install lolcat 2>/dev/null;
-        brew install figlet 2>/dev/null;
-        apt install lolcat 2>/dev/null;
-        apt install figlet 2>/dev/null;
-        check1=0; check2=0
-        elif [ $resp == "n" ];
-        then echo "not installing";
-        echo ;
-        check1=1;check2=1;
-        fi
-    fi
-}
+# function check_dependency2() {
+#     which figlet >/dev/null
+#     check1=$?
+#     which lolcat >/dev/null
+#     check2=$?
+#     if [ $check1 -eq 1 ] || [ $check2 -eq 1 ];
+#         then echo "Please install \`lolcat\` and \`figlet\` (for better user experience)";
+#         read -p "wanna install? [y/n] " resp ;
+#         if [ $resp == "y" ];
+#         then brew install lolcat 2>/dev/null;
+#         brew install figlet 2>/dev/null;
+#         apt install lolcat 2>/dev/null;
+#         apt install figlet 2>/dev/null;
+#         check1=0; check2=0
+#         elif [ $resp == "n" ];
+#         then echo "not installing";
+#         echo ;
+#         check1=1;check2=1;
+#         fi
+#     fi
+# }
 
 function check_dependency() {
     which dialog >/dev/null
@@ -228,14 +233,16 @@ function decor_heading() {
     echo -e "\033[36m ___) | | ||  __/ |___| | | |  __/ (__|   < \033[0m"
     echo -e "\033[33m|____/|_|\__\___|\____|_| |_|\___|\___|_|\_\ \033[0m"
     echo 
+    echo "your useful site tracking tool..."
+    echo -e "---developed by ${lightblue}karma${clear}---"
 }
 
 function int_display(){
     resp=$(dialog --menu "$(
-    echo "SiteCheck"
+    echo -e "SiteCheck"
     echo 
     echo "your useful site tracking tool..."
-    echo "---developed by karma---"
+    echo -e "---developed by karma---"
     echo )" 0 0 0 1 "ping all" 2 "add site" 3 "edit site" 4 "remove site" 5 "display tracked sites" 3>&1 1>&2 2>&3 3>&-)
 
     case $resp in 
