@@ -1,10 +1,11 @@
-# #!/bin/bash
+#!/bin/bash
 WEBSITE_FILE="websites.txt"
 ROW=$(($(tput lines)/2 - 5))
 COL=$(($(tput cols)/2 - 20))
 
 if [[ ! -f "$WEBSITE_FILE" ]]; then
   touch "$WEBSITE_FILE"
+  echo "Created website file"
 fi
 
 clear_screen() {
@@ -96,7 +97,7 @@ remove_website() {
     move_cursor $((ROW + total_lines + 5)) $((COL-7))
     read -r choice
     if [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$total_lines" ]]; then
-        sed -i '' "${choice}d" "$WEBSITE_FILE"
+        sed -i "${choice}d" "$WEBSITE_FILE"
         move_cursor $((ROW + total_lines + 5)) $COL
         echo "$(tput setaf 2)Website removed successfully!"
     else
