@@ -243,7 +243,7 @@ function decor_heading() {
 }
 
 function int_display(){
-    resp=$(dialog --menu "$(
+    resp=$(dialog --cursor-off-label --cancel-label "Exit" --no-lines --backtitle "SiteCheck" --menu "$(
     echo -e "SiteCheck"
     echo 
     echo "your useful site tracking tool..."
@@ -252,7 +252,7 @@ function int_display(){
 
     case $resp in 
     1)
-        dialog --msgbox "
+        dialog --cursor-off-label --no-lines --msgbox "
         $(
         x2=$'\n' read -d '' -r -a linearray < $list
         if [ ${#linearray[@]} -eq 0 ]
@@ -271,13 +271,13 @@ function int_display(){
         int_display
     ;;
     2)
-        site_add=$(dialog --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
+        site_add=$(dialog --cursor-off-label --no-lines --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
 
         if [ $? -eq 1 ]
-        then dialog --msgbox "nothing added" 0 0;
+        then dialog --cursor-off-label --no-lines --msgbox "nothing added" 0 0;
         else
         add_url "$site_add";
-        dialog --title "Site added - " --msgbox "$site_add" 0 0;
+        dialog --cursor-off-label --no-lines --title "Site added - " --msgbox "$site_add" 0 0;
         fi
 
         int_display
@@ -293,10 +293,10 @@ function int_display(){
         x2=$'\n' read -d '' -r -a linearray < $list
 
         if [ ${#linearray[@]} -eq 0 ]
-        then dialog --msgbox "[ EMPTY track_list ]" 10 40; int_display
+        then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40; int_display
         fi
 
-        x=$(dialog --menu "choose site to be editted" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+        x=$(dialog --cursor-off-label --no-lines --menu "choose site to be editted" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
        
         if [ ! $x ]
         then int_display
@@ -304,9 +304,13 @@ function int_display(){
 
         l_edit=${linearray[$(expr $x - 1)]}
 
-        n=$(dialog --inputbox "edit $l_edit to ? " 0 0 3>&1 1>&2 2>&3 3>&-)    
+        n=$(dialog --cursor-off-label --no-lines --inputbox "edit $l_edit to ? " 0 0 3>&1 1>&2 2>&3 3>&-)   
 
-        dialog --title "Edit URL" --msgbox "$l_edit -> $n" 0 0  
+        if [ ! $n ]
+        then int_display
+        fi
+
+        dialog --cursor-off-label --no-lines --title "Edit URL" --msgbox "$l_edit -> $n" 0 0  
 
         linearray[$(expr $x - 1)]=$n
 
@@ -329,29 +333,29 @@ function int_display(){
         x2=$'\n' read -d '' -r -a linearray < $list
 
         if [ ${#linearray[@]} -eq 0 ]
-        then dialog --msgbox "[ EMPTY track_list ]" 10 40; int_display
+        then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40; int_display
         fi
 
-        x=$(dialog --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
+        x=$(dialog --cursor-off-label --no-lines --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
 
         if [ ! $x ]
         then int_display
         fi
 
         l_remove=${linearray[$(expr $x - 1)]}
-        dialog --title "Removing Site - " --msgbox "$l_remove" 0 0 
+        dialog --cursor-off-label --no-lines --title "Removing Site - " --msgbox "$l_remove" 0 0 
         remove_url "$l_remove"
         int_display
     ;;
     5)
         x2=$'\n' read -d '' -r -a linearray < $list
         if [ ${#linearray[@]} -eq 0 ]
-        then dialog --msgbox "[ EMPTY track_list ]" 10 40
-        else dialog --msgbox "$(cat $list)" 0 0
+        then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40
+        else dialog --cursor-off-label --no-lines --msgbox "$(cat $list)" 0 0
         fi
         int_display
     ;;
-    *)dialog --yesno "exit the interactive mode ?" 10 40; 
+    *)dialog --defaultno --cursor-off-label --no-lines --yesno "exit the interactive mode ?" 10 40; 
         dec=$?
         if [ $dec -ne 0 ] 
         then
