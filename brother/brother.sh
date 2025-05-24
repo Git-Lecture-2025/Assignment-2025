@@ -2,11 +2,23 @@
 WEBSITE_FILE="websites.txt"
 ROW=$(($(tput lines)/2 - 5))
 COL=$(($(tput cols)/2 - 20))
+OS=$(uname)
+
 
 if [[ ! -f "$WEBSITE_FILE" ]]; then
   touch "$WEBSITE_FILE"
   echo "Created website file"
 fi
+
+
+sed_i() {
+    if [[ "$OS" == "Darwin" || "$OS" == "FreeBSD" ]]; then
+        sed -i '' "$1" "$2"
+    else
+        sed -i "$1" "$2"
+    fi
+}
+
 
 clear_screen() {
     tput clear
@@ -96,8 +108,8 @@ remove_website() {
     echo "$(tput setaf 6)Enter the number of the website to remove (or 0 to cancel): "
     move_cursor $((ROW + total_lines + 5)) $((COL-7))
     read -r choice
-    if [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$total_lines" ]]; then
-        sed -i "${choice}d" "$WEBSITE_FILE"
+    if [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$((total_lines+1))" ]]; then
+        sed_i "${choice}d" "$WEBSITE_FILE"
         move_cursor $((ROW + total_lines + 5)) $COL
         echo "$(tput setaf 2)Website removed successfully!"
     else
