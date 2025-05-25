@@ -21,7 +21,12 @@ while [ "$y_n" = "1" ]
 do
     : > website.txt
     
-    input=$(dialog --title "Website tracking" --menu "Tasks" 0 0 0 1 "Add" 2 "Remove" 3 "Status" 4 "Edit" 3>&1 1>&2 2>&3 3>&-)
+    input=$(dialog --cancel-label "Quit" --title "Website tracking" --menu "Tasks" 0 0 0 \
+    1 "Add" \
+    2 "Remove" \
+    3 "Status" \
+    4 "Edit" \
+    3>&1 1>&2 2>&3 3>&-)
     if [ $? -eq 1 ]
     then
         y_n="0"
