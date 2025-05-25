@@ -38,11 +38,11 @@ git verify
 <br><br>
 
 # (6) MERGE-CONFLICT
-gave rise to a merge conflict (by merging current branch with another piece of work" then manually fixed it.
+gave rise to a merge conflict (by merging current branch with another piece of work") then manually fixed it.
 `git merge another-piece-of-work` <br>
-Manually fix the `equation.txt` file on text editor
-
-Stage,commit and finally verify:
+Then fix it manually
+Finally,
+Stage,commit and verify:
 ```
 git add equation.txt
 git commit -m "merge another-piece of work"
