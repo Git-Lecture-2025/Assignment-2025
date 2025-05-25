@@ -8,9 +8,9 @@ Here we just cat the readme file to get the password.
 ## Level 1 -> 2
 ```
 cat ./-
-
 ```
 Here the catch is there is a special character which we need to make sure that it is not interpreted as a command.
+We use cat to read out the file content.
 
 
 ## Level 2 -> 3
@@ -18,6 +18,7 @@ Here the catch is there is a special character which we need to make sure that i
 cat "spaces in this filename"
 ```
 Here there are spaces in the file name so we wrap them in ""
+We use cat to read out the file content.
 ## Level 3 -> 4
 
 ```
@@ -25,6 +26,7 @@ cat ...Hiding-From-You
 
 ```
 Here the password is stored in a hidden file which we can see by using ```ls -a``` to show all.
+We use cat to read out the file content.
 
 ## Level 4 -> 5
 
@@ -36,6 +38,7 @@ Then select the correct looking password.
 
 Here we have a bunch of files with special characters at the beginning so we need a script that will cat all the files.
 We use `sed` to append `./` before each file name which we get from the output of the ls command and run cat command on those filenames. 
+Then we use the `for loop` to loop through each of the file name cad `cat` it.
 
 ## Level 5 -> 6
 
@@ -44,6 +47,7 @@ find ./ -size 1033c
 
 ```
 Here we find the file that is of 1033 bytes size.
+For this we use `find` command which looks through all the files recursively until it matches the specified files.
 
 ## Level 6 -> 7
 ```
@@ -51,6 +55,7 @@ find . -group bandit6 -user bandit7 -size 33c 2>/dev/null
 
 ```
 Here we find the file that is of 33 bytes size and is owned by the user bandit7 and belongs to the group bandit6.
+For this we use `find` command which looks through all the files recursively until it matches the specified files.
 
 We use 2>/dev/null to send the error output to /dev/null and not display it.
 ## Level 7 -> 8
@@ -60,6 +65,7 @@ cat data.txt |grep "millionth"
 
 ```
 Simple grep use.
+Here we use the `grep` command which finds the pattern in the file or the input stream
 
 ## Level 8 -> 9
 
@@ -67,13 +73,14 @@ Simple grep use.
 sort data.txt | uniq -u
 
 ```
-Here we simply sort the data.txt and pipe the output in uniq with the u flag which gives the unique value.
+Here we simply sort the data.txt with `sort` command and pipe the output in `uniq` with the u flag which gives the unique value.
 ## Level 9 -> 10
 
 ```
  strings data.txt | grep "=="
 
 ```
+Here we use the `string` command which gives the strings from a binary file and the use `grep` to look for the patter we need.
 
 ## Level 10 -> 11
 
@@ -82,13 +89,14 @@ base64 -d data.txt
 
 ```
 Decode the base64 text.
+we use the `base64` command.
 ## Level 11 -> 12
 
 ```
 cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 
 ```
-Here we use the tr (*translate character*) command to shift the capital and small alphabets by 13 places.
+Here we use the `tr` (*translate character*) command to shift the capital and small alphabets by 13 places.
 
 ## Level 12 -> 13
 
@@ -161,6 +169,7 @@ cat test
 
 ```
 Here we import the private key using rsync on our machine and then use it to SSH in the next level.
+We use the `rsync` command as it can get the key to our machine.
 
 ## Level 14 -> 15
 
@@ -169,12 +178,13 @@ nc localhost:30000
 
 ```
 Note this command has to run on the bandit server as we are using the localhost.
+
 ## Level 15 -> 16
 
 ```
 openssl s_client localhost:30001
-
 ```
+Here we use the `openssl` command as we need to has ssl/tls encryption for connecting to the server
 
 ## Level 16 -> 17
 First, we do an aggressive scan of all the ports: 
@@ -182,6 +192,7 @@ First, we do an aggressive scan of all the ports:
 nmap -A localhost -p 31000-32000
 ```
 Select the port which has the wrong password error and use: 
+We use `nmap` as it can scan all the ports and run scripts on those ports for us.
 ```
 ncat --ssl localhost <port> 
 ```
@@ -202,13 +213,13 @@ ssh -i private.key bandit17@<the URL>
 diff password.new password.old
 
 ```
-Simple use of the diff command.
+Simple use of the `diff` command.
 
 ## Level 18 -> 19
 
 ```
 ssh bandit18@bandit.labs.overthewire.org -p 2220 -t "/bin/sh"
 ```
-Then just cat the file.
+Then just `cat` the file.
 
 
