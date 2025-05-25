@@ -103,6 +103,7 @@ function extract_switch_commands {
 
 function add_url() {
     bul=true
+    resolution_check=true
     for url in $(cat $list)
     do
         if [ $url == $1 ]
@@ -110,11 +111,20 @@ function add_url() {
         fi
     done
 
+    
+
+    if [ $resolution_check != true ]
+    then
+    echo "NOT ADDING $1"
+    echo "site url unresolved."
+    fi
+
     if [ $bul != true ]
     then
     echo "NOT ADDING $1"
     echo "this site is already being tracked."
     else
+
     echo "$1" >> $list
     echo "ADDED $1 to the tracking list"
     fi
