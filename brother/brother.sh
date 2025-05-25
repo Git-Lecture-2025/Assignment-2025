@@ -85,8 +85,16 @@ add_website() {
     if [[ "${website:0:4}" != "http" ]]; then
             website="https://$website"
     fi
-    website=$(sed 's#/.*##' <<< "${website:8}")
-    website="https://$website"
+
+    if [[ "${website:0:7}" == "http://" ]]; then
+      website=$(sed 's#/.*##' <<< "${website:7}")
+      website="http://$website"
+    fi
+
+    if [[ "${website:0:8}" == "https://" ]]; then
+      website=$(sed 's#/.*##' <<< "${website:8}")
+      website="https://$website"
+    fi
 
     if [[ $(sed -n "/[^a-zA-Z0-9./:-]/p; /[[:space:]]/p; /^[^a-zA-Z0-9]/p; /[^a-zA-Z0-9]$/p" <<< "$website") != "" ]]; then
       move_cursor $((ROW + 3)) $COL
@@ -122,6 +130,13 @@ display_websites() {
     clear_screen
     print_banner
     move_cursor $((ROW - 3)) $COL
+    if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      # move_cursor $((ROW + index)) $COL
+      # echo "Add some website first to remove them"
+      # sleep 2
+      return
+    fi
+
     echo "$(tput setaf 3)Websites in the track list:"
     echo "$(tput setaf 6)"
     index=1
@@ -130,13 +145,18 @@ display_websites() {
       echo "$index $val"
       index=$((index+1))
     done<$WEBSITE_FILE
-    echo "$(tput sgr0)"
 }
 
 remove_website() {
     display_websites
     total_lines=$(wc -l < "$WEBSITE_FILE")
     move_cursor $((ROW + total_lines + 3)) $((COL-7))
+    if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      move_cursor $((ROW + index)) $COL
+      echo "$(tput setaf 3)Add some website first to remove them"
+      sleep 2
+      return
+    fi
     echo "$(tput setaf 6)Enter the number of the website to remove (or 0 to cancel): "
     move_cursor $((ROW + total_lines + 5)) $((COL-7))
     read -r choice
@@ -159,6 +179,13 @@ remove_website() {
 check_status() {
     clear_screen
     print_banner
+ if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      move_cursor $((ROW + index)) $COL
+      echo "$(tput setaf 3)Add some website first to check there status"
+      sleep 2
+      return
+    fi
+
     move_cursor $((ROW - 3)) $((COL - 5))
     echo "$(tput setaf 3)Checking website status..."
     move_cursor $((ROW - 1)) $((COL - 5))
