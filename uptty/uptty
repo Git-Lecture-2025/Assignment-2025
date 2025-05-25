@@ -106,6 +106,12 @@ add_site(){
     local status="unknown"
     local response_time="infinity"
     local last_checked="never"
+
+    local res=$(curl -Is "$url" | head -n 1)
+    if [ -z "$res" ]; then
+        echo "Invalid URL, Could not Resolve Host"
+        exit
+    fi
     echo $trackerid,$name,$url,$status,$response_time,$last_checked >> "$UPT_CSV"
 }
 
@@ -188,7 +194,7 @@ check() {
         local spinPid=$!
 
 
-        local res=$(curl -w "%{time_total}" -Is $url -m 2)
+        local res=$(curl -w "%{time_total}" -LIs $url -m 2)
         local resStat=$(echo $res | head -n 1)
         local resLat=$(echo $res | tail -n 1)
         resLat=${resLat:0:-1}
