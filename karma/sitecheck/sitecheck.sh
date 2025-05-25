@@ -67,7 +67,7 @@ function just_display {
     fi
     for item in $(cat $list)
     do
-        response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
+        response_code=$(curl -s -L -m 10 -w "%{http_code}" "$item" -o /dev/null)    
         curl_exit_code=$?
         echo -e "${yellow}Site -${clear} $item" 
         desc=$(code_dictionary $response_code $curl_exit_code)
@@ -111,7 +111,7 @@ function add_url() {
         fi
     done
 
-    response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$1" -o /dev/null)
+    response_code=$(curl -s -L -m 10 -w "%{http_code}" "$1" -o /dev/null)
 
     if [ $response_code == "000" ]
     then resolution_check=false;
@@ -308,7 +308,7 @@ function int_display(){
         fi
         for item in $(cat $list)
         do
-            response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$item" -o /dev/null)    
+            response_code=$(curl -s -L -m 10 -w "%{http_code}" "$item" -o /dev/null)    
             curl_exit_code=$?
             echo -e "Site : $item" 
             desc=$(code_dictionary $response_code $curl_exit_code)
@@ -320,6 +320,19 @@ function int_display(){
     ;;
     2)
         site_add=$(dialog --cursor-off-label --no-lines --inputbox "enter the site to be added" 0 0 3>&1 1>&2 2>&3 3>&-)
+
+        response_code=$(curl -s -L -m 10 -w "%{http_code}" "$site_add" -o /dev/null)
+
+        resolution_check=true;
+        if [ $response_code == "000" ]
+        then resolution_check=false;
+        fi
+
+        if [ $resolution_check != true ]
+        then
+        dialog --cursor-off-label --no-lines --title "Site NOT added - " --msgbox "unresolved site - $site_add" 10 40;
+        int_display
+        fi
 
         if [ $? -eq 1 ]
         then dialog --cursor-off-label --no-lines --msgbox "nothing added" 0 0;
