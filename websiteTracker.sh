@@ -66,19 +66,23 @@ view () {
                 echo "You can check the status of websites by adding them to the list!"
                 echo ""
         else
+                i=1
+                declare -A indexed_array
                 for key in "${!websites_list[@]}"; do
-                        echo -e "$key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+                        echo -e "$i. $key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+                        indexed_array[$i]=$key
+                        ((i++))
                 done
                 echo ""
                 read -p "Would you like to view detailed status of the accessible websites? (y/n) " ans
                 if [[ "$ans" == "y" ]]; then
-                        read -p "Enter the website you want detailed status of : " status_key
+                        read -p "Enter the website you want detailed status of : " key
                         echo -e "${NC}"
-                        status $status_key
+                        status $key
                 else
                         options
                 fi
-
+		unset indexed_array
         fi
         options
 }
@@ -104,35 +108,51 @@ add () {
 }
 
 edit () {
-        read -p "Enter the website you want to edit : " key
-        if [[ -z "$key" ]]; then
-                echo "You can only edit non-empty strings!"
+	 i=1
+        declare -A indexed_array
+	for key in "${!websites_list[@]}"; do
+		echo -e "$i. $key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+		indexed_array[$i]=$key
+		((i++))
+	done
+        read -p "Enter the index of website you want to edit : " index
+        if [[ -z "$index" ]]; then
+                echo "You didnt enter a index."
                 options
                 return 0
         fi
-	if [[ -n "${websites_list[$key]}" ]]; then
-		unset websites_list[$key]
+        if [[ -n "${indexed_array[$index]}" ]]; then
+                unset websites_list[${indexed_array[$index]}]
+                unset indexed_array
                 read -p "Enter the new website : " key_replace
                 add $key_replace
-	else
-                echo "The website isn't being tracked currently."
-	fi	
-	options
+        else
+                echo "The index doesn't exist in the list."
+        fi
+        options
 }
 
 delete () { 
-	read -p "Enter the website you want to delete : " key
- 	if [[ -z "$key" ]]; then
-                echo "You can only delete non-empty strings!"
+	 i=1
+	declare -A indexed_array
+	for key in "${!websites_list[@]}"; do
+		echo -e "$i. $key ${GREEN} ${websites_list[$key]} ${YELLOW}"
+		indexed_array[$i]=$key
+		((i++))
+	done
+	read -p "Enter the index of website you want to delete : " index
+        if [[ -z "$index" ]]; then
+                echo "You didnt enter a index."
                 options
                 return 0
         fi
-	if [[ -n "${websites_list[$key]}" ]]; then
-		unset websites_list[$key]
+        if [[ -n "${indexed_array[$index]}" ]]; then
+                unset websites_list[${indexed_array[$index]}]
+                unset indexed_array
                 echo "Deleted."
         else
-		echo "The website isnt being tracked currently."
-	fi
+                echo "The index doesn't exist in the list."
+        fi
 	options
 }
 
