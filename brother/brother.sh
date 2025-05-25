@@ -131,9 +131,6 @@ display_websites() {
     print_banner
     move_cursor $((ROW - 3)) $COL
     if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
-      # move_cursor $((ROW + index)) $COL
-      # echo "Add some website first to remove them"
-      # sleep 2
       return
     fi
 
@@ -152,7 +149,7 @@ remove_website() {
     total_lines=$(wc -l < "$WEBSITE_FILE")
     move_cursor $((ROW + total_lines + 3)) $((COL-7))
     if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
-      move_cursor $((ROW + index)) $COL
+      move_cursor $((ROW)) $((COL-4))
       echo "$(tput setaf 3)Add some website first to remove them"
       sleep 2
       return
@@ -180,7 +177,7 @@ check_status() {
     clear_screen
     print_banner
  if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
-      move_cursor $((ROW + index)) $COL
+   move_cursor $((ROW)) $((COL-4))
       echo "$(tput setaf 3)Add some website first to check there status"
       sleep 2
       return
