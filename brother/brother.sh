@@ -198,16 +198,16 @@ check_status() {
         move_cursor $line_num $((COL - 5))
         echo "$(tput setaf 6)${website:0:35}"
        
-        if curl -s --head --request GET "$website" | grep "200" > /dev/null; then
+        status_code=$(curl -s -o /dev/null -w "%{http_code}" "$website")
+        if [[ "$status_code" == 200 || "$status_code" == 300 || "$status_code" == 301 || "$status_code" == 302 ]]; then
             move_cursor $line_num $((COL + 35))
-            echo "$(tput setaf 2)Accessible"
-        elif curl -s --head --request GET "$website" | grep "301" > /dev/null; then
-            move_cursor $line_num $((COL + 35))
-            echo "$(tput setaf 3)Not Sure (301)"
+            echo "$(tput setaf 2)Website is up"
         else
+
             move_cursor $line_num $((COL + 35))
-            echo "$(tput setaf 1)Not Accessible"
+            echo "$(tput setaf 1)Not Accessible (status: $status_code)"
         fi
+
         line_num=$((line_num + 1))
     done < "$WEBSITE_FILE"
 
