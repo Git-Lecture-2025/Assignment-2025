@@ -168,7 +168,9 @@ function edit_list() {
         fi
         echo "Which line to edit? (enter S.No)"
         read r
-
+        if [[ "$r" =~ ^[0-9]+(\.[0-9]+)?$ ]]
+        then echo -e "\nplease enter valid index"; continue
+        fi
         if [[ "$r" -gt ${#lines[@]} || "$r" -le 0 || -z "$r" ]];
         then
         echo -e "\nplease enter valid index"; continue
@@ -218,6 +220,9 @@ function remove_url() {
         fi
         echo "Which site to remove? (enter S.No)"
         read r
+        if [[ "$r" =~ ^[0-9]+(\.[0-9]+)?$ ]]
+        then echo -e "\nplease enter valid index"; continue
+        fi
         if [[ "$r" -gt ${#lines[@]} || "$r" -le 0 || -z "$r" ]]
         then
         echo -e "\nplease enter valid index"; continue
