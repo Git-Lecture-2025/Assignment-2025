@@ -173,16 +173,42 @@ function edit_list() {
 }
 
 function remove_url() {
-    r=""
+    x=$'\n' read -d '' -r -a lines < $list
+    i=1
+    for l in ${lines[@]}
+    do
+    echo "$i) $l"
+    i=$(expr $i + 1)
+    done
+
+    isok=true;
+    while $isok
+    do
+        echo
+        if [ ${#lines[@]} -eq 0 ]
+        then echo "Current Tracking list is empty, add sites to edit them"; echo; exit 1234;
+        fi
+        echo "Which site to remove? (enter S.No)"
+        read r
+        if [ $(expr $r ) -gt ${#lines[@]} ] || [ $r -le 0 ]
+        then
+        echo -e "\nplease enter valid index"; continue
+        fi
+        isok=false
+    done
+
+    r=$(expr $r - 1)
+
+    r3=""
     for url in $(cat $list)
     do
-        if [ $url != $1 ]
+        if [ $url != ${lines[$r]} ]
         then
-            r=$r"\n"$url
+            r3=$r3"\n"$url
         fi
     done
-    echo -e "$r" > $list 
-    echo "removing $1 from the list."
+    echo -e "$r3" > $list 
+    echo "removing ${lines[$r]} from the list."
 }
 
 function help_menu() {
@@ -350,8 +376,20 @@ function int_display(){
         fi
 
         l_remove=${linearray[$(expr $x - 1)]}
+
         dialog --cursor-off-label --no-lines --title "Removing Site - " --msgbox "$l_remove" 0 0 
-        remove_url "$l_remove"
+
+        r3=""
+        for url in $(cat $list)
+        do
+            if [ $url != $l_remove ]
+            then
+                r3=$r3"\n"$url
+            fi
+        done
+        echo -e "$r3" > $list
+
+        # remove_url "$l_remove"
         int_display
     ;;
     5)
@@ -363,39 +401,7 @@ function int_display(){
         fi
         int_display
     ;;
-    # 6)
 
-    # d_file=~/.config/sitecheck/detailed_inspection.txt
-    # touch $d_file
-    # echo " " > $d_file;
-
-    # r2=""
-    #     i=1
-    # for line in $(cat $list)
-    # do
-    #     r2=$r2"$i $line "; i=$(expr $i + 1)
-    # done
-
-    # x2=$'\n' read -d '' -r -a linearray < $list
-
-    # if [ ${#linearray[@]} -eq 0 ]
-    # then dialog --cursor-off-label --no-lines --msgbox "[ EMPTY track_list ]" 10 40; int_display
-    # fi
-
-    # x=$(dialog --cursor-off-label --no-lines --menu "choose site to be removed" 0 0 0 $r2 3>&1 1>&2 2>&3 3>&-)
-
-    # if [ ! $x ]
-    # then int_display
-    # fi
-
-    # l_remove=${linearray[$(expr $x - 1)]}
-
-    # curl -s -L -m 10 -I $l_remove -o $d_file;
-    # code $d_file;
-    # dialog --no-lines --no-collapse --cursor-off-label --tailbox $d_file 0 0;
-    # int_display
-
-    # ;;
     *)dialog --defaultno --cursor-off-label --no-lines --pause "exitting interactive mode...in" 10 40 5; 
         dec=$?
         if [ $dec -ne 0 ] 
@@ -429,12 +435,13 @@ else
             then just_display $isok;
             elif [ $curr_command == "i" ]
             then int_display;
+            elif [ $curr_command == "x" ]
+            then remove_url
             fi
         continue;
         else 
             case $curr_command in
                 "a") add_url ${!i};;
-                "x") remove_url ${!i};;
                 *) echo "invalid command(s) found, use -h to know more."
             esac
         fi
