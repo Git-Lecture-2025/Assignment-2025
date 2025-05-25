@@ -460,9 +460,9 @@ function int_display(){
         int_display
     ;;
 
-    *)dialog --defaultno --cursor-off-label --no-lines --pause "exitting interactive mode...in" 10 40 5; 
-        dec=$?
-        if [ $dec -ne 0 ] 
+    *)dialog --cancel-label "Stay" --ok-label "Leave" --defaultno --cursor-off-label --no-lines --pause "exitting interactive mode...in" 10 40 5
+        re=$?
+        if [[ $re -ne 0 ]] 
         then
         int_display
         else help_menu
