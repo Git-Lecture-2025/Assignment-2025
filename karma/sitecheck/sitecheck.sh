@@ -328,6 +328,19 @@ function int_display(){
         then resolution_check=false;
         fi
 
+        bul=true
+        for url in $(cat $list)
+        do
+            if [ $url == $site_add ]
+                then bul=false ; break;
+            fi
+        done
+        if [ $bul != true ]
+        then
+        dialog --cursor-off-label --no-lines --title "NOT ADDING $site_add" --msgbox "this site is already being tracked." 10 40;
+        int_display
+        fi
+
         if [ $resolution_check != true ]
         then
         dialog --cursor-off-label --no-lines --title "Site NOT added - " --msgbox "unresolved site - $site_add" 10 40;
@@ -340,7 +353,6 @@ function int_display(){
         add_url "$site_add";
         dialog --cursor-off-label --no-lines --title "Site added - " --msgbox "$site_add" 0 0;
         fi
-
         int_display
     ;;
     3)
