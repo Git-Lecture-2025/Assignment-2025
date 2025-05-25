@@ -1,7 +1,6 @@
 # (1) MASTER
-Initialise the exercise<br>
-Use `git start` <br>
-Use `git verify` to verify<br><br>
+Use `git start` 
+then `git verify` 
 
 
 # (2) COMMIT ONE-FILE
@@ -10,39 +9,40 @@ then commit with `git commit -m "commit message"`<br>
 finally, `git verify`<br><br>
 
 
-# 3. COMMIT-ONE-FILE-STAGED
-use `git reset` to remove one file<br>
+# (3) COMMIT-ONE-FILE-STAGED
+What i did- unstage one file then commit the other file.
+`git reset` to remove one file<br>
 Add file using `git add A.txt`<br>
-Commit using `git commit -m "commit message"`<br>
-finally, `git verify`<br><br>
+Commit the added file using `git commit -m "Added A.txt"`<br>
 
 
-# 4. IGNORE-THEM
-Create a `.gitignore` file using `touch .gitignore` and write the following four lines to ignore files:
+# (4) IGNORE-THEM
+Create a `.gitignore` file using `touch .gitignore`
+Added the following to the `.gitignore` file:
 >*.exe <br>
 *.o <br>
 *.jar <br>
 libraries/ 
 
-Then stage,commit and finally verify:
+Stage,commit and finally verify:
 ```
 git add .gitignore
 git commit -m "add .gitignore"
 git verify
 ```
-<br>
+<br><br>
 
 
 # (5) CHASE-BRANCH
-`git merge escaped` to merge<br>
-Verify.<br><br>
-
+`git merge escaped` 
+<br><br>
 
 # (6) MERGE-CONFLICT
-`git merge another-piece-of-work` will give rise to a conflict<br>
-Manually fix the `equation.txt` file
+gave rise to a merge conflict (by merging current branch with another piece of work" then manually fixed it.
+`git merge another-piece-of-work` <br>
+Manually fix the `equation.txt` file on text editor
 
-Then stage,commit and finally verify:
+Stage,commit and finally verify:
 ```
 git add equation.txt
 git commit -m "merge another-piece of work"
@@ -51,37 +51,41 @@ git verify
 <br><br>
 
 # (7) SAVE-YOUR-WORK
-Save progress using `git stash` <br>
-then, Fix the bug manually
+run
+`git stash`
+manually fix the bug, then run
 ```
 git add bug.txt
 git commit -m "fix bug"
 ```
-Use `git stash pop` to reapply previous work<br>
-Update `bug.txt` <br>
-Use `git add .` to add all files to staging area<br>
-Commit and verify
+reapply previous changes using
+`git stash pop`
+make further updates to bug.txt, then run
 ```
+git add .
 git commit -m "update files"
 git verify
 ```
 <br><br>
 
 # (8) CHANGE-BRANCH-HISTORY
-`git rebase hot-bugfix change-branch-history`<br>
-Verify.<br><br>
+```
+git rebase hot-bugfix
+git verify
+```
 
 
 # (9) REMOVE-IGNORED
+If a file was tracked before being added to .gitignore, we can use the following to stop tracking it:
 ```
 git rm ignored.txt
-git commit -m "untrack file"
+git commit -m "Remove ignored.txt"
 git verify
 ```
 <br><br>
 
 # (10)CASE-SENSITIVE-FILE-NAME
-Rename `File.txt` to `file.txt`
+To rename a file by changing only its letter casing (e.g., File.txt to file.txt), we can use:
 ```
 git mv File.txt file.txt
 git commit -m "rename file"
@@ -90,20 +94,17 @@ git verify
 <br><br>
 
 # (11) FIX-TYPO
-Manually edit `file.txt`<br>
-stage file, amend, commit:
+After manually editing file.txt, stage the changes and amend the last commit using:
 ```
 git add file.txt
-git commit --ammend -m "Add Hello world"
+git commit --amend -m "Add Hello world"
 git verify
 ```
-<br>
 
 
 # (12) FORGE-DATE
 ```
-git commit --amend --date=1987 -m "add work.txt"
-git verify
+git commit --date "Sun May 25 00:49:23 1987 +0530" --amend
 ```
 <br>
 
