@@ -345,5 +345,3 @@ case $1 in
         ;;
 esac
 
-# TODO: EDGE CASES FOR COMMANDS AND USAGE HELP
-

@@ -21,5 +21,5 @@ echo "Installing UpTTY TUI ..."
 wget -nv --no-cache -O /usr/bin/uptty-tui https://raw.githubusercontent.com/TanmayArya-1p/Assignment-2025/refs/heads/tcan/uptty/uptty-tui
 
 chmod +x /usr/bin/uptty
-chmod +x /usr/bin/uptty-tui
+chmod +x /usr/bin/uptty-tu  i
 uptty version
