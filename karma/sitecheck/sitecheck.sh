@@ -162,13 +162,14 @@ function edit_list() {
     isok=true;
     while $isok
     do
-    echo
-    if [ ${#lines[@]} -eq 0 ]
-    then echo "Current Tracking list is empty, add sites to edit them"; echo; exit 1234;
-    fi
-    echo "Which line to edit? (enter S.No)"
-    read r
-        if [ $(expr $r ) -gt ${#lines[@]} ] || [ $r -le 0 ]
+        echo
+        if [ ${#lines[@]} -eq 0 ]
+        then echo "Current Tracking list is empty, add sites to edit them"; echo; exit 1234;
+        fi
+        echo "Which line to edit? (enter S.No)"
+        read r
+
+        if [[ "$r" -gt ${#lines[@]} || "$r" -le 0 || -z "$r" ]];
         then
         echo -e "\nplease enter valid index"; continue
         fi
@@ -178,7 +179,19 @@ function edit_list() {
     r=$(expr $r - 1)
     echo "> [${lines[$r]}] edit to :-" 
     read resp
+
+    response_code=$(curl -s -L -m 10 -w "%{http_code}" "$resp" -o /dev/null)
+    resolution_check=true;
+    if [ $response_code == "000" ]
+    then resolution_check=false;
+    fi
+
+    if [ $resolution_check != true ]
+    then
+    echo "INVALID site"
+    else
     lines[$r]=$resp
+    fi
 
     echo "" > $list
     for l in ${lines[@]}
@@ -205,7 +218,7 @@ function remove_url() {
         fi
         echo "Which site to remove? (enter S.No)"
         read r
-        if [ $(expr $r ) -gt ${#lines[@]} ] || [ $r -le 0 ]
+        if [[ "$r" -gt ${#lines[@]} || "$r" -le 0 || -z "$r" ]]
         then
         echo -e "\nplease enter valid index"; continue
         fi
@@ -235,7 +248,7 @@ function help_menu() {
     echo -e "  ${green}-s${clear}                       Check status of all Tracked sites"
     echo -e "  ${green}-a${clear} [arg1] [arg2] ...     Add url(s) to your tracking list."
     echo -e "  ${green}-d${clear}                       Display all the urls in your tracking list"
-    echo -e "  ${green}-x${clear} [arg1] [arg2] ...     Remove url(s) from the tracking list."
+    echo -e "  ${green}-x${clear}                       Remove url(s) from the tracking list."
     echo -e "  ${green}-e${clear}                       Edit the tracking list."
     echo -e "  ${yellow}-i${clear}                       To enter the Interactive mode."
     echo -e "  ${red}-h${clear}                       To open this help menu (default function)" 
