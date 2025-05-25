@@ -17,7 +17,7 @@ echo ""
 if [ -f /usr/bin/uptty ]; then
     echo "Looks like you already have UpTTY installed."
     echo -n "Delete the current installation and install the latest version of UpTTY? (Y/n) "
-    read -rn1 inp
+    read -rn1 inp </dev/tty
     echo
     if [[ "$inp" == "n" || "$inp" == "N" ]]; then
         echo "Exiting Installer!"
