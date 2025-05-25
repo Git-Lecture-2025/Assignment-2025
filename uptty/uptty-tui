@@ -6,7 +6,7 @@ echo() {
     local width=$(tput cols)
     local offs=$(( (width - ${#otpt}) / 2 ))
     
-    local it=0;
+    local it=0; 
     while [ $it -lt $offs ]; do
         builtin echo -n " "
         it=$((it + 1))
@@ -116,7 +116,11 @@ add_tracker() {
     fi
 
     clear
-    uptty add $sitename $url
+    local upttyRes=$(uptty add $sitename $url)
+    if [[ "$upttyRes" == "Invalid URL, Could not Resolve Host" ]]; then
+        display_error "Error Adding Tracker, Could not Resolve Host: $url"
+        exit
+    fi
     clear
     refresh
 }
@@ -264,6 +268,7 @@ print_menu() {
             esac
         elif [[ $k == "q" ]] ; then
             clear
+            tput cnorm
             exit
         elif [[ $k == "k" ]] ; then
             curr=$(((curr-1+ ${#opts[@]}) % ${#opts[@]}))
