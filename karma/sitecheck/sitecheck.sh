@@ -111,12 +111,17 @@ function add_url() {
         fi
     done
 
-    
+    response_code=$(curl -s -L -m 10 -w "%{http_code}" -I "$1" -o /dev/null)
+
+    if [ $response_code == "000" ]
+    then resolution_check=false;
+    fi
 
     if [ $resolution_check != true ]
     then
     echo "NOT ADDING $1"
     echo "site url unresolved."
+    exit 345;
     fi
 
     if [ $bul != true ]
