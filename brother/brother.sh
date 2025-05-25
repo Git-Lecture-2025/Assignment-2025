@@ -82,7 +82,7 @@ add_website() {
     echo "$(tput setaf 6)Enter the website URL to add:"
     move_cursor $((ROW)) $COL
     read -r website
-    if [[ $(sed -n "/[^a-zA-Z0-9]/p; /[[:space:]]/p" <<< "$website") != "" ]]; then
+    if [[ $(sed -n "/[^a-zA-Z0-9./:]/p; /[[:space:]]/p" <<< "$website") != "" ]]; then
       move_cursor $((ROW + 3)) $COL
       echo "$(tput setaf 3)Incorrect domain name."
       sleep 2
