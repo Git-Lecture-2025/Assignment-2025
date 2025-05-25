@@ -16,6 +16,8 @@ fi
 
 list=~/.config/sitecheck/track_list.txt
 
+DIALOGRC=~/.config/sitecheck/test.dialogrc
+
 script_args=$@
 
 ########function zone########################
@@ -431,17 +433,16 @@ else
         continue;
         else 
             case $curr_command in
-                "a") add_url ${!i}; curr_command="" ;;
-                "x") remove_url ${!i}; curr_command="" ;;
-                *) echo "invalid command(s) found, use -h to know more."; exit 567;
+                "a") add_url ${!i};;
+                "x") remove_url ${!i};;
+                *) echo "invalid command(s) found, use -h to know more."
             esac
-            continue
         fi
         i=$(expr $i + 1)
     done
-    if [ $curr_command == "a" ]
-    then echo -e "\nArguments Expected to add url (Refer Help menu with -h)\n"
-    elif [ $curr_command == "x" ]
-    then echo -e "\nArguments Expected to remove url (Refer Help menu with -h)\n"
-    fi
+    # if [ $curr_command == "a" ]
+    # then echo -e "\nArguments Expected to add url (Refer Help menu with -h)\n"
+    # elif [ $curr_command == "x" ]
+    # then echo -e "\nArguments Expected to remove url (Refer Help menu with -h)\n"
+    # fi
 fi
