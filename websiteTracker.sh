@@ -85,8 +85,8 @@ view () {
 
 add () {
 	if curl -ILs "$1" >/dev/null 2>&1; then
-		echo -e "${GREEN}$1 is accessible"
 		websites_list[$1]=$(curl -s -o /dev/null -I -w "%{http_code}" "$1")
+		echo -e "${GREEN}$1 is accessible with status code ${websites_list[$1]}"
 		echo -e "Added $1 to the list of tracked websites"
   		echo -e "${YELLOW}"
                 echo ""
