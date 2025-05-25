@@ -148,6 +148,7 @@ We can find if a file is gzip compressed or bzip2 compressed
 1. using `file`
 2. using `xxd` which translates the contents of a file (or standard input) into a human-readable hexadecimal representation and looking at the first 2 bytes
    * if they are `1f 8b` it is a gzip compressed file
+     
 We need to make a of copy data.txt using `cp` to a temporary directory to perform modification.
 `xxd -r` is used to convert file data to binary
 `mv` command can be used to rename a file
