@@ -160,6 +160,9 @@ ls
 file test
 cat test
 ```
+Here we first use `xxd -r` to reverse hex dump 
+Then we can use `file` to find out which the formate and compression type then we use
+Use `gunzip` or `tar` to decompress the file based on the type
 ## Level 13 -> 14
 
 ```
