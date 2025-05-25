@@ -82,7 +82,13 @@ add_website() {
     echo "$(tput setaf 6)Enter the website URL to add:"
     move_cursor $((ROW)) $COL
     read -r website
-    if [[ $(sed -n "/[^a-zA-Z0-9./:]/p; /[[:space:]]/p" <<< "$website") != "" ]]; then
+    if [[ "${website:0:4}" != "http" ]]; then
+            website="https://$website"
+    fi
+    website=$(sed 's#/.*##' <<< "${website:8}")
+    website="https://$website"
+
+    if [[ $(sed -n "/[^a-zA-Z0-9./:-]/p; /[[:space:]]/p; /^[^a-zA-Z0-9]/p; /[^a-zA-Z0-9]$/p" <<< "$website") != "" ]]; then
       move_cursor $((ROW + 3)) $COL
       echo "$(tput setaf 3)Incorrect domain name."
       sleep 2
@@ -101,7 +107,7 @@ add_website() {
     if [[ "$isthere" != "true" ]]; then
         echo "$website" >> "$WEBSITE_FILE"
         move_cursor $((ROW + 2)) $COL
-        echo "$(tput setaf 2)Website added successfully!"
+        echo "$(tput setaf 2)"$website" added to the list successfully!"
     else
         move_cursor $((ROW + 2)) $COL
         echo "$(tput setaf 3)Website already exists!"
@@ -164,9 +170,7 @@ check_status() {
     while IFS= read -r website; do
         move_cursor $line_num $((COL - 5))
         echo "$(tput setaf 6)${website:0:35}"
-        if [[ "${website:0:4}" != "http" ]]; then
-            website="https://$website"
-        fi
+       
         if curl -s --head --request GET "$website" | grep "200" > /dev/null; then
             move_cursor $line_num $((COL + 35))
             echo "$(tput setaf 2)Accessible"
