@@ -115,14 +115,20 @@ add_website() {
     if [[ "$isthere" != "true" ]]; then
         echo "$website" >> "$WEBSITE_FILE"
         move_cursor $((ROW + 2)) $COL
-        echo "$(tput setaf 2)"$website" added to the list successfully!"
+        if [[ $(curl -s -o /dev/null -w "%{http_code}" -L "$website") -eq 200 ]]; then
+          echo "$(tput setaf 2)$website added to the list successfully!"
+        else
+          echo "$(tput setaf 3)Website is not reachable!"
+        fi
+
+
     else
         move_cursor $((ROW + 2)) $COL
         echo "$(tput setaf 3)Website already exists!"
     fi
 
     move_cursor $((ROW + 3)) $COL
-    echo "$(tput setaf 6)Press Enter to continue..."
+    echo "$(tput setaf 5)Press Enter to continue..."
     read -r
 }
 
