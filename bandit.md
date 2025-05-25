@@ -134,7 +134,9 @@ Password:dtR173fZKb0RRsDFSGsg2RWnpNVj3qRr
 
 
 # LEVEL 11 -> 12
-rotated by 13
+We use `tr` command to perform rotation by 13 which translates the given characters using the specified characters given next to it. 
+`'A-Za-z'` `'N-ZA-Mn-za-m'` means translate 'A-Z' to 'N-ZA-M' and same for small alphabets.
+We use the output of cat command redirected to tr using `|`.
 ```
 cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 ```
@@ -142,7 +144,17 @@ Password:7x16WNeHIi5YkIhWsfFIqoognUTyj9Q4
 
 
 # LEVEL 12 -> 13
-can find if a file is gzip compressed or bzip2 compressed using file or xxd and looking at the first 4 bytes
+We can find if a file is gzip compressed or bzip2 compressed 
+1. using `file`
+2. using `xxd` which translates the contents of a file (or standard input) into a human-readable hexadecimal representation and looking at the first 2 bytes
+   * if they are `1f 8b` it is a gzip compressed file
+We need to make a of copy data.txt using `cp` to a temporary directory to perform modification.
+`xxd -r` is used to convert file data to binary
+`mv` command can be used to rename a file
+`gzip -d` `bzip2 -d` are used to decompress the files
+gzip requires the file to be ending in .gz to compress
+`tar` command is used to extract archive files here
+After multiple decompression we will retrieve the password
 ```
 mktemp -d
 cp data.txt /tmp/tmp.g8bZWTdXRJ
@@ -179,43 +191,46 @@ Password:FO5dwFsc0cbaIiH0h8J2eUks2vdTDwAn
 
 
 # LEVEL 13 -> 14
-
-given a private key , stored it and used it to login to nexr level
-
+We find a file, `sshkey.private` which contains a private key which can be used to login into next level so we use:
+```
+ssh -i sshkey.private bandit14@bandit.labs.overthewire.org -p 2220
+```
+where `-i` helps us login using the private key by specifying the path to it.
 Password:MU4VWeTyJk8ROof1qqmcBPaLh7lDCPvS
 
 
 # LEVEL 14 -> 15
+We got logged in at the previous level and then we:
 ```
-nano bandit14_keys
-```
-store the key and
-```
-ssh -i '~/bandit14_keys' bandit14@bandit.labs.overthewire.org -p 2220
 cd  /etc/bandit_pass
 cat bandit14
 ```
+We store the password for level 14 that we got and connect to *localhost port 30000* using `nc` which is generally used for reading and writing data across networks 
 ```
 nc localhost 30000
-
 ```
-submitted the password and got new password
+We submit the password for bandit14 and get new password for bandit15
 
 Password:8xCjnmgoKbGLhHFAZlGE5Tmu4M2tKJQo
 
 
 # LEVEL 15 -> 16
-openssl s_client is used for testing ssl/tls connection
+We use `openssl`'s tool `s_client` to check ssl/tls connection to the specified domain name (localhost) and port (30001)
+`openssl` is a cryptography toolkit implementing the Secure Sockets Layer (SSL) and Transport Layer Security (TLS) network protocols and related cryptography standards required by them.
+`-connect` tests connectivity to an HTTPS service
 ```
-openssl s_client localhost:30001
+openssl s_client -connect localhost:30001
 ```
 Password:kSkvUpMQ7lBYyCM4GBPvCvT1BfWRy0Dx
 
 
 # LEVEL 16 -> 17
+We use `nmap` to scan for listening/open ports 
 ```
 nmap -p31000-32000 localhost
 ```
+`-p` is used to give port number or range in our case being 31000-32000
+We got the following:
 ```
 PORT      STATE SERVICE
 31046/tcp open  unknown
@@ -224,26 +239,32 @@ PORT      STATE SERVICE
 31790/tcp open  unknown
 31960/tcp open  unknown
 ```
-checked each port one by one using
+We check each port one by one for SSL/TLS connection using openssl s_client again
 ```
 openssl s_client -connect -nocommands localhost:31046
 openssl s_client -connect -nocommands localhost:31518
 openssl s_client -connect -nocommands localhost:31691
 openssl s_client -connect -nocommands localhost:31790
 ```
-got a rsa key & stored it
+`-nocommands` is used because the password we are providing starts with 'k' which is a special command in openssl s_client so to prevent it from interpreting our password as a command we use this flag
+We get a rsa key for next level and we will store it in a file named bandit17 in home directory
 
 
 # LEVEL 17 -> 18
-diff used for finding difference in content of two files
+We use the rsa key stored from previous level in bandit17 to login to this level
+```
+ssh -i bandit17 bandit14@bandit.labs.overthewire.org -p 2220
+```
+`diff` is used for finding difference in content of two files:
 ```
 diff passwords.old passwords.new
 ```
+We got the password
 Password:x2gLTTjFwMOhQ8oWNbMN362QKxfRqGlO
 
 
 # LEVEL 18 -> 19
-executing a command as soon as entering the password
+Since it doesnt let us stay logged in on using ssh we will execute the command `cat readme` to view the password as soon as entering the password by:
 ```
 ssh bandit18@bandit.labs.overthewire.org -p 2220 cat readme
 ```
@@ -251,10 +272,20 @@ Password:cGWpMaKXVwDUNgPAVJbWYuGHVn9zl3j8
 
 
 # LEVEL 19 -> 20
-used to script to access the bandit20 file
+We have a setuid executable, a script which temprorarily changes the current user to another user
+On executing 
+```
+./bandit20-do
+```
+It tells us we can run a command as another user along with an example:
+```
+./bandit20-do id
+```
+We find using it we have permission of bandit20 user so we:
 ```
 ./bandit20-do cat /etc/bandit_pass/bandit20
 ```
+And get the password
 Password:0qXahG8ZjOVMN9Ghs7iOWsCfZyXOUbYO
 
 
