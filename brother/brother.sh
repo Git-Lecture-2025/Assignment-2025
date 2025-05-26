@@ -203,8 +203,7 @@ edit_site(){
         if [[ "${website_edit:0:7}" == "http://" ]]; then
             website_edit=$(sed 's#/.*##' <<< "${website_edit:7}")
             website_edit="http://$website_edit"
-
-        elif [[ "${website_edit:0:8}" == "http://" ]]; then
+        elif [[ "${website_edit:0:8}" == "https://" ]]; then
           website_edit=$(sed 's#/.*##' <<< "${website_edit:8}")
           website_edit="https://$website_edit"
         else
