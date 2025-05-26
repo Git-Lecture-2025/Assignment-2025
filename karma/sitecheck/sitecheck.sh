@@ -260,28 +260,6 @@ function help_menu() {
     echo 
 }
 
-# function check_dependency2() {
-#     which figlet >/dev/null
-#     check1=$?
-#     which lolcat >/dev/null
-#     check2=$?
-#     if [ $check1 -eq 1 ] || [ $check2 -eq 1 ];
-#         then echo "Please install \`lolcat\` and \`figlet\` (for better user experience)";
-#         read -p "wanna install? [y/n] " resp ;
-#         if [ $resp == "y" ];
-#         then brew install lolcat 2>/dev/null;
-#         brew install figlet 2>/dev/null;
-#         apt install lolcat 2>/dev/null;
-#         apt install figlet 2>/dev/null;
-#         check1=0; check2=0
-#         elif [ $resp == "n" ];
-#         then echo "not installing";
-#         echo ;
-#         check1=1;check2=1;
-#         fi
-#     fi
-# }
-
 function check_dependency() {
     which dialog >/dev/null
     check=$?
@@ -505,9 +483,4 @@ else
         fi
         i=$(expr $i + 1)
     done
-    # if [ $curr_command == "a" ]
-    # then echo -e "\nArguments Expected to add url (Refer Help menu with -h)\n"
-    # elif [ $curr_command == "x" ]
-    # then echo -e "\nArguments Expected to remove url (Refer Help menu with -h)\n"
-    # fi
 fi
