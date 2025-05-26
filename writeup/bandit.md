@@ -99,8 +99,16 @@ cat data.txt | tr 'A-Za-z' 'N-ZA-Mn-za-m'
 Here we use the `tr` (*translate character*) command to shift the capital and small alphabets by 13 places.
 
 ## Level 12 -> 13
+* First, we used `xxd -r` to reverse the hex dump back into its original binary form:
+* Next, we used the file command to identify the file format and compression type:
+* Based on the output from the file command, we used the appropriate command to extract the contents.
+    * if it was a gzip file:
+    `gunzip output.bin`
+    * If it was a tar archive:
+    `tar -xf output.bin`
 
-I am just pasting my history.
+
+I am just pasting my history for the exact steps followed.
 
 ```
 place=$(mktemp -d);
@@ -160,9 +168,6 @@ ls
 file test
 cat test
 ```
-Here we first use `xxd -r` to reverse hex dump 
-Then we can use `file` to find out which the formate and compression type then we use
-Use `gunzip` or `tar` to decompress the file based on the type
 ## Level 13 -> 14
 
 ```
