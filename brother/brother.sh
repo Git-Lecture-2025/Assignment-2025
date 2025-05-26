@@ -1,0 +1,322 @@
+#!/bin/bash
+WEBSITE_FILE="websites.txt"
+ROW=$(($(tput lines)/2 - 5))
+COL=$(($(tput cols)/2 - 20))
+OS=$(uname)
+if [[ $(tput lines) -lt 35 || $(tput cols) -lt 94 ]]; then
+  echo "Screen resolution too small"
+  exit
+fi
+
+
+if [[ ! -f "$WEBSITE_FILE" ]]; then
+  touch "$WEBSITE_FILE"
+  echo "Created website file"
+fi
+
+
+sed_i() {
+    if [[ "$OS" == "Darwin" || "$OS" == "FreeBSD" ]]; then
+        sed -i '' "$1" "$2"
+    else
+        sed -i "$1" "$2"
+    fi
+}
+
+clear_screen() {
+    tput clear
+}
+
+move_cursor() {
+    tput cup "$1" "$2"
+}
+print_banner() {
+    
+    move_cursor $((ROW - 12)) $((COL -10))
+    echo "$(tput setaf 5)"
+    move_cursor $((ROW - 11)) $((COL -10))
+    echo "██████╗ ██████╗  ██████╗ ████████╗██╗  ██╗███████╗██████╗ "
+    move_cursor $((ROW - 10)) $((COL -10))
+    echo "██╔══██╗██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║██╔════╝██╔══██╗"
+    move_cursor $((ROW - 9)) $((COL -10))
+    echo "██████╔╝██████╔╝██║   ██║   ██║   ███████║█████╗  ██████╔╝"
+    move_cursor $((ROW - 8)) $((COL -10))
+    echo "██╔══██╗██╔══██╗██║   ██║   ██║   ██╔══██║██╔══╝  ██╔══██╗"
+    move_cursor $((ROW - 7)) $((COL -10))
+    echo "██████═╝██║  ██║╚██████╔╝   ██║   ██║  ██║███████╗██║  ██║"
+    move_cursor $((ROW - 6)) $((COL -10))
+    echo "╚═╝     ╚═╝  ╚═╝ ╚═════╝    ╚═╝   ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝"
+    move_cursor $((ROW - 5)) $((COL -10))
+    echo ""
+}
+
+
+show_menu() {
+    clear_screen
+    print_banner
+    move_cursor $((ROW - 1)) $COL
+    echo "$(tput setaf 3)Website Accessibility Checker"
+    move_cursor $((ROW + 1)) $((COL + 3))
+
+    echo "$(tput setaf 6)1. Add Website"
+    move_cursor $((ROW + 2)) $((COL + 3))
+
+    echo "$(tput setaf 6)2. Remove Website"
+    move_cursor $((ROW + 3)) $((COL + 3))
+
+    echo "$(tput setaf 6)3. Check Website Status"
+    move_cursor $((ROW + 4)) $((COL + 3))
+
+    echo "$(tput setaf 6)4. Edit Website "
+    move_cursor $((ROW + 5)) $((COL + 3))
+
+
+    echo "$(tput setaf 6)5. Exit"
+    move_cursor $((ROW + 7)) $((COL + 3))
+
+    echo "$(tput setaf 6)Enter your choice: "
+    read -r choice
+}
+check_site(){
+  website=$1
+  if [[ "${website:0:4}" != "http" ]]; then
+          website="https://$website"
+  fi
+
+  if [[ "${website:0:7}" == "http://" ]]; then
+    website=$(sed 's#/.*##' <<< "${website:7}")
+    website="http://$website"
+  fi
+
+  if [[ "${website:0:8}" == "https://" ]]; then
+    website=$(sed 's#/.*##' <<< "${website:8}")
+    website="https://$website"
+  fi
+
+  if [[ $(sed -n "/[^a-zA-Z0-9./:-]/p; /[[:space:]]/p; /^[^a-zA-Z0-9]/p; /[^a-zA-Z0-9]$/p" <<< "$website") != "" ]]; then
+    return 1
+  fi
+  return 0
+
+}
+
+add_website() {
+    clear_screen
+    print_banner
+    move_cursor $((ROW - 2)) $COL
+    echo "$(tput setaf 6)Enter the website URL to add:"
+    move_cursor $((ROW)) $COL
+    read -r website
+    if ! check_site "$website"; then
+      move_cursor $((ROW + 3)) $COL
+      echo "$(tput setaf 3)Incorrect domain name."
+      sleep 2
+    fi
+
+
+
+    isthere=false
+    if grep -Fxq "$website" "$WEBSITE_FILE"; then
+      isthere=true
+      else
+        isthere=false
+    fi
+    if [[ "$isthere" != "true" ]]; then
+        move_cursor $((ROW + 2)) $COL
+        if [[ $(curl -s -o /dev/null -w "%{http_code}" -L "$website") -eq 200 ]]; then
+          echo "$(tput setaf 2)$website added to the list successfully!"
+          echo "$website" >> "$WEBSITE_FILE"
+        else
+          echo "$(tput setaf 3)Website is not reachable!"
+        fi
+
+
+    else
+        move_cursor $((ROW + 2)) $COL
+        echo "$(tput setaf 3)Website already exists!"
+    fi
+
+    move_cursor $((ROW + 3)) $COL
+    echo "$(tput setaf 5)Press Enter to continue..."
+    read -r
+}
+
+
+
+display_websites() {
+    clear_screen
+    print_banner
+    move_cursor $((ROW - 3)) $((COL+5))
+    if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      return
+    fi
+
+    echo "$(tput setaf 3)Websites in the track list:"
+    move_cursor $((ROW - 2)) $((COL))
+    echo "$(tput setaf 3)==================================="
+    echo "$(tput setaf 6)"
+    index=1
+    while IFS= read -r val; do
+      move_cursor $((ROW + index)) $((COL))
+      echo "$index.   $val"
+      index=$((index+1))
+    done<$WEBSITE_FILE
+}
+edit_site(){
+    display_websites
+    total_lines=$(wc -l < "$WEBSITE_FILE")
+    move_cursor $((ROW + total_lines + 3)) $((COL-7))
+    if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      move_cursor $((ROW)) $((COL))
+      echo "$(tput setaf 3)Add some website first to edit them"
+      sleep 2
+      return
+    fi
+    echo "$(tput setaf 6)Enter the number of the website to edit it (or 0 to cancel): "
+    move_cursor $((ROW + total_lines + 4)) $((COL - 7))
+    move_cursor $((ROW + total_lines + 5)) $((COL - 7))
+    read -r choice
+    if [[ "$choice" -eq 0 ]]; then
+      return
+
+    elif [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$((total_lines+1))" ]]; then
+      move_cursor $((ROW + total_lines + 7)) $((COL-7))
+        tput setaf 4
+        echo "Editing"
+        tput setaf 2
+        tput setaf 5
+        move_cursor $((ROW + total_lines + 8)) $((COL-7))
+
+        sed -n "${choice}p" "$WEBSITE_FILE"
+        move_cursor $((ROW + total_lines + 9)) $((COL-7))
+
+        read -r website_edit
+        if [[ "${website_edit:0:7}" == "http://" ]]; then
+            website_edit=$(sed 's#/.*##' <<< "${website_edit:7}")
+            website_edit="http://$website_edit"
+        elif [[ "${website_edit:0:8}" == "https://" ]]; then
+          website_edit=$(sed 's#/.*##' <<< "${website_edit:8}")
+          website_edit="https://$website_edit"
+        else
+          website_edit=https://$(sed 's#/.*##' <<< "${website_edit}")
+        fi
+
+        if check_site "$website_edit" ;then
+          isthere="0"
+          if grep -Fxq "$website_edit" "$WEBSITE_FILE"; then
+            isthere="1"
+            else
+              isthere="0"
+          fi
+          if [[ "$isthere" == "1" ]]; then
+                    move_cursor $((ROW + total_lines + 11)) $COL
+                    echo "$(tput setaf 3)Website already exists!"
+                    sleep 2
+                    return
+          fi
+          sed_i "${choice}d" "$WEBSITE_FILE"
+          move_cursor $((ROW + total_lines + 10)) $COL
+          echo "$(tput setaf 2)Website edited successfully!"
+          echo "$website_edit">>$WEBSITE_FILE
+        else
+          move_cursor $((ROW + total_lines + 11)) $((COL-7))
+          echo "$(tput setaf 1)Website edit unsuccessfully! no changes made"
+          move_cursor $((ROW + total_lines + 12)) $((COL-7))
+        fi
+
+    else
+        move_cursor $((ROW + total_lines + 7)) $COL
+        echo "$(tput setaf 1) Invalid choice" 
+    fi
+    move_cursor $((ROW + total_lines + 13)) $COL
+    echo "$(tput setaf 4)Press Enter to continue..."
+    move_cursor $((ROW + total_lines + 11)) $COL
+    read -r
+}
+
+remove_website() {
+    display_websites
+    total_lines=$(wc -l < "$WEBSITE_FILE")
+    move_cursor $((ROW + total_lines + 3)) $((COL-7))
+    if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+      move_cursor $((ROW)) $((COL-4))
+      echo "$(tput setaf 3)Add some website first to remove them"
+      sleep 2
+      return
+    fi
+    echo "$(tput setaf 6)Enter the number of the website to remove (or 0 to cancel): "
+    move_cursor $((ROW + total_lines + 5)) $((COL-7))
+    read -r choice
+    if [[ "$choice" -eq 0 ]]; then
+      return
+    elif [[ "$choice" -gt 0 ]] && [[ "$choice" -lt "$((total_lines+1))" ]]; then
+        sed_i "${choice}d" "$WEBSITE_FILE"
+        move_cursor $((ROW + total_lines + 5)) $COL
+        echo "$(tput setaf 2)Website removed successfully!"
+    else
+        move_cursor $((ROW + total_lines + 7)) $COL
+        echo "$(tput setaf 1) Invalid choice" 
+    fi
+    move_cursor $((ROW + total_lines + 9)) $COL
+    echo "$(tput setaf 6)Press Enter to continue..."
+    move_cursor $((ROW + total_lines + 11)) $COL
+    read -r
+}
+
+check_status() {
+    clear_screen
+    print_banner
+ if [[ $(wc -l < "$WEBSITE_FILE") -eq 0 ]]; then
+   move_cursor $((ROW)) $((COL-4))
+      echo "$(tput setaf 3)Add some website first to check there status"
+      sleep 2
+      return
+    fi
+
+    move_cursor $((ROW - 3)) $((COL - 5))
+    echo "$(tput setaf 3)Checking website status..."
+    move_cursor $((ROW - 1)) $((COL - 5))
+    echo "$(tput setaf 6)Website                                   Status"
+    move_cursor $ROW $((COL - 5))
+    echo "$(tput setaf 6)--------------------------------------------------"
+    line_num=$((ROW + 1))
+
+    while IFS= read -r website; do
+        move_cursor $line_num $((COL - 5))
+        echo "$(tput setaf 6)${website:0:35}"
+       
+        status_code=$(curl -s -o /dev/null -w "%{http_code}" "$website")
+        if [[ "$status_code" == 200 || "$status_code" == 300 || "$status_code" == 301 || "$status_code" == 302 ]]; then
+            move_cursor $line_num $((COL + 35))
+            echo "$(tput setaf 2)Website is up"
+        else
+
+            move_cursor $line_num $((COL + 35))
+            echo "$(tput setaf 1)Not Accessible (status: $status_code)"
+        fi
+
+        line_num=$((line_num + 1))
+    done < "$WEBSITE_FILE"
+
+    move_cursor $((line_num + 2)) $COL
+    echo "$(tput setaf 6)Press Enter to continue..."
+    read -r
+}
+
+while true; do
+    show_menu
+    case "$choice" in
+        1) add_website ;;
+        2) remove_website ;;
+        3) check_status ;;
+        4) edit_site ;;
+        5) clear_screen; exit 0 ;;
+        *)
+            move_cursor $((ROW + 8)) $COL
+            echo "$(tput setaf 1)Invalid choice. Press Enter to continue..."
+            move_cursor $((ROW + 9)) $COL
+            read -r
+            ;;
+    esac
+done
+
