@@ -22,13 +22,6 @@ sed_i() {
         sed -i "$1" "$2"
     fi
 }
-sed_n() {
-    if [[ "$OS" == "Darwin" || "$OS" == "FreeBSD" ]]; then
-        sed -n '' "$1" "$2"
-    else
-        sed -n "$1" "$2"
-    fi
-}
 
 clear_screen() {
     tput clear
@@ -123,13 +116,11 @@ add_website() {
 
 
     isthere=false
-    while IFS= read -r var; do
-        if [[ "$var" == "$website" ]]; then
-            isthere=true
-            break
-        fi
-    done < "$WEBSITE_FILE"
-
+    if grep -Fxq "$website" "$WEBSITE_FILE"; then
+      isthere=true
+      else
+        isthere=false
+    fi
     if [[ "$isthere" != "true" ]]; then
         move_cursor $((ROW + 2)) $COL
         if [[ $(curl -s -o /dev/null -w "%{http_code}" -L "$website") -eq 200 ]]; then
@@ -212,14 +203,13 @@ edit_site(){
 
         if check_site "$website_edit" ;then
           isthere="0"
-          while IFS= read -r var; do
-            if [[ "$var" == "$website_edit" ]]; then
-                isthere="1"
-                break
-            fi
-          done < "$WEBSITE_FILE"
+          if grep -Fxq "$website_edit" "$WEBSITE_FILE"; then
+            isthere="1"
+            else
+              isthere="0"
+          fi
           if [[ "$isthere" == "1" ]]; then
-                    move_cursor $((ROW + 11)) $COL
+                    move_cursor $((ROW + total_lines + 11)) $COL
                     echo "$(tput setaf 3)Website already exists!"
                     sleep 2
                     return
@@ -227,7 +217,6 @@ edit_site(){
           sed_i "${choice}d" "$WEBSITE_FILE"
           move_cursor $((ROW + total_lines + 10)) $COL
           echo "$(tput setaf 2)Website edited successfully!"
-          sed_i "${choice}p" "$WEBSITE_FILE"
           echo "$website_edit">>$WEBSITE_FILE
         else
           move_cursor $((ROW + total_lines + 11)) $((COL-7))
