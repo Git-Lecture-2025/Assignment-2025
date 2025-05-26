@@ -1,20 +1,37 @@
 #!/bin/bash
 
-websites=("https://www.google.com")
+websites=()
+
+if [ -f websites.txt ]; then
+    mapfile -t websites < websites.txt
+fi
+
+saveSite() {
+    printf "%s\n" "${websites[@]}" > websites.txt
+}
 
 addSite()
 {
+    clear
     local c="y"
     while [ "$c" = "y" ]
     do
         read -p "Enter website URL to be tracked : " site_url
-        websites+=("$site_url")
-        read -p "Done! Do you want to add another site? (y/n)" c
+        curl -I -s "$site_url" > /dev/null
+        if ! [  -z "$(curl -L 2>/dev/null $site_url)" ]; then
+            websites+=("$site_url")
+            saveSite
+            echo "Added website successfully!"
+        else
+            echo "Invalid site detected. Please try again."
+        fi
+        read -p "Do you want to add another site? (y/n)" c
     done
 }
 
 removeSite()
 {
+    clear
     local d="y"
 
     while [ "$d" = "y" ]
@@ -46,6 +63,7 @@ removeSite()
 
         if [ "$f" = true ]; then
             websites=("${r_sites[@]}")
+            saveSite
             read -p "Done! Do you want to remove another site? (y/n): " d
         else
             echo "looks like you made a mistake"
@@ -57,7 +75,7 @@ removeSite()
 }
 
 editSite() {
-    echo ""
+    clear
     echo "Tracked websites :"
     for i in "${!websites[@]}"; do
         echo "$((i+1)) ${websites[$i]}"
@@ -68,8 +86,13 @@ editSite() {
 
     if [ "$id" -ge 0 ] && [ "$id" -lt "${#websites[@]}" ]; then
         read -p "Enter the new URL: " new_url
-        websites[$id]="$new_url"
-        echo "Website URL updated!"
+        if ! [  -z "$(curl -L 2>/dev/null $new_url)" ]; then
+            websites[$id]="$new_url"
+            saveSite
+            echo "Website URL updated!"
+        else
+            echo "Invalid site detected. Please try again."
+        fi
     else
         echo "Invalid index"
     fi
@@ -78,7 +101,7 @@ editSite() {
 
 checkSite()
 {
-    echo ""
+    clear
     for site in "${websites[@]}"
     do
     code=$(curl -s -L -o /dev/null -w "%{http_code}" "$site")
