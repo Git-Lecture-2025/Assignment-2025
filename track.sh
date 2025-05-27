@@ -1,5 +1,10 @@
 #!/bin/bash
 
+RED="\e[31m"
+GREEN="\e[32m"
+YELLOW="\e[33m"
+END="\e[0m"
+
 websites=()
 
 if [ -f websites.txt ]; then
@@ -21,11 +26,11 @@ addSite()
         if ! [  -z "$(curl -L 2>/dev/null $site_url)" ]; then
             websites+=("$site_url")
             saveSite
-            echo "Added website successfully!"
+            echo -e "${GREEN}Added website successfully!${END}"
         else
-            echo "Invalid site detected. Please try again."
+            echo -e "${RED}Invalid site detected. Please try again.${END}"
         fi
-        read -p "Do you want to add another site? (y/n)" c
+        read -p "Do you want to add another site? (y/n) : " c
     done
 }
 
@@ -39,7 +44,7 @@ removeSite()
         echo ""
         echo "Tracked websites :"
         for i in "${!websites[@]}"; do
-            echo "$((i+1)) ${websites[$i]}"
+            echo -e "${YELLOW} $((i+1)) ${websites[$i]} ${END}"
         done
 
         read -p "Enter website index to stop tracking : " id
@@ -57,7 +62,7 @@ removeSite()
                 fi
             done
         else
-            echo "Invalid index"
+            echo -e "${RED}Invalid index${END}"
             continue
         fi
 
@@ -66,7 +71,7 @@ removeSite()
             saveSite
             read -p "Done! Do you want to remove another site? (y/n): " d
         else
-            echo "looks like you made a mistake"
+            echo -e "${RED}looks like you made a mistake${END}"
             read -p "Do you want to remove another site? (y/n): " d
         fi
         
@@ -78,7 +83,7 @@ editSite() {
     clear
     echo "Tracked websites :"
     for i in "${!websites[@]}"; do
-        echo "$((i+1)) ${websites[$i]}"
+        echo -e "${YELLOW}$((i+1)) ${websites[$i]}${END}"
     done
 
     read -p "Enter the index to edit : " id
@@ -89,12 +94,12 @@ editSite() {
         if ! [  -z "$(curl -L 2>/dev/null $new_url)" ]; then
             websites[$id]="$new_url"
             saveSite
-            echo "Website URL updated!"
+            echo -e "${GREEN}Website URL updated!${END}"
         else
-            echo "Invalid site detected. Please try again."
+            echo -e "${RED}Invalid site detected. Please try again.${END}"
         fi
     else
-        echo "Invalid index"
+        echo -e "${RED}Invalid index${END}"
     fi
     echo ""
 }
