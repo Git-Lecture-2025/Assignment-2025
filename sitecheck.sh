@@ -16,7 +16,17 @@ touch "$WEBSITES_FILE"
 touch "$LOG_FILE"
 
 show_progress() {
-    echo -e "will do something here..."
+    # thanks saturn
+    local current=$1
+    local total=$2
+    local width=40
+    local percentage=$((current * 100 / total))
+    local completed=$((current * width / total))
+    
+    printf "\r${CYAN}[i] Progress: [${NC}"
+    for ((i=0; i<completed; i++)); do printf "${GREEN}█${NC}"; done
+    for ((i=completed; i<width; i++)); do printf "${WHITE}░${NC}"; done
+    printf "${CYAN}] ${percentage}%% (${current}/${total})${NC}"
 }
 
 show_banner() {
@@ -106,15 +116,12 @@ list() {
         read -p "Press Enter to continue..."
         return
     fi
-    
-    local no=1
-    while IFS= read -r website; do
-        echo -e "${CYAN}$no.${NC} $website"
-        ((no++))
-    done < "$WEBSITES_FILE"
 
-    return $((no-1))
+    awk -v cyan="$CYAN" -v nc="$NC" '{ printf "%s%d.%s %s\n", cyan, NR, nc, $0 }' "$WEBSITES_FILE"
+
+    return "$(wc -l < "$WEBSITES_FILE")"
 }
+
 
 ls_websites() {
     show_banner
@@ -260,6 +267,41 @@ check_status() {
 
 setup_cron() {
     show_banner
+    echo -e "${GREEN}[i] Setup Automated Monitoring${NC}"
+    echo -e "${WHITE}Choose interval:${NC}"
+    echo -e "${CYAN}1.${NC} Custom minutes interval"
+    echo -e "${CYAN}2.${NC} Remove automation"
+    echo -e "${CYAN}0.${NC} Cancel"
+    
+    echo -en "${BLUE}Choice: ${NC}"
+    read -r choice
+    
+    case "$choice" in
+        1)
+            echo -en "${BLUE}Enter minutes interval (1-59): ${NC}"
+            read -r minutes
+            if [[ "$minutes" =~ ^[0-9]+$ ]] && [[ "$minutes" -ge 1 ]] && [[ "$minutes" -le 59 ]]; then
+                :
+            fi
+            ;;
+        2)
+            (crontab -l 2>/dev/null | grep -v "$SCRIPT_PATH") | crontab -
+            echo -e "${GREEN}[i] Cronjbo removed${NC}"
+            read -p "Press Enter to continue..."
+            return
+            ;;
+        0) return ;;
+        *) 
+            echo -e "${RED}[!] Invalid choice!${NC}"
+            read -p "Press Enter to continue..."
+            return 
+            ;;
+    esac
+    
+    (crontab -l 2>/dev/null | grep -v "$SCRIPT_PATH"; echo "*/$minutes * * * * $SCRIPT_PATH >> $LOG_FILE 2>&1") | crontab -
+    
+    echo -e "${GREEN}[i] Automation setup complete!${NC}"
+    read -p "Press Enter to continue..."
 }
 
 view_logs() {
