@@ -112,6 +112,8 @@ list() {
         echo -e "${CYAN}$no.${NC} $website"
         ((no++))
     done < "$WEBSITES_FILE"
+
+    return $((no-1))
 }
 
 ls_websites() {
@@ -127,13 +129,14 @@ rm_website() {
     echo -e "${GREEN}[i] Remove Website${NC}"
     
     list
+    local count=$?
     
     echo -en "${BLUE}Enter number to remove (0 to cancel): ${NC}"
     read -r choice
     
     [[ "$choice" == "0" ]] && return
     
-    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 ]] || [[ "$choice" -gt $((count-1)) ]]; then
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 ]] || [[ "$choice" -gt $count ]]; then
         echo -e "${RED}[!] Invalid number!${NC}"
         read -p "Press Enter to continue..."
         return
@@ -150,13 +153,14 @@ edit_website() {
     echo -e "${GREEN}[i] Edit Website${NC}"
     
     list
+    local count=$?
     
     echo -en "${BLUE}Enter number to edit (0 to cancel): ${NC}"
     read -r choice
     
     [[ "$choice" == "0" ]] && return
     
-    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 ]] || [[ "$choice" -gt $((count-1)) ]]; then
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || [[ "$choice" -lt 1 ]] || [[ "$choice" -gt $count ]]; then
         echo -e "${RED}[!] Invalid number!${NC}"
         read -p "Press Enter to continue..."
         return
