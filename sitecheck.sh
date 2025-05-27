@@ -306,6 +306,15 @@ setup_cron() {
 
 view_logs() {
     show_banner
+    echo -e "${GREEN}[i] Monitoring Logs${NC}"
+    
+    if [[ ! -s "$LOG_FILE" ]]; then
+        echo -e "${RED}[!] No logs available!${NC}"
+        read -p "Press Enter to continue..."
+        return
+    fi
+    
+    less "$LOG_FILE"
 }
 
 main() {
