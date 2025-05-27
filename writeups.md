@@ -108,3 +108,14 @@ git commit --date "Sun May 25 00:49:23 1987 +0530" --amend
 ```
 <br>
 
+# (13) FIX-OLD-TYPO
+Used the following:
+`git rebase -i HEAD^^ `
+then change "pick" to edit 
+`git add file.txt`
+`git commit --amend -m "Add Hello world"`
+`git rebase --continue`
+then merge-conflict arises (edited text file to have ```Hello world
+Hello World is an excellent program.```in it)
+`git add file.txt`
+`git rebase --continue`
