@@ -180,11 +180,13 @@ Use stashing to save the current work to background followed by a bug fix in `bu
 $ git stash
 $ vim bug.txt # remove the buggy line
 $ git commit -am "fix bug in bug.txt"
-$ git stash pop
+$ git stash apply # can use git stash pop too 
 $ vim bug.txt # add the final text
 $ git commit -am "update bug.txt"
 $ git verify
 ```
+
+`git stash apply` and `git stash pop` can be both used for the exercise here, but there's an actuall different between the two. `git stash apply` will apply the stash, while preserving it in the stash list while `git stash pop` removes it, the former is helpful when the stash needs to be accessed again. The stash can be always removed from te stash list using `git stash drop`.
 
 ### Change branch history
 
