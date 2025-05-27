@@ -113,8 +113,7 @@ add_websites() {
 list() {
     if [[ ! -s "$WEBSITES_FILE" ]]; then
         echo -e "${RED}[!] No websites are being monitored!${NC}"
-        read -p "Press Enter to continue..."
-        return
+        return 0
     fi
 
     awk -v cyan="$CYAN" -v nc="$NC" '{ printf "%s%d.%s %s\n", cyan, NR, nc, $0 }' "$WEBSITES_FILE"
@@ -128,6 +127,7 @@ ls_websites() {
     echo -e "${GREEN}[i] Current Monitoring List${NC}"
     
     list
+    
     read -p "Press Enter to continue..."
 }
 
@@ -137,6 +137,11 @@ rm_website() {
     
     list
     local count=$?
+
+    if [[ "$count" == 0 ]]; then
+        read -p "Press Enter to continue..."
+        return
+    fi
     
     echo -en "${BLUE}Enter number to remove (0 to cancel): ${NC}"
     read -r choice
@@ -161,6 +166,11 @@ edit_website() {
     
     list
     local count=$?
+
+    if [[ "$count" == 0 ]]; then
+        read -p "Press Enter to continue..."
+        return
+    fi
     
     echo -en "${BLUE}Enter number to edit (0 to cancel): ${NC}"
     read -r choice
