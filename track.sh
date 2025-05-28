@@ -81,6 +81,13 @@ removeSite()
 
 editSite() {
     clear
+
+    if [ ${#websites[@]} -eq 0 ]; then
+        echo -e "${YELLOW}No websites are being tracked currently${END}"
+        echo ""
+        return
+    fi
+
     echo "Tracked websites :"
     for i in "${!websites[@]}"; do
         echo -e "${YELLOW}$((i+1)) ${websites[$i]}${END}"
