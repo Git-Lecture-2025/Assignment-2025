@@ -15,6 +15,10 @@ SCRIPT_PATH="$(realpath "$0")"
 touch "$WEBSITES_FILE"
 touch "$LOG_FILE"
 
+if [[ ! -n "$TERM" ]]; then
+    TERM=xterm
+fi
+
 show_progress() {
     # thanks saturn
     local current=$1
