@@ -15,8 +15,8 @@ SCRIPT_PATH="$(realpath "$0")"
 touch "$WEBSITES_FILE"
 touch "$LOG_FILE"
 
-if [[ ! -n "$TERM" ]]; then
-    TERM=xterm
+if [[ -z "$TERM" ]]; then
+    export TERM=xterm
 fi
 
 show_progress() {
@@ -243,6 +243,7 @@ check_status() {
     local down_count=0
     local error_count=0
     local temp_results=$(mktemp)
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
     echo -e "${WHITE}Checking $total website(s)...${NC}"
 
@@ -251,6 +252,22 @@ check_status() {
         show_progress $current $total
         local status=$(check_website "$website")
         echo "$website|$status" >> "$temp_results"
+        
+        local status_code="${status#*:}"
+        local status_type="${status%:*}"
+
+        case "$status_type" in
+            "UP")
+                echo "[$timestamp] $website - UP ($status_code)" >> "$LOG_FILE"
+                ;;
+            "DOWN")
+                echo "[$timestamp] $website - DOWN ($status_code)" >> "$LOG_FILE"
+                ;;
+            "ERROR")
+                echo "[$timestamp] $website - ERROR (Connection Failed)" >> "$LOG_FILE"
+                ;;
+        esac
+        
         sleep 0.1
     done < "$WEBSITES_FILE"
 
@@ -282,11 +299,34 @@ check_status() {
     echo "======================================================================"
     echo -e "${GREEN}UP: $up_count${NC} | ${RED}DOWN: $down_count${NC} | ${YELLOW}ERRORS: $error_count${NC} | Total: $total"
 
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
-    echo "[$timestamp] UP: $up_count, DOWN: $down_count, ERRORS: $error_count, Total: $total" >> "$LOG_FILE"
-
     rm "$temp_results"
     read -p "Press Enter to continue..."
+}
+
+cron_check() {
+    if [[ ! -s "$WEBSITES_FILE" ]]; then
+        touch "$WEBSITES_FILE"
+    fi
+
+    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+
+    while IFS= read -r website; do
+        local status=$(check_website "$website")
+        local status_code="${status#*:}"
+        local status_type="${status%:*}"
+
+        case "$status_type" in
+            "UP")
+                echo "[$timestamp] $website - UP ($status_code)" >> "$LOG_FILE" 2>/dev/null
+                ;;
+            "DOWN")
+                echo "[$timestamp] $website - DOWN ($status_code)" >> "$LOG_FILE" 2>/dev/null
+                ;;
+            "ERROR")
+                echo "[$timestamp] $website - ERROR (Connection Failed)" >> "$LOG_FILE" 2>/dev/null
+                ;;
+        esac
+    done < "$WEBSITES_FILE"
 }
 
 setup_cron() {
@@ -322,7 +362,7 @@ setup_cron() {
             ;;
     esac
 
-    (crontab -l 2>/dev/null | grep -v "$SCRIPT_PATH"; echo "*/$minutes * * * * $SCRIPT_PATH >> $LOG_FILE 2>&1") | crontab -
+    (crontab -l 2>/dev/null | grep -v "$SCRIPT_PATH"; echo "*/$minutes * * * * $SCRIPT_PATH cron") | crontab -
 
     echo -e "${GREEN}[i] Automation setup complete!${NC}"
     read -p "Press Enter to continue..."
@@ -343,6 +383,11 @@ view_logs() {
 
 main() {
 
+    if [[ "$1" == "cron" ]]; then
+        cron_check
+        exit 0
+    fi
+
     while true; do
         show_menu
         read -r choice
@@ -361,4 +406,4 @@ main() {
     done
 }
 
-main
+main "$@"
